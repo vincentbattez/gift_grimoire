@@ -3,7 +3,7 @@ import { useStore } from "../store";
 import { ENIGMAS } from "../config";
 import { sndOk, sndBad, sndClick } from "../audio";
 import { fireEvent } from "../ha";
-import { spawnParticles } from "./Starfield";
+import { spawnFirework } from "./Starfield";
 
 function normalize(s: string): string {
   return s
@@ -110,7 +110,7 @@ export function SpellModal() {
       const el = document.querySelector(`[data-card-id="${modalId}"]`);
       if (el) {
         const r = el.getBoundingClientRect();
-        spawnParticles(r.left + r.width / 2, r.top + r.height / 2, 35, "#4ecca3");
+        spawnFirework(r.left + r.width / 2, r.top + r.height / 2);
       }
 
       setTimeout(() => {
