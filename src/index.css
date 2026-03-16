@@ -1,0 +1,92 @@
+@import "tailwindcss";
+
+@theme {
+  --color-bg: #07060f;
+  --color-card-bg: #110e22;
+  --color-locked-border: #221a35;
+  --color-unlocked-border: #7b5ea7;
+  --color-solved-border: #4ecca3;
+  --color-gold: #e8c96a;
+  --color-text: #d4c5a9;
+  --color-muted: #5a4f6a;
+  --color-accent: #9b6dff;
+  --color-success: #4ecca3;
+  --color-danger: #ff6b8a;
+  --font-cinzel: "Cinzel", Georgia, serif;
+  --font-cinzel-decorative: "Cinzel Decorative", "Cinzel", serif;
+}
+
+* {
+  -webkit-tap-highlight-color: transparent;
+}
+
+html,
+body {
+  min-height: 100vh;
+  overflow-x: hidden;
+  background: var(--color-bg);
+  color: var(--color-text);
+  font-family: var(--font-cinzel);
+}
+
+@keyframes bob {
+  0%,
+  100% {
+    transform: translateY(0) rotate(-3deg);
+  }
+  50% {
+    transform: translateY(-10px) rotate(3deg);
+  }
+}
+
+@keyframes unlock-flash {
+  0% {
+    transform: scale(1);
+    filter: brightness(1);
+  }
+  25% {
+    transform: scale(1.1);
+    filter: brightness(3) saturate(2);
+  }
+  50% {
+    transform: scale(0.97);
+    filter: brightness(1.8);
+  }
+  75% {
+    transform: scale(1.05);
+    filter: brightness(2.2);
+  }
+  100% {
+    transform: scale(1);
+    filter: brightness(1);
+  }
+}
+
+@keyframes shake {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  20% {
+    transform: translateX(-9px);
+  }
+  40% {
+    transform: translateX(9px);
+  }
+  60% {
+    transform: translateX(-6px);
+  }
+  80% {
+    transform: translateX(6px);
+  }
+}
+
+@keyframes solved-glow {
+  0%,
+  100% {
+    box-shadow: 0 0 22px #4ecca340;
+  }
+  50% {
+    box-shadow: 0 0 45px #4ecca370, 0 0 90px #4ecca325;
+  }
+}
