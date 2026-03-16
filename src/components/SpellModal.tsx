@@ -24,10 +24,69 @@ export function SpellModal() {
   const [feedbackMsg, setFeedbackMsg] = useState("");
   const [shaking, setShaking] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
+  const sheetRef = useRef<HTMLDivElement>(null);
+  const dragState = useRef<{
+    startY: number;
+    startTime: number;
+    currentY: number;
+  } | null>(null);
+  const [dragOffset, setDragOffset] = useState(0);
+  const [isDragging, setIsDragging] = useState(false);
 
   const enigma = modalId ? ENIGMAS.find((e) => e.id === modalId) : null;
   const isOpen = !!enigma;
   const isSolved = state?.solved ?? false;
+
+  function onDragStart(clientY: number) {
+    dragState.current = { startY: clientY, startTime: Date.now(), currentY: clientY };
+    setIsDragging(true);
+  }
+
+  function onDragMove(clientY: number) {
+    if (!dragState.current) return;
+    dragState.current.currentY = clientY;
+    const dy = Math.max(0, clientY - dragState.current.startY);
+    setDragOffset(dy);
+  }
+
+  function onDragEnd() {
+    if (!dragState.current) return;
+    const dy = dragState.current.currentY - dragState.current.startY;
+    const dt = Date.now() - dragState.current.startTime;
+    const velocity = dy / Math.max(dt, 1);
+
+    dragState.current = null;
+    setIsDragging(false);
+
+    // Fast swipe (velocity > 0.5px/ms) or dragged more than 40% of sheet height
+    const sheetH = sheetRef.current?.offsetHeight ?? 400;
+    if (velocity > 0.5 || dy > sheetH * 0.4) {
+      sndClick();
+      closeModal();
+    }
+    setDragOffset(0);
+  }
+
+  function handleTouchStart(e: React.TouchEvent) {
+    onDragStart(e.touches[0].clientY);
+  }
+  function handleTouchMove(e: React.TouchEvent) {
+    onDragMove(e.touches[0].clientY);
+  }
+  function handleTouchEnd() {
+    onDragEnd();
+  }
+  function handleMouseDown(e: React.MouseEvent) {
+    onDragStart(e.clientY);
+    const onMove = (ev: MouseEvent) => onDragMove(ev.clientY);
+    const onUp = () => {
+      onDragEnd();
+      window.removeEventListener("mousemove", onMove);
+      window.removeEventListener("mouseup", onUp);
+    };
+    window.addEventListener("mousemove", onMove);
+    window.addEventListener("mouseup", onUp);
+  }
 
   useEffect(() => {
     if (isOpen) {
@@ -98,21 +157,34 @@ export function SpellModal() {
       onClick={handleOverlayClick}
     >
       <div
-        className={`w-full max-w-[430px] mx-auto rounded-t-3xl border border-[#3a2a5a] border-b-0 px-[22px] pt-7 pb-11 relative overflow-hidden transition-transform duration-400 ${
-          isOpen ? "translate-y-0" : "translate-y-full"
-        } ${shaking ? "animate-[shake_0.42s_ease]" : ""}`}
+        ref={sheetRef}
+        className={`w-full max-w-[430px] mx-auto rounded-t-3xl border border-[#3a2a5a] border-b-0 px-[22px] pt-7 pb-11 relative overflow-hidden ${
+          isDragging ? "" : "transition-transform duration-400"
+        } ${isOpen && !isDragging ? "translate-y-0" : !isOpen ? "translate-y-full" : ""} ${shaking ? "animate-[shake_0.42s_ease]" : ""}`}
         style={{
           background: "linear-gradient(180deg, #1c1438, #100d20)",
-          transitionTimingFunction: "cubic-bezier(.34,1.56,.64,1)",
+          ...(!isDragging && { transitionTimingFunction: "cubic-bezier(.34,1.56,.64,1)" }),
+          ...(isDragging && { transform: `translateY(${dragOffset}px)` }),
         }}
       >
         {/* Drag handle */}
-        <div className="absolute top-2.5 left-1/2 -translate-x-1/2 w-[38px] h-[3.5px] bg-[#3a2a5a] rounded-sm" />
+        <div
+          className="absolute top-0 left-0 right-0 h-10 cursor-grab active:cursor-grabbing touch-none flex items-start justify-center pt-2.5"
+          onTouchStart={handleTouchStart}
+          onTouchMove={handleTouchMove}
+          onTouchEnd={handleTouchEnd}
+          onMouseDown={handleMouseDown}
+          role="button"
+          tabIndex={0}
+          aria-label="Faire glisser pour fermer"
+        >
+          <div className="w-[38px] h-[3.5px] bg-[#3a2a5a] rounded-sm" />
+        </div>
 
         {/* Close button */}
         <button
           onClick={() => { sndClick(); closeModal(); }}
-          className="absolute top-[18px] right-4 w-[30px] h-[30px] bg-white/4 border border-[#3a2a5a] rounded-full flex items-center justify-center cursor-pointer text-muted text-[0.8rem]"
+          className="absolute top-[18px] right-4 w-[30px] h-[30px] bg-white/4 border border-[#3a2a5a] rounded-full flex items-center justify-center cursor-pointer text-muted text-[0.8rem] z-10"
         >
           ✕
         </button>
