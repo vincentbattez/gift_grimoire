@@ -7,6 +7,8 @@ import { spawnParticles } from "./Starfield";
 export function SpellCard({ enigma }: { enigma: Enigma }) {
   const state = useStore((s) => s.enigmas[enigma.id]);
   const openModal = useStore((s) => s.openModal);
+  const acknowledgeUnlock = useStore((s) => s.acknowledgeUnlock);
+  const isNew = useStore((s) => s.newlyUnlocked.has(enigma.id));
   const ref = useRef<HTMLDivElement>(null);
 
   const isLocked = !state.unlocked && !state.solved;
@@ -14,6 +16,7 @@ export function SpellCard({ enigma }: { enigma: Enigma }) {
 
   function handleClick() {
     if (isLocked) return;
+    if (isNew) acknowledgeUnlock(enigma.id);
     sndClick();
     openModal(enigma.id);
   }
@@ -24,7 +27,7 @@ export function SpellCard({ enigma }: { enigma: Enigma }) {
   const stateClass = isSolved
     ? "border-solved-border shadow-[0_0_22px_#4ecca340,inset_0_0_16px_#4ecca310] cursor-pointer"
     : state.unlocked
-      ? "border-unlocked-border shadow-[0_0_22px_#7b5ea728,inset_0_0_16px_#7b5ea70c] cursor-pointer active:scale-[0.94]"
+      ? "border-unlocked-border cursor-pointer active:scale-[0.94]"
       : "border-locked-border grayscale brightness-[0.35]";
 
   return (
@@ -33,6 +36,11 @@ export function SpellCard({ enigma }: { enigma: Enigma }) {
       className={`${base} ${stateClass}`}
       style={{
         background: "linear-gradient(155deg, #130f26, #0b0917)",
+        ...(isNew && {
+          background: "linear-gradient(155deg, rgb(11 9 23), rgb(42 28 122))",
+          animation: "newly-unlocked-pulse 2s ease-in-out infinite",
+          borderColor: "var(--color-accent)",
+        }),
       }}
       onClick={handleClick}
     >
@@ -91,16 +99,26 @@ export function triggerUnlockEffect(id: number, enigmaTitle: string) {
   if (store.enigmas[id]?.unlocked || store.enigmas[id]?.solved) return;
 
   store.unlock(id);
-  sndUnlock();
   store.showToast(`✦ « ${enigmaTitle} » déverrouillé !`);
+  sndUnlock();
 
   setTimeout(() => {
     const el = document.querySelector(`[data-card-id="${id}"]`);
     if (el) {
-      el.classList.add("animate-unlock");
-      el.addEventListener("animationend", () => el.classList.remove("animate-unlock"), { once: true });
+      // Auto-scroll vers la carte déverrouillée
+      el.scrollIntoView({ behavior: "smooth", block: "center" });
+
+      // Animation d'apparition (unlock-flash)
+      const card = el.firstElementChild as HTMLElement | null;
+      if (card) {
+        card.style.animation = "unlock-flash 0.7s ease-out";
+        card.addEventListener("animationend", () => {
+          card.style.animation = "";
+        }, { once: true });
+      }
+
       const r = el.getBoundingClientRect();
       spawnParticles(r.left + r.width / 2, r.top + r.height / 2, 28, "#9b6dff");
     }
-  }, 150);
+  }, 300);
 }

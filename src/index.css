@@ -90,3 +90,13 @@ body {
     box-shadow: 0 0 45px #4ecca370, 0 0 90px #4ecca325;
   }
 }
+
+@keyframes newly-unlocked-pulse {
+  0%,
+  100% {
+    box-shadow: 0 0 18px #9b6dff30, inset 0 0 12px #9b6dff08;
+  }
+  50% {
+    box-shadow: 0 0 38px #9b6dff60, 0 0 70px #9b6dff20, inset 0 0 20px #9b6dff15;
+  }
+}

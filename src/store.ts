@@ -8,9 +8,11 @@ type GrimoireStore = {
   enigmas: Record<number, EnigmaState>;
   toastMessage: string | null;
   modalEnigmaId: number | null;
+  newlyUnlocked: Set<number>;
 
   unlock: (id: number) => void;
   solve: (id: number) => void;
+  acknowledgeUnlock: (id: number) => void;
   openModal: (id: number) => void;
   closeModal: () => void;
   showToast: (msg: string) => void;
@@ -28,15 +30,19 @@ export const useStore = create<GrimoireStore>()(
       enigmas: initialEnigmas,
       toastMessage: null,
       modalEnigmaId: null,
+      newlyUnlocked: new Set(),
 
       unlock: (id) =>
         set((s) => {
           if (s.enigmas[id]?.unlocked || s.enigmas[id]?.solved) return s;
+          const next = new Set(s.newlyUnlocked);
+          next.add(id);
           return {
             enigmas: {
               ...s.enigmas,
               [id]: { ...s.enigmas[id], unlocked: true },
             },
+            newlyUnlocked: next,
           };
         }),
 
@@ -47,6 +53,13 @@ export const useStore = create<GrimoireStore>()(
             [id]: { ...s.enigmas[id], solved: true },
           },
         })),
+
+      acknowledgeUnlock: (id) =>
+        set((s) => {
+          const next = new Set(s.newlyUnlocked);
+          next.delete(id);
+          return { newlyUnlocked: next };
+        }),
 
       openModal: (id) => set({ modalEnigmaId: id }),
       closeModal: () => set({ modalEnigmaId: null }),
