@@ -8,8 +8,20 @@ import { EnigmaModal } from "./components/EnigmaModal";
 import { Toast } from "./components/Toast";
 import { triggerUnlockEffect } from "./unlock";
 import { initAdmin, useAdmin } from "./useAdmin";
+import { fireEvent } from "./ha";
 
 initAdmin();
+
+function initGrimoireInit() {
+  const params = new URLSearchParams(location.search);
+  if (params.get("init") !== "true") return;
+  params.delete("init");
+  const qs = params.toString();
+  history.replaceState({}, "", location.pathname + (qs ? `?${qs}` : ""));
+  fireEvent("gift_grimoire-init");
+}
+
+initGrimoireInit();
 
 function useQRUnlock() {
   useEffect(() => {
