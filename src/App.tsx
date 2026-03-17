@@ -7,6 +7,9 @@ import { EnigmaGrid } from "./components/EnigmaGrid";
 import { EnigmaModal } from "./components/EnigmaModal";
 import { Toast } from "./components/Toast";
 import { triggerUnlockEffect } from "./components/EnigmaCard";
+import { initAdmin, useAdmin } from "./useAdmin";
+
+initAdmin();
 
 function useQRUnlock() {
   useEffect(() => {
@@ -64,13 +67,14 @@ function AttemptBadge() {
 export default function App() {
   useQRUnlock();
   const resetAttempt = useStore((s) => s.resetAttempt);
+  const isAdmin = useAdmin();
 
   return (
     <>
       <Starfield />
       <div className="relative z-1 max-w-[430px] mx-auto px-4 pb-12">
         <Header />
-        <EnigmaGrid />
+        <EnigmaGrid isAdmin={isAdmin} />
         <button
           onClick={resetAttempt}
           className="w-full mt-20 py-2 text-[0.5rem] text-muted/20 bg-transparent border-none cursor-default select-none"

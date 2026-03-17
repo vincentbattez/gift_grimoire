@@ -4,7 +4,7 @@ import { useStore } from "../store";
 import { sndClick, sndUnlock } from "../audio";
 import { spawnParticles } from "./Starfield";
 
-export function EnigmaCard({ enigma }: { enigma: Enigma }) {
+export function EnigmaCard({ enigma, isAdmin }: { enigma: Enigma; isAdmin: boolean }) {
   const state = useStore((s) => s.enigmas[enigma.id]);
   const openModal = useStore((s) => s.openModal);
   const acknowledgeUnlock = useStore((s) => s.acknowledgeUnlock);
@@ -19,6 +19,11 @@ export function EnigmaCard({ enigma }: { enigma: Enigma }) {
     if (isNew) acknowledgeUnlock(enigma.id);
     sndClick();
     openModal(enigma.id);
+  }
+
+  function handleAdminUnlock(e: React.MouseEvent) {
+    e.stopPropagation();
+    triggerUnlockEffect(enigma.id, enigma.title);
   }
 
   const base =
@@ -84,6 +89,16 @@ export function EnigmaCard({ enigma }: { enigma: Enigma }) {
             {enigma.title}
           </div>
         </>
+      )}
+
+      {/* Admin unlock button */}
+      {isAdmin && isLocked && (
+        <button
+          onClick={handleAdminUnlock}
+          className="absolute bottom-2 z-10 px-2 py-0.5 text-[0.55rem] rounded-full bg-accent/20 border border-accent/40 text-accent hover:bg-accent/30 transition-colors"
+        >
+          unlock
+        </button>
       )}
 
       {/* Rune */}

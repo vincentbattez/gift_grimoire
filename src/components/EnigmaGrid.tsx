@@ -1,7 +1,7 @@
 import { ENIGMAS } from "../config";
 import { EnigmaCard } from "./EnigmaCard";
 
-export function EnigmaGrid() {
+export function EnigmaGrid({ isAdmin }: { isAdmin: boolean }) {
   return (
     <>
       <div className="text-center text-[0.6rem] tracking-[0.35em] text-muted my-4 uppercase">
@@ -10,7 +10,7 @@ export function EnigmaGrid() {
       <div className="grid grid-cols-2 gap-3">
         {ENIGMAS.map((e) => (
           <div key={e.id} data-card-id={e.id}>
-            <EnigmaCard enigma={e} />
+            <EnigmaCard enigma={e} isAdmin={isAdmin} />
           </div>
         ))}
       </div>
