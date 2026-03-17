@@ -1,7 +1,8 @@
-import { HA_URL, HA_TOKEN } from "./config";
+import { env } from "./env";
 
 export async function fireEvent(event: string) {
   try {
+    const { HA_URL, HA_TOKEN } = env;
     const r = await fetch(`${HA_URL}/api/events/${event}`, {
       method: "POST",
       headers: {

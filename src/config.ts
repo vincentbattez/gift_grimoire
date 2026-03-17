@@ -69,5 +69,3 @@ export const ENIGMAS: Enigma[] = z.array(enigmaSchema).parse([
   },
 ]);
 
-export const HA_URL = "https://YOUR_HOME_ASSISTANT_URL";
-export const HA_TOKEN = "YOUR_LONG_LIVED_ACCESS_TOKEN";
