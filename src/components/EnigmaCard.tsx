@@ -3,6 +3,7 @@ import type { Enigma } from "../config";
 import { useStore } from "../store";
 import { sndClick, sndVictory } from "../audio";
 import { spawnCelebration } from "../particles";
+import { CELEBRATION_SCROLL_SETTLE_MS, CELEBRATION_DURATION_MS } from "../timings";
 
 export function EnigmaCard({ enigma }: { enigma: Enigma }) {
   const state = useStore((s) => s.enigmas[enigma.id]);
@@ -46,8 +47,8 @@ export function EnigmaCard({ enigma }: { enigma: Enigma }) {
       spawnCelebration(r.left + r.width / 2, r.top + r.height / 2);
 
       // Nettoyage après la célébration
-      clearTimer = setTimeout(() => clearCelebrate(), 1200);
-    }, 400);
+      clearTimer = setTimeout(() => clearCelebrate(), CELEBRATION_DURATION_MS);
+    }, CELEBRATION_SCROLL_SETTLE_MS);
 
     return () => {
       clearTimeout(timer);

@@ -1,6 +1,7 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 import { ENIGMAS } from "./config";
+import { MODAL_CLOSE_MS } from "./timings";
 
 type EnigmaId = string;
 type EnigmaState = { unlocked: boolean; solved: boolean };
@@ -79,7 +80,7 @@ export const useStore = create<GrimoireStore>()(
       closeModal: () => {
         const closingId = get().modalEnigmaId;
         set({ modalEnigmaId: null, modalClosingId: closingId });
-        setTimeout(() => set({ modalClosingId: null }), 400);
+        setTimeout(() => set({ modalClosingId: null }), MODAL_CLOSE_MS);
       },
       showToast: (msg) => set({ toastMessage: msg }),
       hideToast: () => set({ toastMessage: null }),

@@ -3,6 +3,7 @@ import { useStore, isAttemptUsedToday, msUntilMidnight } from "../store";
 import { ENIGMAS, type Enigma } from "../config";
 import { sndOk, sndBad, sndClick } from "../audio";
 import { fireEvent } from "../ha";
+import { SOLVE_FEEDBACK_MS, INPUT_FOCUS_DELAY_MS, ERROR_FEEDBACK_MS } from "../timings";
 
 function normalize(s: string): string {
   return s
@@ -58,7 +59,7 @@ function ModalBody({
 
   useEffect(() => {
     if (!isSolved) {
-      const timer = setTimeout(() => inputRef.current?.focus(), 1000);
+      const timer = setTimeout(() => inputRef.current?.focus(), INPUT_FOCUS_DELAY_MS);
       return () => clearTimeout(timer);
     }
   }, [isSolved]);
@@ -128,7 +129,7 @@ function ModalBody({
       setTimeout(() => {
         closeModal();
         celebrate(enigma.id);
-      }, 1300);
+      }, SOLVE_FEEDBACK_MS);
     } else {
       setFeedback("err");
       setFeedbackMsg("Ce n'est pas la bonne réponse…");
@@ -139,7 +140,7 @@ function ModalBody({
         setFeedback(null);
         setFeedbackMsg("");
         setShaking(false);
-      }, 2200);
+      }, ERROR_FEEDBACK_MS);
     }
   }
 
