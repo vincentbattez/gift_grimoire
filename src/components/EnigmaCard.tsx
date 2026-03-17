@@ -4,11 +4,13 @@ import { useStore } from "../store";
 import { sndClick, sndVictory } from "../audio";
 import { spawnCelebration } from "../particles";
 import { CELEBRATION_SCROLL_SETTLE_MS, CELEBRATION_DURATION_MS } from "../timings";
+import { triggerUnlockEffect } from "../unlock";
 
 export function EnigmaCard({ enigma, isAdmin }: { enigma: Enigma; isAdmin: boolean }) {
   const state = useStore((s) => s.enigmas[enigma.id]);
   const openModal = useStore((s) => s.openModal);
   const acknowledgeUnlock = useStore((s) => s.acknowledgeUnlock);
+  const relock = useStore((s) => s.relock);
   const isCelebrating = useStore((s) => s.celebrateCardId === enigma.id);
   const clearCelebrate = useStore((s) => s.clearCelebrate);
   const isNew = useStore((s) => s.newlyUnlocked.has(enigma.id));
@@ -66,6 +68,11 @@ export function EnigmaCard({ enigma, isAdmin }: { enigma: Enigma; isAdmin: boole
   function handleAdminUnlock(e: React.MouseEvent) {
     e.stopPropagation();
     triggerUnlockEffect(enigma.id, enigma.title);
+  }
+
+  function handleAdminRelock(e: React.MouseEvent) {
+    e.stopPropagation();
+    relock(enigma.id);
   }
 
   const base =
@@ -133,13 +140,21 @@ export function EnigmaCard({ enigma, isAdmin }: { enigma: Enigma; isAdmin: boole
         </>
       )}
 
-      {/* Admin unlock button */}
+      {/* Admin buttons */}
       {isAdmin && isLocked && (
         <button
           onClick={handleAdminUnlock}
           className="absolute bottom-2 z-10 px-2 py-0.5 text-[0.55rem] rounded-full bg-accent/20 border border-accent/40 text-accent hover:bg-accent/30 transition-colors"
         >
           unlock
+        </button>
+      )}
+      {isAdmin && !isLocked && (
+        <button
+          onClick={handleAdminRelock}
+          className="absolute bottom-2 z-10 px-2 py-0.5 text-[0.55rem] rounded-full bg-danger/20 border border-danger/40 text-danger hover:bg-danger/30 transition-colors"
+        >
+          relock
         </button>
       )}
 

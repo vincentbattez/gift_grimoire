@@ -17,6 +17,7 @@ type GrimoireStore = {
 
   unlock: (id: EnigmaId) => void;
   solve: (id: EnigmaId) => void;
+  relock: (id: EnigmaId) => void;
   recordAttempt: () => void;
   resetAttempt: () => void;
   acknowledgeUnlock: (id: EnigmaId) => void;
@@ -65,6 +66,19 @@ export const useStore = create<GrimoireStore>()(
             [id]: { ...s.enigmas[id], solved: true },
           },
         })),
+
+      relock: (id) =>
+        set((s) => {
+          const next = new Set(s.newlyUnlocked);
+          next.delete(id);
+          return {
+            enigmas: {
+              ...s.enigmas,
+              [id]: { unlocked: false, solved: false },
+            },
+            newlyUnlocked: next,
+          };
+        }),
 
       recordAttempt: () => set({ lastAttempt: Date.now() }),
       resetAttempt: () => set({ lastAttempt: null }),
