@@ -94,7 +94,7 @@ export function EnigmaModal() {
       setValue("");
       setFeedback(isSolved ? "ok" : null);
       setFeedbackMsg(isSolved ? "✦ Énigme déjà résolue !" : "");
-      if (!isSolved) setTimeout(() => inputRef.current?.focus(), 420);
+      if (!isSolved) setTimeout(() => inputRef.current?.focus(), 1000);
     }
   }, [isOpen, modalId, isSolved]);
 
@@ -202,27 +202,30 @@ export function EnigmaModal() {
               {enigma.question}
             </p>
 
-            <input
-              ref={inputRef}
-              type="text"
-              placeholder="Votre réponse…"
-              autoComplete="off"
-              autoCorrect="off"
-              spellCheck={false}
-              disabled={isSolved}
-              value={value}
-              onChange={(e) => setValue(e.target.value)}
-              onKeyDown={(e) => e.key === "Enter" && submit()}
-              className={`w-full bg-[#0d0a1a] border-[1.5px] rounded-[14px] py-3.5 px-4 text-base text-text font-[var(--font-cinzel)] text-center outline-none transition-all duration-300 tracking-[0.1em] ${inputBorder}`}
-            />
+            {!isSolved && (
+              <input
+                ref={inputRef}
+                type="text"
+                placeholder="Votre réponse…"
+                autoComplete="off"
+                autoCorrect="off"
+                spellCheck={false}
+                value={value}
+                onChange={(e) => setValue(e.target.value)}
+                onKeyDown={(e) => e.key === "Enter" && submit()}
+                className={`w-full bg-[#0d0a1a] border-[1.5px] rounded-[14px] py-3.5 px-4 text-base text-text font-[var(--font-cinzel)] text-center outline-none transition-all duration-300 tracking-[0.1em] ${inputBorder}`}
+              />
+            )}
 
-            <p
-              className={`text-center text-[0.72rem] mt-2 h-3.5 transition-colors duration-300 ${
-                feedback === "ok" ? "text-success" : feedback === "err" ? "text-danger" : ""
-              }`}
-            >
-              {feedbackMsg}
-            </p>
+            {!isSolved && (
+              <p
+                className={`text-center text-[0.72rem] mt-2 h-3.5 transition-colors duration-300 ${
+                  feedback === "ok" ? "text-success" : feedback === "err" ? "text-danger" : ""
+                }`}
+              >
+                {feedbackMsg}
+              </p>
+            )}
 
             <button
               onClick={submit}
