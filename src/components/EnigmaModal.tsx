@@ -246,21 +246,27 @@ export function EnigmaModal() {
                   {feedbackMsg}
                 </p>
 
-                <p className="text-center text-[0.65rem] text-muted mt-1 mb-1">
-                  Essai disponible : 1/1
-                </p>
+                <div className="flex items-center justify-center gap-2 mt-2 mb-1 py-1.5 px-3 rounded-full bg-success/10 border border-success/20 w-fit mx-auto">
+                  <span className="w-1.5 h-1.5 rounded-full bg-success animate-pulse" />
+                  <span className="text-[0.72rem] text-success font-semibold tracking-wide">
+                    1 essai disponible
+                  </span>
+                </div>
               </>
             )}
 
             {!isSolved && attemptUsed && (
-              <div className="text-center py-4">
-                <p className="text-[0.8rem] text-muted mb-2">
-                  Essai disponible : <span className="text-danger font-semibold">0/1</span>
-                </p>
-                <p className="text-[0.75rem] text-muted">
+              <div className="text-center py-5">
+                <div className="flex items-center justify-center gap-2 py-1.5 px-3 rounded-full bg-danger/10 border border-danger/20 w-fit mx-auto mb-3">
+                  <span className="w-1.5 h-1.5 rounded-full bg-danger" />
+                  <span className="text-[0.72rem] text-danger font-semibold tracking-wide">
+                    0 essai disponible
+                  </span>
+                </div>
+                <p className="text-[0.72rem] text-muted">
                   Prochain essai dans
                 </p>
-                <p className="text-[1.3rem] font-[var(--font-cinzel)] text-accent tracking-[0.15em] mt-1">
+                <p className="text-[1.4rem] font-[var(--font-cinzel)] text-accent tracking-[0.15em] mt-1.5">
                   {countdown}
                 </p>
               </div>
