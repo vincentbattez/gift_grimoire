@@ -285,11 +285,11 @@ export function EnigmaModal() {
   const [mounted, setMounted] = useState(false);
 
   // Render-time sync : mettre à jour quand la modale s'ouvre (pas d'effect)
-  if (enigma && modalId && staleEnigma?.id !== modalId) {
+  if (enigma && modalId && (staleEnigma?.id !== modalId || !mounted)) {
     setStaleEnigma({ enigma, id: modalId, isSolved });
     setMounted(true);
   }
-  if (enigma && modalId && staleEnigma?.id === modalId && staleEnigma.isSolved !== isSolved) {
+  if (enigma && modalId && mounted && staleEnigma?.id === modalId && staleEnigma.isSolved !== isSolved) {
     setStaleEnigma({ enigma, id: modalId, isSolved });
   }
 
