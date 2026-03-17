@@ -41,3 +41,16 @@ export const sndBad = () => {
 };
 
 export const sndClick = () => tone(900, "sine", 0.09, 0.1);
+
+export const sndVictory = () => {
+  // Arpège ascendant rapide (Do-Mi-Sol-Do-Mi)
+  [523, 659, 784, 1047, 1319].forEach((f, i) =>
+    tone(f, "triangle", 0.16, 0.6, i * 0.07),
+  );
+  // Accord majeur soutenu
+  [1047, 1319, 1568].forEach((f, i) =>
+    tone(f, "sine", 0.22, 2.2, 0.4 + i * 0.03),
+  );
+  // Note haute scintillante
+  tone(2093, "sine", 0.12, 1.5, 0.6);
+};

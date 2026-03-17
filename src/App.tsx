@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useStore, isAttemptUsedToday, msUntilMidnight } from "./store";
 import { ENIGMAS } from "./config";
 import { Starfield } from "./components/Starfield";
@@ -6,7 +6,7 @@ import { Header } from "./components/Header";
 import { EnigmaGrid } from "./components/EnigmaGrid";
 import { EnigmaModal } from "./components/EnigmaModal";
 import { Toast } from "./components/Toast";
-import { triggerUnlockEffect } from "./components/EnigmaCard";
+import { triggerUnlockEffect } from "./unlock";
 
 function useQRUnlock() {
   useEffect(() => {
@@ -27,7 +27,7 @@ function AttemptBadge() {
   const [countdown, setCountdown] = useState("");
 
   useEffect(() => {
-    if (!attemptUsed) { setCountdown(""); return; }
+    if (!attemptUsed) return;
     function tick() {
       const ms = msUntilMidnight();
       const h = Math.floor(ms / 3_600_000);
@@ -61,6 +61,30 @@ function AttemptBadge() {
   );
 }
 
+function ScreenFlash() {
+  const celebrateCardId = useStore((s) => s.celebrateCardId);
+  const ref = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!celebrateCardId) return;
+    const el = ref.current;
+    if (!el) return;
+    el.style.animation = "none";
+    void el.offsetHeight; // force reflow
+    el.style.animation = "screen-flash 0.5s ease-out forwards";
+  }, [celebrateCardId]);
+
+  return (
+    <div
+      ref={ref}
+      className="fixed inset-0 z-[90] pointer-events-none opacity-0"
+      style={{
+        background: "radial-gradient(circle at 50% 50%, #e8c96a40, #4ecca320, transparent 70%)",
+      }}
+    />
+  );
+}
+
 export default function App() {
   useQRUnlock();
   const resetAttempt = useStore((s) => s.resetAttempt);
@@ -78,6 +102,7 @@ export default function App() {
           reset
         </button>
       </div>
+      <ScreenFlash />
       <AttemptBadge />
       <EnigmaModal />
       <Toast />
