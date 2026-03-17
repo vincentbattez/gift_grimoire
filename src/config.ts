@@ -1,7 +1,7 @@
 import { z } from "zod";
 
 export const enigmaSchema = z.object({
-  id: z.number().int().min(1).max(6),
+  id: z.number().or(z.string()),
   title: z.string(),
   icon: z.string(),
   haEvent: z.string(),
@@ -14,7 +14,7 @@ export type Enigma = z.infer<typeof enigmaSchema>;
 
 export const ENIGMAS: Enigma[] = z.array(enigmaSchema).parse([
   {
-    id: 1,
+    id: 5,
     title: "La fissure invisible",
     icon: "🦋",
     haEvent: "gift_grimoire-mirabel",
@@ -23,25 +23,16 @@ export const ENIGMAS: Enigma[] = z.array(enigmaSchema).parse([
     rune: "ᚠ",
   },
   {
-    id: 2,
-    title: "Le poids du sourire",
-    icon: "🏔️",
-    haEvent: "gift_grimoire-luisa",
-    question: "Le jour où mon don a vacillé, je n'ai pas eu peur de souffrir. J'ai eu peur qu'on ne me regarde plus. Car ici, on ne m'aime pas pour ce que je suis — on m'aime pour ce que je soulève.",
-    answer: "luisa",
-    rune: "ᚢ",
+    id: "Y",
+    title: "Les voix du ciel",
+    icon: "🏮",
+    haEvent: "gift_grimoire-raiponce",
+    question: "Chaque année, le ciel me parle. Des centaines de voix silencieuses flottent vers moi, et je suis la seule à croire qu'elles me cherchent. Tout le monde y voit une fête. Moi, j'y vois une question",
+    answer: "raiponce",
+    rune: "ᚲ",
   },
   {
-    id: 3,
-    title: "Le cadre doré",
-    icon: "🖼️",
-    haEvent: "gift_grimoire-bruno",
-    question: "Dans cette maison, on voit l'avenir, on guérit les corps, on déplace les montagnes. Mais le vrai miracle, c'est celui qu'on refuse de regarder — et pourtant il est juste là, à hauteur d'yeux, dans un cadre doré",
-    answer: "bruno",
-    rune: "ᚦ",
-  },
-  {
-    id: 4,
+    id: "2g",
     title: "L'idiot magnifique",
     icon: "🤖",
     haEvent: "gift_grimoire-wall_e",
@@ -50,22 +41,31 @@ export const ENIGMAS: Enigma[] = z.array(enigmaSchema).parse([
     rune: "ᚨ",
   },
   {
-    id: 5,
+    id: "F",
+    title: "Le cadre doré",
+    icon: "🖼️",
+    haEvent: "gift_grimoire-bruno",
+    question: "Dans cette maison, on voit l'avenir, on guérit les corps, on déplace les montagnes. Mais le vrai miracle, c'est celui qu'on refuse de regarder — et pourtant il est juste là, à hauteur d'yeux, dans un cadre doré",
+    answer: "bruno",
+    rune: "ᚦ",
+  },
+  {
+    id: "X",
+    title: "Le poids du sourire",
+    icon: "🏔️",
+    haEvent: "gift_grimoire-luisa",
+    question: "Le jour où mon don a vacillé, je n'ai pas eu peur de souffrir. J'ai eu peur qu'on ne me regarde plus. Car ici, on ne m'aime pas pour ce que je suis — on m'aime pour ce que je soulève.",
+    answer: "luisa",
+    rune: "ᚢ",
+  },
+  {
+    id: "2d",
     title: "Le jardin perdu",
     icon: "🌱",
     haEvent: "gift_grimoire-eve",
     question: "Mon créateur m'a donné un nom de trois lettres, le même que la première femme d'un jardin. Ma mission tient en un mot : chercher. Mon arme est un bras qui devient canon. Mais c'est une main sale qui m'a appris à aimer. Qui suis-je ?",
     answer: "eve",
     rune: "ᚱ",
-  },
-  {
-    id: 6,
-    title: "Les voix du ciel",
-    icon: "🏮",
-    haEvent: "gift_grimoire-raiponce",
-    question: "Chaque année, le ciel me parle. Des centaines de voix silencieuses flottent vers moi, et je suis la seule à croire qu'elles me cherchent. Tout le monde y voit une fête. Moi, j'y vois une question",
-    answer: "raiponce",
-    rune: "ᚲ",
   },
 ]);
 
