@@ -6,7 +6,7 @@ import { Header } from "./components/Header";
 import { EnigmaGrid } from "./components/EnigmaGrid";
 import { EnigmaModal } from "./components/EnigmaModal";
 import { Toast } from "./components/Toast";
-import { triggerUnlockEffect } from "./components/EnigmaCard";
+import { triggerUnlockEffect } from "./unlock";
 
 function useQRUnlock() {
   useEffect(() => {
@@ -27,7 +27,7 @@ function AttemptBadge() {
   const [countdown, setCountdown] = useState("");
 
   useEffect(() => {
-    if (!attemptUsed) { setCountdown(""); return; }
+    if (!attemptUsed) return;
     function tick() {
       const ms = msUntilMidnight();
       const h = Math.floor(ms / 3_600_000);
