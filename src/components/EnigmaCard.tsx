@@ -1,17 +1,55 @@
-import { useRef } from "react";
+import { useRef, useEffect } from "react";
 import type { Enigma } from "../config";
 import { useStore } from "../store";
-import { sndClick } from "../audio";
+import { sndClick, sndVictory } from "../audio";
+import { spawnCelebration } from "../particles";
 
 export function EnigmaCard({ enigma }: { enigma: Enigma }) {
   const state = useStore((s) => s.enigmas[enigma.id]);
   const openModal = useStore((s) => s.openModal);
   const acknowledgeUnlock = useStore((s) => s.acknowledgeUnlock);
+  const isCelebrating = useStore((s) => s.celebrateCardId === enigma.id);
+  const clearCelebrate = useStore((s) => s.clearCelebrate);
   const isNew = useStore((s) => s.newlyUnlocked.has(enigma.id));
   const ref = useRef<HTMLDivElement>(null);
 
   const isLocked = !state.unlocked && !state.solved;
   const isSolved = state.solved;
+
+  useEffect(() => {
+    if (!isCelebrating || !ref.current) return;
+
+    const card = ref.current;
+
+    // Scroll vers la carte
+    card.scrollIntoView({ behavior: "smooth", block: "center" });
+
+    // Attendre le scroll puis lancer la célébration
+    const timer = setTimeout(() => {
+      // Son de victoire
+      sndVictory();
+
+      // Vibration mobile
+      navigator.vibrate?.(200);
+
+      // Animation CSS sur la carte
+      card.style.animation = "solve-celebrate 1s ease-out";
+      card.addEventListener(
+        "animationend",
+        () => { card.style.animation = ""; },
+        { once: true },
+      );
+
+      // Particules spectaculaires
+      const r = card.getBoundingClientRect();
+      spawnCelebration(r.left + r.width / 2, r.top + r.height / 2);
+
+      // Nettoyage après la célébration
+      setTimeout(() => clearCelebrate(), 1200);
+    }, 400);
+
+    return () => clearTimeout(timer);
+  }, [isCelebrating, clearCelebrate]);
 
   function handleClick() {
     if (isLocked) return;

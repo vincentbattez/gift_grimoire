@@ -3,7 +3,6 @@ import { useStore, isAttemptUsedToday, msUntilMidnight } from "../store";
 import { ENIGMAS, type Enigma } from "../config";
 import { sndOk, sndBad, sndClick } from "../audio";
 import { fireEvent } from "../ha";
-import { spawnFirework } from "../particles";
 
 function normalize(s: string): string {
   return s
@@ -28,6 +27,7 @@ function ModalBody({
   const closeModal = useStore((s) => s.closeModal);
   const solve = useStore((s) => s.solve);
   const recordAttempt = useStore((s) => s.recordAttempt);
+  const celebrate = useStore((s) => s.celebrate);
 
   const [value, setValue] = useState("");
   const [feedback, setFeedback] = useState<"ok" | "err" | null>(
@@ -115,23 +115,10 @@ function ModalBody({
       solve(enigma.id);
       fireEvent(enigma.haEvent);
 
-      const el = document.querySelector(`[data-card-id="${enigma.id}"]`);
-      if (el) {
-        const r = el.getBoundingClientRect();
-        spawnFirework(r.left + r.width / 2, r.top + r.height / 2);
-      }
-
+      // Fermer la modale, puis déclencher la célébration visible
       setTimeout(() => {
         closeModal();
-        const card = document.querySelector(`[data-card-id="${enigma.id}"]`);
-        if (card) {
-          card.classList.add("animate-solved-glow");
-          card.addEventListener(
-            "animationend",
-            () => card.classList.remove("animate-solved-glow"),
-            { once: true },
-          );
-        }
+        celebrate(enigma.id);
       }, 1300);
     } else {
       setFeedback("err");
