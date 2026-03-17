@@ -4,7 +4,7 @@ import { spawnParticles } from "./particles";
 
 export function triggerUnlockEffect(id: string, enigmaTitle: string) {
   const store = useStore.getState();
-  if (store.enigmas[id]?.unlocked || store.enigmas[id]?.solved) return;
+  if (!store.enigmas[id] || store.enigmas[id].unlocked || store.enigmas[id].solved) return;
 
   store.unlock(id);
   store.showToast(`✦ « ${enigmaTitle} » déverrouillé !`);

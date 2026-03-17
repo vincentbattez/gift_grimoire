@@ -18,11 +18,13 @@ function ModalBody({
   isSolved,
   attemptUsed,
   countdown,
+  isOpen,
 }: {
   enigma: Enigma;
   isSolved: boolean;
   attemptUsed: boolean;
   countdown: string;
+  isOpen: boolean;
 }) {
   const closeModal = useStore((s) => s.closeModal);
   const solve = useStore((s) => s.solve);
@@ -146,7 +148,7 @@ function ModalBody({
       ref={sheetRef}
       className={`w-full max-w-[430px] mx-auto rounded-t-3xl border border-[#3a2a5a] border-b-0 px-[22px] pt-7 pb-11 relative overflow-hidden ${
         isDragging ? "" : "transition-transform duration-400"
-      } ${!isDragging ? "translate-y-0" : ""} ${shaking ? "animate-[shake_0.42s_ease]" : ""}`}
+      } ${isOpen && !isDragging ? "translate-y-0" : !isOpen ? "translate-y-full" : ""} ${shaking ? "animate-[shake_0.42s_ease]" : ""}`}
       style={{
         background: "linear-gradient(180deg, #1c1438, #100d20)",
         ...(!isDragging && { transitionTimingFunction: "cubic-bezier(.34,1.56,.64,1)" }),
@@ -278,6 +280,29 @@ export function EnigmaModal() {
   const isOpen = !!enigma;
   const isSolved = state?.solved ?? false;
 
+  // Garder la dernière enigma en mémoire pour l'animation de fermeture
+  const [staleEnigma, setStaleEnigma] = useState<{ enigma: Enigma; id: string; isSolved: boolean } | null>(null);
+  const [mounted, setMounted] = useState(false);
+
+  // Render-time sync : mettre à jour quand la modale s'ouvre (pas d'effect)
+  if (enigma && modalId && staleEnigma?.id !== modalId) {
+    setStaleEnigma({ enigma, id: modalId, isSolved });
+    setMounted(true);
+  }
+  if (enigma && modalId && staleEnigma?.id === modalId && staleEnigma.isSolved !== isSolved) {
+    setStaleEnigma({ enigma, id: modalId, isSolved });
+  }
+
+  // Effect uniquement pour le délai de démontage (fermeture)
+  useEffect(() => {
+    if (!isOpen && mounted) {
+      const timer = setTimeout(() => setMounted(false), 400);
+      return () => clearTimeout(timer);
+    }
+  }, [isOpen, mounted]);
+
+  const showBody = mounted && staleEnigma;
+
   function handleOverlayClick(e: React.MouseEvent) {
     if (e.target === e.currentTarget) closeModal();
   }
@@ -289,13 +314,14 @@ export function EnigmaModal() {
       }`}
       onClick={handleOverlayClick}
     >
-      {enigma && (
+      {showBody && (
         <ModalBody
-          key={modalId}
-          enigma={enigma}
-          isSolved={isSolved}
+          key={staleEnigma.id}
+          enigma={staleEnigma.enigma}
+          isSolved={staleEnigma.isSolved}
           attemptUsed={attemptUsed}
           countdown={countdown}
+          isOpen={isOpen}
         />
       )}
     </div>
