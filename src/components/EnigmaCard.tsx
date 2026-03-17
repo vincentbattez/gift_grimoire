@@ -25,6 +25,7 @@ export function EnigmaCard({ enigma }: { enigma: Enigma }) {
     card.scrollIntoView({ behavior: "smooth", block: "center" });
 
     // Attendre le scroll puis lancer la célébration
+    let clearTimer: ReturnType<typeof setTimeout>;
     const timer = setTimeout(() => {
       // Son de victoire
       sndVictory();
@@ -45,10 +46,13 @@ export function EnigmaCard({ enigma }: { enigma: Enigma }) {
       spawnCelebration(r.left + r.width / 2, r.top + r.height / 2);
 
       // Nettoyage après la célébration
-      setTimeout(() => clearCelebrate(), 1200);
+      clearTimer = setTimeout(() => clearCelebrate(), 1200);
     }, 400);
 
-    return () => clearTimeout(timer);
+    return () => {
+      clearTimeout(timer);
+      clearTimeout(clearTimer);
+    };
   }, [isCelebrating, clearCelebrate]);
 
   function handleClick() {

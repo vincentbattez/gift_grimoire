@@ -33,31 +33,6 @@ export function spawnParticles(
 
 const FIREWORK_COLORS = ["#4ecca3", "#9b6dff", "#e8c96a", "#ff6b8a", "#59c3ff"];
 
-export function spawnFirework(cx: number, cy: number) {
-  // Burst central immédiat
-  spawnParticles(cx, cy, 40, "#4ecca3");
-
-  // 4 explosions secondaires décalées autour du centre
-  const offsets = [
-    { dx: -60, dy: -40, delay: 150 },
-    { dx: 55, dy: -50, delay: 300 },
-    { dx: -40, dy: 45, delay: 450 },
-    { dx: 50, dy: 35, delay: 600 },
-  ];
-
-  for (const { dx, dy, delay } of offsets) {
-    setTimeout(() => {
-      const col = FIREWORK_COLORS[Math.floor(Math.random() * FIREWORK_COLORS.length)];
-      spawnParticles(cx + dx + Math.random() * 20 - 10, cy + dy + Math.random() * 20 - 10, 25, col);
-    }, delay);
-  }
-
-  // Dernière grosse explosion dorée
-  setTimeout(() => {
-    spawnParticles(cx, cy, 50, "#e8c96a");
-  }, 800);
-}
-
 export function spawnCelebration(cx: number, cy: number) {
   // Vague 1 : explosion dorée centrale
   spawnParticles(cx, cy, 60, "#e8c96a");

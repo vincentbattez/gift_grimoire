@@ -77,7 +77,7 @@ function ScreenFlash() {
   return (
     <div
       ref={ref}
-      className="fixed inset-0 z-90 pointer-events-none opacity-0"
+      className="fixed inset-0 z-[90] pointer-events-none opacity-0"
       style={{
         background: "radial-gradient(circle at 50% 50%, #e8c96a40, #4ecca320, transparent 70%)",
       }}

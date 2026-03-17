@@ -291,16 +291,16 @@ export function EnigmaModal() {
   const [staleEnigma, setStaleEnigma] = useState<{ enigma: Enigma; id: string; isSolved: boolean } | null>(null);
   const [mounted, setMounted] = useState(false);
 
-  // Render-time sync : mettre à jour quand la modale s'ouvre (pas d'effect)
-  if (enigma && modalId && (staleEnigma?.id !== modalId || !mounted)) {
-    setStaleEnigma({ enigma, id: modalId, isSolved });
+  // Mettre à jour le snapshot quand la modale s'ouvre ou que isSolved change
+  useEffect(() => {
+    if (!modalId) return;
+    const e = ENIGMAS.find((en) => en.id === modalId);
+    if (!e) return;
+    setStaleEnigma({ enigma: e, id: modalId, isSolved });
     setMounted(true);
-  }
-  if (enigma && modalId && mounted && staleEnigma?.id === modalId && staleEnigma.isSolved !== isSolved) {
-    setStaleEnigma({ enigma, id: modalId, isSolved });
-  }
+  }, [modalId, isSolved]);
 
-  // Effect uniquement pour le délai de démontage (fermeture)
+  // Délai de démontage pour laisser l'animation de fermeture se jouer
   useEffect(() => {
     if (!isOpen && mounted) {
       const timer = setTimeout(() => setMounted(false), 400);
