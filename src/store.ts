@@ -1,6 +1,7 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 import { ENIGMAS } from "./config";
+import { MODAL_CLOSE_MS } from "./timings";
 
 type EnigmaId = string;
 type EnigmaState = { unlocked: boolean; solved: boolean };
@@ -10,7 +11,9 @@ type GrimoireStore = {
   lastAttempt: number | null;
   toastMessage: string | null;
   modalEnigmaId: EnigmaId | null;
+  modalClosingId: EnigmaId | null;
   newlyUnlocked: Set<EnigmaId>;
+  celebrateCardId: EnigmaId | null;
 
   unlock: (id: EnigmaId) => void;
   solve: (id: EnigmaId) => void;
@@ -21,6 +24,8 @@ type GrimoireStore = {
   closeModal: () => void;
   showToast: (msg: string) => void;
   hideToast: () => void;
+  celebrate: (id: EnigmaId) => void;
+  clearCelebrate: () => void;
 };
 
 const initialEnigmas: Record<EnigmaId, EnigmaState> = {};
@@ -30,12 +35,14 @@ ENIGMAS.forEach((e) => {
 
 export const useStore = create<GrimoireStore>()(
   persist(
-    (set) => ({
+    (set, get) => ({
       enigmas: initialEnigmas,
       lastAttempt: null,
       toastMessage: null,
       modalEnigmaId: null,
+      modalClosingId: null,
       newlyUnlocked: new Set(),
+      celebrateCardId: null,
 
       unlock: (id) =>
         set((s) => {
@@ -69,10 +76,16 @@ export const useStore = create<GrimoireStore>()(
           return { newlyUnlocked: next };
         }),
 
-      openModal: (id) => set({ modalEnigmaId: id }),
-      closeModal: () => set({ modalEnigmaId: null }),
+      openModal: (id) => set({ modalEnigmaId: id, modalClosingId: null }),
+      closeModal: () => {
+        const closingId = get().modalEnigmaId;
+        set({ modalEnigmaId: null, modalClosingId: closingId });
+        setTimeout(() => set({ modalClosingId: null }), MODAL_CLOSE_MS);
+      },
       showToast: (msg) => set({ toastMessage: msg }),
       hideToast: () => set({ toastMessage: null }),
+      celebrate: (id) => set({ celebrateCardId: id }),
+      clearCelebrate: () => set({ celebrateCardId: null }),
     }),
     {
       name: "grimoire_v3",

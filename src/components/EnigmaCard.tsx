@@ -1,18 +1,60 @@
-import { useRef } from "react";
+import { useRef, useEffect } from "react";
 import type { Enigma } from "../config";
 import { useStore } from "../store";
-import { sndClick, sndUnlock } from "../audio";
-import { spawnParticles } from "./Starfield";
+import { sndClick, sndVictory } from "../audio";
+import { spawnCelebration } from "../particles";
+import { CELEBRATION_SCROLL_SETTLE_MS, CELEBRATION_DURATION_MS } from "../timings";
 
 export function EnigmaCard({ enigma, isAdmin }: { enigma: Enigma; isAdmin: boolean }) {
   const state = useStore((s) => s.enigmas[enigma.id]);
   const openModal = useStore((s) => s.openModal);
   const acknowledgeUnlock = useStore((s) => s.acknowledgeUnlock);
+  const isCelebrating = useStore((s) => s.celebrateCardId === enigma.id);
+  const clearCelebrate = useStore((s) => s.clearCelebrate);
   const isNew = useStore((s) => s.newlyUnlocked.has(enigma.id));
   const ref = useRef<HTMLDivElement>(null);
 
   const isLocked = !state.unlocked && !state.solved;
   const isSolved = state.solved;
+
+  useEffect(() => {
+    if (!isCelebrating || !ref.current) return;
+
+    const card = ref.current;
+
+    // Scroll vers la carte
+    card.scrollIntoView({ behavior: "smooth", block: "center" });
+
+    // Attendre le scroll puis lancer la célébration
+    let clearTimer: ReturnType<typeof setTimeout>;
+    const timer = setTimeout(() => {
+      // Son de victoire
+      sndVictory();
+
+      // Vibration mobile
+      navigator.vibrate?.(200);
+
+      // Animation CSS sur la carte
+      card.style.animation = "solve-celebrate 1s ease-out";
+      card.addEventListener(
+        "animationend",
+        () => { card.style.animation = ""; },
+        { once: true },
+      );
+
+      // Particules spectaculaires
+      const r = card.getBoundingClientRect();
+      spawnCelebration(r.left + r.width / 2, r.top + r.height / 2);
+
+      // Nettoyage après la célébration
+      clearTimer = setTimeout(() => clearCelebrate(), CELEBRATION_DURATION_MS);
+    }, CELEBRATION_SCROLL_SETTLE_MS);
+
+    return () => {
+      clearTimeout(timer);
+      clearTimeout(clearTimer);
+    };
+  }, [isCelebrating, clearCelebrate]);
 
   function handleClick() {
     if (isLocked) return;
@@ -107,33 +149,4 @@ export function EnigmaCard({ enigma, isAdmin }: { enigma: Enigma; isAdmin: boole
       </div>
     </div>
   );
-}
-
-export function triggerUnlockEffect(id: string, enigmaTitle: string) {
-  const store = useStore.getState();
-  if (store.enigmas[id]?.unlocked || store.enigmas[id]?.solved) return;
-
-  store.unlock(id);
-  store.showToast(`✦ « ${enigmaTitle} » déverrouillé !`);
-  sndUnlock();
-
-  setTimeout(() => {
-    const el = document.querySelector(`[data-card-id="${id}"]`);
-    if (el) {
-      // Auto-scroll vers la carte déverrouillée
-      el.scrollIntoView({ behavior: "smooth", block: "center" });
-
-      // Animation d'apparition (unlock-flash)
-      const card = el.firstElementChild as HTMLElement | null;
-      if (card) {
-        card.style.animation = "unlock-flash 0.7s ease-out";
-        card.addEventListener("animationend", () => {
-          card.style.animation = "";
-        }, { once: true });
-      }
-
-      const r = el.getBoundingClientRect();
-      spawnParticles(r.left + r.width / 2, r.top + r.height / 2, 28, "#9b6dff");
-    }
-  }, 300);
 }
