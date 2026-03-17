@@ -262,7 +262,9 @@ function ModalBody({
 
 export function EnigmaModal() {
   const modalId = useStore((s) => s.modalEnigmaId);
-  const state = useStore((s) => (modalId ? s.enigmas[modalId] : null));
+  const closingId = useStore((s) => s.modalClosingId);
+  const displayId = modalId ?? closingId;
+  const state = useStore((s) => (displayId ? s.enigmas[displayId] : null));
   const closeModal = useStore((s) => s.closeModal);
   const lastAttempt = useStore((s) => s.lastAttempt);
 
@@ -283,32 +285,9 @@ export function EnigmaModal() {
     return () => clearInterval(id);
   }, [attemptUsed]);
 
-  const enigma = modalId ? ENIGMAS.find((e) => e.id === modalId) : null;
-  const isOpen = !!enigma;
+  const enigma = displayId ? ENIGMAS.find((e) => e.id === displayId) : null;
+  const isOpen = !!modalId;
   const isSolved = state?.solved ?? false;
-
-  // Garder la dernière enigma en mémoire pour l'animation de fermeture
-  const [staleEnigma, setStaleEnigma] = useState<{ enigma: Enigma; id: string; isSolved: boolean } | null>(null);
-  const [mounted, setMounted] = useState(false);
-
-  // Mettre à jour le snapshot quand la modale s'ouvre ou que isSolved change
-  useEffect(() => {
-    if (!modalId) return;
-    const e = ENIGMAS.find((en) => en.id === modalId);
-    if (!e) return;
-    setStaleEnigma({ enigma: e, id: modalId, isSolved });
-    setMounted(true);
-  }, [modalId, isSolved]);
-
-  // Délai de démontage pour laisser l'animation de fermeture se jouer
-  useEffect(() => {
-    if (!isOpen && mounted) {
-      const timer = setTimeout(() => setMounted(false), 400);
-      return () => clearTimeout(timer);
-    }
-  }, [isOpen, mounted]);
-
-  const showBody = mounted && staleEnigma;
 
   function handleOverlayClick(e: React.MouseEvent) {
     if (e.target === e.currentTarget) closeModal();
@@ -321,11 +300,11 @@ export function EnigmaModal() {
       }`}
       onClick={handleOverlayClick}
     >
-      {showBody && (
+      {enigma && (
         <ModalBody
-          key={staleEnigma.id}
-          enigma={staleEnigma.enigma}
-          isSolved={staleEnigma.isSolved}
+          key={displayId}
+          enigma={enigma}
+          isSolved={isSolved}
           attemptUsed={attemptUsed}
           countdown={countdown}
           isOpen={isOpen}

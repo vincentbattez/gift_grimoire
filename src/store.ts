@@ -10,6 +10,7 @@ type GrimoireStore = {
   lastAttempt: number | null;
   toastMessage: string | null;
   modalEnigmaId: EnigmaId | null;
+  modalClosingId: EnigmaId | null;
   newlyUnlocked: Set<EnigmaId>;
   celebrateCardId: EnigmaId | null;
 
@@ -33,11 +34,12 @@ ENIGMAS.forEach((e) => {
 
 export const useStore = create<GrimoireStore>()(
   persist(
-    (set) => ({
+    (set, get) => ({
       enigmas: initialEnigmas,
       lastAttempt: null,
       toastMessage: null,
       modalEnigmaId: null,
+      modalClosingId: null,
       newlyUnlocked: new Set(),
       celebrateCardId: null,
 
@@ -73,8 +75,12 @@ export const useStore = create<GrimoireStore>()(
           return { newlyUnlocked: next };
         }),
 
-      openModal: (id) => set({ modalEnigmaId: id }),
-      closeModal: () => set({ modalEnigmaId: null }),
+      openModal: (id) => set({ modalEnigmaId: id, modalClosingId: null }),
+      closeModal: () => {
+        const closingId = get().modalEnigmaId;
+        set({ modalEnigmaId: null, modalClosingId: closingId });
+        setTimeout(() => set({ modalClosingId: null }), 400);
+      },
       showToast: (msg) => set({ toastMessage: msg }),
       hideToast: () => set({ toastMessage: null }),
       celebrate: (id) => set({ celebrateCardId: id }),
