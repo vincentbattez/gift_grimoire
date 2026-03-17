@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from "react";
-import { useStore } from "../store";
+import { useStore, isAttemptUsedToday, msUntilMidnight } from "../store";
 import { ENIGMAS } from "../config";
 import { sndOk, sndBad, sndClick } from "../audio";
 import { fireEvent } from "../ha";
@@ -19,6 +19,25 @@ export function EnigmaModal() {
   const state = useStore((s) => (modalId ? s.enigmas[modalId] : null));
   const closeModal = useStore((s) => s.closeModal);
   const solve = useStore((s) => s.solve);
+  const lastAttempt = useStore((s) => s.lastAttempt);
+  const recordAttempt = useStore((s) => s.recordAttempt);
+
+  const attemptUsed = isAttemptUsedToday(lastAttempt);
+  const [countdown, setCountdown] = useState("");
+
+  useEffect(() => {
+    if (!attemptUsed) { setCountdown(""); return; }
+    function tick() {
+      const ms = msUntilMidnight();
+      const h = Math.floor(ms / 3_600_000);
+      const m = Math.floor((ms % 3_600_000) / 60_000);
+      const s = Math.floor((ms % 60_000) / 1_000);
+      setCountdown(`${String(h).padStart(2, "0")}:${String(m).padStart(2, "0")}:${String(s).padStart(2, "0")}`);
+    }
+    tick();
+    const id = setInterval(tick, 1_000);
+    return () => clearInterval(id);
+  }, [attemptUsed]);
 
   const [value, setValue] = useState("");
   const [feedback, setFeedback] = useState<"ok" | "err" | null>(null);
@@ -99,12 +118,13 @@ export function EnigmaModal() {
   }, [isOpen, modalId, isSolved]);
 
   function submit() {
-    if (!enigma || !modalId || isSolved) return;
+    if (!enigma || !modalId || isSolved || attemptUsed) return;
 
     if (normalize(value) === normalize(enigma.answer)) {
       setFeedback("ok");
       setFeedbackMsg("✦ Énigme résolue avec succès !");
       sndOk();
+      recordAttempt();
       solve(modalId);
       fireEvent(enigma.haEvent);
 
@@ -130,6 +150,7 @@ export function EnigmaModal() {
       setFeedback("err");
       setFeedbackMsg("Ce n'est pas la bonne réponse…");
       sndBad();
+      recordAttempt();
       setShaking(true);
       setTimeout(() => {
         setFeedback(null);
@@ -202,41 +223,61 @@ export function EnigmaModal() {
               {enigma.question}
             </p>
 
-            {!isSolved && (
-              <input
-                ref={inputRef}
-                type="text"
-                placeholder="Votre réponse…"
-                autoComplete="off"
-                autoCorrect="off"
-                spellCheck={false}
-                value={value}
-                onChange={(e) => setValue(e.target.value)}
-                onKeyDown={(e) => e.key === "Enter" && submit()}
-                className={`w-full bg-[#0d0a1a] border-[1.5px] rounded-[14px] py-3.5 px-4 text-base text-text font-[var(--font-cinzel)] text-center outline-none transition-all duration-300 tracking-[0.1em] ${inputBorder}`}
-              />
+            {!isSolved && !attemptUsed && (
+              <>
+                <input
+                  ref={inputRef}
+                  type="text"
+                  placeholder="Votre réponse…"
+                  autoComplete="off"
+                  autoCorrect="off"
+                  spellCheck={false}
+                  value={value}
+                  onChange={(e) => setValue(e.target.value)}
+                  onKeyDown={(e) => e.key === "Enter" && submit()}
+                  className={`w-full bg-[#0d0a1a] border-[1.5px] rounded-[14px] py-3.5 px-4 text-base text-text font-[var(--font-cinzel)] text-center outline-none transition-all duration-300 tracking-[0.1em] ${inputBorder}`}
+                />
+
+                <p
+                  className={`text-center text-[0.72rem] mt-2 h-3.5 transition-colors duration-300 ${
+                    feedback === "ok" ? "text-success" : feedback === "err" ? "text-danger" : ""
+                  }`}
+                >
+                  {feedbackMsg}
+                </p>
+
+                <p className="text-center text-[0.65rem] text-muted mt-1 mb-1">
+                  Essai disponible : 1/1
+                </p>
+              </>
             )}
 
-            {!isSolved && (
-              <p
-                className={`text-center text-[0.72rem] mt-2 h-3.5 transition-colors duration-300 ${
-                  feedback === "ok" ? "text-success" : feedback === "err" ? "text-danger" : ""
-                }`}
-              >
-                {feedbackMsg}
-              </p>
+            {!isSolved && attemptUsed && (
+              <div className="text-center py-4">
+                <p className="text-[0.8rem] text-muted mb-2">
+                  Essai disponible : <span className="text-danger font-semibold">0/1</span>
+                </p>
+                <p className="text-[0.75rem] text-muted">
+                  Prochain essai dans
+                </p>
+                <p className="text-[1.3rem] font-[var(--font-cinzel)] text-accent tracking-[0.15em] mt-1">
+                  {countdown}
+                </p>
+              </div>
             )}
 
             <button
               onClick={submit}
-              disabled={isSolved}
+              disabled={isSolved || attemptUsed}
               className={`w-full mt-3 py-4 border-none rounded-[14px] text-white font-[var(--font-cinzel)] text-[0.85rem] font-semibold tracking-[0.12em] uppercase cursor-pointer transition-all duration-200 active:scale-[0.97] ${
                 isSolved
                   ? "bg-gradient-to-br from-[#2a6a4a] to-success shadow-[0_4px_22px_#4ecca328]"
-                  : "bg-gradient-to-br from-[#6b4a97] to-accent shadow-[0_4px_22px_#9b6dff28]"
+                  : attemptUsed
+                    ? "bg-gradient-to-br from-[#3a3a4a] to-[#2a2a3a] opacity-50 cursor-not-allowed"
+                    : "bg-gradient-to-br from-[#6b4a97] to-accent shadow-[0_4px_22px_#9b6dff28]"
               }`}
             >
-              {isSolved ? "✦ Énigme Résolue ✦" : "Valider la Réponse ✦"}
+              {isSolved ? "✦ Énigme Résolue ✦" : attemptUsed ? "Essai épuisé" : "Valider la Réponse ✦"}
             </button>
           </>
         )}

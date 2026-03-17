@@ -7,12 +7,15 @@ type EnigmaState = { unlocked: boolean; solved: boolean };
 
 type GrimoireStore = {
   enigmas: Record<EnigmaId, EnigmaState>;
+  lastAttempt: number | null;
   toastMessage: string | null;
   modalEnigmaId: EnigmaId | null;
   newlyUnlocked: Set<EnigmaId>;
 
   unlock: (id: EnigmaId) => void;
   solve: (id: EnigmaId) => void;
+  recordAttempt: () => void;
+  resetAttempt: () => void;
   acknowledgeUnlock: (id: EnigmaId) => void;
   openModal: (id: EnigmaId) => void;
   closeModal: () => void;
@@ -29,6 +32,7 @@ export const useStore = create<GrimoireStore>()(
   persist(
     (set) => ({
       enigmas: initialEnigmas,
+      lastAttempt: null,
       toastMessage: null,
       modalEnigmaId: null,
       newlyUnlocked: new Set(),
@@ -55,6 +59,9 @@ export const useStore = create<GrimoireStore>()(
           },
         })),
 
+      recordAttempt: () => set({ lastAttempt: Date.now() }),
+      resetAttempt: () => set({ lastAttempt: null }),
+
       acknowledgeUnlock: (id) =>
         set((s) => {
           const next = new Set(s.newlyUnlocked);
@@ -69,10 +76,27 @@ export const useStore = create<GrimoireStore>()(
     }),
     {
       name: "grimoire_v3",
-      partialize: (s) => ({ enigmas: s.enigmas }),
+      partialize: (s) => ({ enigmas: s.enigmas, lastAttempt: s.lastAttempt }),
     },
   ),
 );
 
-export const solvedCount = () =>
-  Object.values(useStore.getState().enigmas).filter((e) => e.solved).length;
+/** Returns true if an attempt was already used today */
+export function isAttemptUsedToday(lastAttempt: number | null): boolean {
+  if (!lastAttempt) return false;
+  const now = new Date();
+  const last = new Date(lastAttempt);
+  return (
+    now.getFullYear() === last.getFullYear() &&
+    now.getMonth() === last.getMonth() &&
+    now.getDate() === last.getDate()
+  );
+}
+
+/** Returns ms until midnight (next attempt) */
+export function msUntilMidnight(): number {
+  const now = new Date();
+  const midnight = new Date(now);
+  midnight.setHours(24, 0, 0, 0);
+  return midnight.getTime() - now.getTime();
+}

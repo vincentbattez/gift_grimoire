@@ -1,4 +1,5 @@
 import { useEffect } from "react";
+import { useStore } from "./store";
 import { ENIGMAS } from "./config";
 import { Starfield } from "./components/Starfield";
 import { Header } from "./components/Header";
@@ -22,6 +23,7 @@ function useQRUnlock() {
 
 export default function App() {
   useQRUnlock();
+  const resetAttempt = useStore((s) => s.resetAttempt);
 
   return (
     <>
@@ -29,6 +31,12 @@ export default function App() {
       <div className="relative z-1 max-w-[430px] mx-auto px-4 pb-12">
         <Header />
         <EnigmaGrid />
+        <button
+          onClick={resetAttempt}
+          className="w-full mt-20 py-2 text-[0.5rem] text-muted/20 bg-transparent border-none cursor-default select-none"
+        >
+          reset
+        </button>
       </div>
       <EnigmaModal />
       <Toast />
