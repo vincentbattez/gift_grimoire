@@ -10,13 +10,12 @@ import { triggerUnlockEffect } from "./components/EnigmaCard";
 function useQRUnlock() {
   useEffect(() => {
     const params = new URLSearchParams(location.search);
-    const id = parseInt(params.get("unlock") ?? "");
-    if (id >= 1 && id <= ENIGMAS.length) {
+    const raw = params.get("unlock");
+    if (!raw) return;
+    const enigma = ENIGMAS.find((e) => String(e.id) === raw);
+    if (enigma) {
       history.replaceState({}, "", location.pathname);
-      const enigma = ENIGMAS.find((e) => e.id === id);
-      if (enigma) {
-        setTimeout(() => triggerUnlockEffect(id, enigma.title), 700);
-      }
+      setTimeout(() => triggerUnlockEffect(enigma.id, enigma.title), 700);
     }
   }, []);
 }

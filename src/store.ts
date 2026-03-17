@@ -2,24 +2,25 @@ import { create } from "zustand";
 import { persist } from "zustand/middleware";
 import { ENIGMAS } from "./config";
 
+type EnigmaId = string;
 type EnigmaState = { unlocked: boolean; solved: boolean };
 
 type GrimoireStore = {
-  enigmas: Record<number, EnigmaState>;
+  enigmas: Record<EnigmaId, EnigmaState>;
   toastMessage: string | null;
-  modalEnigmaId: number | null;
-  newlyUnlocked: Set<number>;
+  modalEnigmaId: EnigmaId | null;
+  newlyUnlocked: Set<EnigmaId>;
 
-  unlock: (id: number) => void;
-  solve: (id: number) => void;
-  acknowledgeUnlock: (id: number) => void;
-  openModal: (id: number) => void;
+  unlock: (id: EnigmaId) => void;
+  solve: (id: EnigmaId) => void;
+  acknowledgeUnlock: (id: EnigmaId) => void;
+  openModal: (id: EnigmaId) => void;
   closeModal: () => void;
   showToast: (msg: string) => void;
   hideToast: () => void;
 };
 
-const initialEnigmas: Record<number, EnigmaState> = {};
+const initialEnigmas: Record<EnigmaId, EnigmaState> = {};
 ENIGMAS.forEach((e) => {
   initialEnigmas[e.id] = { unlocked: false, solved: false };
 });
@@ -67,7 +68,7 @@ export const useStore = create<GrimoireStore>()(
       hideToast: () => set({ toastMessage: null }),
     }),
     {
-      name: "grimoire_v2",
+      name: "grimoire_v3",
       partialize: (s) => ({ enigmas: s.enigmas }),
     },
   ),

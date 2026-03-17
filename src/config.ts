@@ -1,7 +1,7 @@
 import { z } from "zod";
 
 export const enigmaSchema = z.object({
-  id: z.number().or(z.string()),
+  id: z.string(),
   title: z.string(),
   icon: z.string(),
   haEvent: z.string(),
@@ -14,7 +14,7 @@ export type Enigma = z.infer<typeof enigmaSchema>;
 
 export const ENIGMAS: Enigma[] = z.array(enigmaSchema).parse([
   {
-    id: 5,
+    id: "5",
     title: "La fissure invisible",
     icon: "🦋",
     haEvent: "gift_grimoire-mirabel",

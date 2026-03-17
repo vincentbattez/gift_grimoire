@@ -94,7 +94,7 @@ export function EnigmaCard({ enigma }: { enigma: Enigma }) {
   );
 }
 
-export function triggerUnlockEffect(id: number, enigmaTitle: string) {
+export function triggerUnlockEffect(id: string, enigmaTitle: string) {
   const store = useStore.getState();
   if (store.enigmas[id]?.unlocked || store.enigmas[id]?.solved) return;
 
