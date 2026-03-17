@@ -4,7 +4,7 @@ import { useStore } from "../store";
 import { sndClick, sndUnlock } from "../audio";
 import { spawnParticles } from "./Starfield";
 
-export function SpellCard({ enigma }: { enigma: Enigma }) {
+export function EnigmaCard({ enigma }: { enigma: Enigma }) {
   const state = useStore((s) => s.enigmas[enigma.id]);
   const openModal = useStore((s) => s.openModal);
   const acknowledgeUnlock = useStore((s) => s.acknowledgeUnlock);
@@ -69,13 +69,13 @@ export function SpellCard({ enigma }: { enigma: Enigma }) {
         <>
           <div className="text-2xl text-muted mb-1.5 opacity-60">🔒</div>
           <div className="text-[0.6rem] tracking-[0.2em] text-muted uppercase">
-            Sort {enigma.id}
+            Énigme {enigma.id}
           </div>
         </>
       ) : (
         <>
           <div className="text-[0.6rem] tracking-[0.2em] text-muted uppercase mb-2">
-            Sort {enigma.id}
+            Énigme {enigma.id}
           </div>
           <div className="text-[2.3rem] mb-2 leading-none drop-shadow-[0_0_10px_rgba(155,109,255,0.6)]">
             {enigma.icon}

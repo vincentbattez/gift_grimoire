@@ -14,7 +14,7 @@ function normalize(s: string): string {
     .replace(/[^a-z0-9]/g, "");
 }
 
-export function SpellModal() {
+export function EnigmaModal() {
   const modalId = useStore((s) => s.modalEnigmaId);
   const state = useStore((s) => (modalId ? s.enigmas[modalId] : null));
   const closeModal = useStore((s) => s.closeModal);
@@ -93,7 +93,7 @@ export function SpellModal() {
     if (isOpen) {
       setValue("");
       setFeedback(isSolved ? "ok" : null);
-      setFeedbackMsg(isSolved ? "✦ Sort déjà accompli !" : "");
+      setFeedbackMsg(isSolved ? "✦ Énigme déjà résolue !" : "");
       if (!isSolved) setTimeout(() => inputRef.current?.focus(), 420);
     }
   }, [isOpen, modalId, isSolved]);
@@ -103,7 +103,7 @@ export function SpellModal() {
 
     if (normalize(value) === normalize(enigma.answer)) {
       setFeedback("ok");
-      setFeedbackMsg("✦ Sort invoqué avec succès !");
+      setFeedbackMsg("✦ Énigme résolue avec succès !");
       sndOk();
       solve(modalId);
       fireEvent(enigma.haEvent);
@@ -128,7 +128,7 @@ export function SpellModal() {
       }, 1300);
     } else {
       setFeedback("err");
-      setFeedbackMsg("Ce n'est pas la bonne incantation…");
+      setFeedbackMsg("Ce n'est pas la bonne réponse…");
       sndBad();
       setShaking(true);
       setTimeout(() => {
@@ -233,7 +233,7 @@ export function SpellModal() {
                   : "bg-gradient-to-br from-[#6b4a97] to-accent shadow-[0_4px_22px_#9b6dff28]"
               }`}
             >
-              {isSolved ? "✦ Sort Accompli ✦" : "Invoquer le Sort ✦"}
+              {isSolved ? "✦ Énigme Résolue ✦" : "Valider la Réponse ✦"}
             </button>
           </>
         )}

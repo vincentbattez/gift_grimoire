@@ -2,10 +2,10 @@ import { useEffect } from "react";
 import { ENIGMAS } from "./config";
 import { Starfield } from "./components/Starfield";
 import { Header } from "./components/Header";
-import { SpellGrid } from "./components/SpellGrid";
-import { SpellModal } from "./components/SpellModal";
+import { EnigmaGrid } from "./components/EnigmaGrid";
+import { EnigmaModal } from "./components/EnigmaModal";
 import { Toast } from "./components/Toast";
-import { triggerUnlockEffect } from "./components/SpellCard";
+import { triggerUnlockEffect } from "./components/EnigmaCard";
 
 function useQRUnlock() {
   useEffect(() => {
@@ -29,9 +29,9 @@ export default function App() {
       <Starfield />
       <div className="relative z-1 max-w-[430px] mx-auto px-4 pb-12">
         <Header />
-        <SpellGrid />
+        <EnigmaGrid />
       </div>
-      <SpellModal />
+      <EnigmaModal />
       <Toast />
     </>
   );
