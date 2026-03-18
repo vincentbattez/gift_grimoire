@@ -42,6 +42,31 @@ export const sndBad = () => {
 
 export const sndClick = () => tone(900, "sine", 0.09, 0.1);
 
+/** Bubbly heart pop — pitch varies per call for organic feel */
+export const sndHeartPop = (pitchOffset = 0) => {
+  const base = 1200 + pitchOffset;
+  const c = getCtx();
+  const t = c.currentTime;
+
+  // Round bubble attack
+  const o = c.createOscillator();
+  const g = c.createGain();
+  o.connect(g);
+  g.connect(c.destination);
+  o.type = "sine";
+  o.frequency.setValueAtTime(base * 0.7, t);
+  o.frequency.exponentialRampToValueAtTime(base, t + 0.025);
+  o.frequency.exponentialRampToValueAtTime(base * 0.85, t + 0.12);
+  g.gain.setValueAtTime(0, t);
+  g.gain.linearRampToValueAtTime(0.1, t + 0.008);
+  g.gain.exponentialRampToValueAtTime(0.0001, t + 0.15);
+  o.start(t);
+  o.stop(t + 0.16);
+
+  // Airy harmonic shimmer
+  tone(base * 1.5, "sine", 0.025, 0.09, 0.01);
+};
+
 /** Modern fluid swap — letter slides into place */
 export const sndLetterSwap = () => {
   const c = getCtx();

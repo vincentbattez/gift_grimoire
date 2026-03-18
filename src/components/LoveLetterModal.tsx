@@ -1,9 +1,19 @@
 import { useEffect, useRef, useState } from "react";
 import { useStore } from "../store";
 import { ENIGMAS } from "../config";
-import { sndLoveClose } from "../audio";
+import { sndLoveClose, sndHeartPop } from "../audio";
 
 const CLOSE_MS = 500;
+const HEART_COUNT = 14;
+
+const HEARTS = Array.from({ length: HEART_COUNT }, (_, i) => ({
+  emoji: i % 3 === 0 ? "\u2764\uFE0F" : i % 3 === 1 ? "\u{1F9E1}" : "\u{1F49B}",
+  left: 10 + Math.random() * 80,
+  delay: 0.15 + i * 0.12,
+  size: 0.75 + Math.random() * 0.55,
+  rot: -20 + Math.random() * 40,
+  pitch: -300 + Math.random() * 600,
+}));
 
 const GOLD_PARTICLES = Array.from({ length: 10 }, (_, i) => ({
   left: `${8 + i * 9}%`,
@@ -17,17 +27,31 @@ export function LoveLetterModal() {
   const closeLoveLetter = useStore((s) => s.closeLoveLetter);
   const [entered, setEntered] = useState(false);
   const [closing, setClosing] = useState(false);
+  const [showHearts, setShowHearts] = useState(false);
   const closingEnigmaRef = useRef<string | null>(null);
+  const popTimers = useRef<ReturnType<typeof setTimeout>[]>([]);
 
   useEffect(() => {
     if (!enigmaId) {
       setEntered(false);
+      setShowHearts(false);
       return;
     }
     closingEnigmaRef.current = enigmaId;
     setClosing(false);
     const raf = requestAnimationFrame(() => setEntered(true));
-    return () => cancelAnimationFrame(raf);
+
+    // Launch heart burst with staggered pops
+    const showTimer = setTimeout(() => setShowHearts(true), 400);
+    popTimers.current = HEARTS.map((h) =>
+      setTimeout(() => sndHeartPop(h.pitch), h.delay * 1000 + 400),
+    );
+
+    return () => {
+      cancelAnimationFrame(raf);
+      clearTimeout(showTimer);
+      popTimers.current.forEach(clearTimeout);
+    };
   }, [enigmaId]);
 
   const displayId = enigmaId ?? (closing ? closingEnigmaRef.current : null);
@@ -56,18 +80,34 @@ export function LoveLetterModal() {
       }}
       onClick={handleClose}
     >
+      {/* Heart burst */}
+      {showHearts && HEARTS.map((h, i) => (
+        <div
+          key={i}
+          className="absolute pointer-events-none z-10"
+          style={{
+            left: `${h.left}%`,
+            bottom: "20%",
+            fontSize: `${h.size}rem`,
+            ["--heart-rot" as string]: `${h.rot}deg`,
+            animation: `heart-float-up 3.5s linear ${h.delay}s both`,
+          }}
+        >
+          {h.emoji}
+        </div>
+      ))}
+
       {enigma && (
         <div
-          className={`relative max-w-[380px] w-full rounded-[22px] overflow-hidden transition-all duration-600 ${
-            entered ? "opacity-100 scale-100" : "opacity-0 scale-[0.82]"
+          className={`relative max-w-[380px] w-full rounded-[22px] overflow-hidden transition-all duration-700 ${
+            entered ? "opacity-100 scale-100 translate-y-0" : "opacity-0 scale-[0.82] translate-y-5"
           }`}
           style={{
             background: "linear-gradient(165deg, #fdf8ec, #f5e6c8, #ede0c0)",
             border: "1.5px solid #d4a94280",
             boxShadow:
               "0 0 50px #e8c96a30, 0 0 100px #e8c96a15, inset 0 1px 0 #ffffff60",
-            transitionTimingFunction: "cubic-bezier(.34,1.56,.64,1)",
-            ...(entered && { animation: "love-letter-enter 0.7s ease-out" }),
+            transitionTimingFunction: "cubic-bezier(.22,1,.36,1)",
           }}
           onClick={(e) => e.stopPropagation()}
         >
