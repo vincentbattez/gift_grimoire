@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect } from "react";
 import { useStore } from "../store";
 import { pollEntityState } from "../ha";
-import { sndAnalysis, sndOk } from "../audio";
+import { sndDeepListen, sndOk } from "../audio";
 import { EnigmaPicker } from "./EnigmaPicker";
 
 const ENTITY_ID = "binary_sensor.gift_grimoire_vibration_vibration";
@@ -39,13 +39,18 @@ export function VibrationListener() {
     return () => clearInterval(id);
   }, [phase]);
 
+  const stopSoundRef = useRef<(() => void) | null>(null);
+
   async function handleClick() {
     if (phase === "listening" || phase === "detected") return;
     setPhase("listening");
     setProgress(0);
-    sndAnalysis();
+    stopSoundRef.current = sndDeepListen();
 
     const detected = await pollEntityState(ENTITY_ID, "on", LISTEN_DURATION_MS);
+
+    stopSoundRef.current?.();
+    stopSoundRef.current = null;
 
     if (detected) {
       setPhase("detected");
