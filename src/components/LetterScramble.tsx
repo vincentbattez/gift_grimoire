@@ -1,5 +1,5 @@
-import { useState, useRef, useCallback } from "react";
-import { sndClick, sndScrambleSolved } from "../audio";
+import { useState, useRef, useCallback, useLayoutEffect } from "react";
+import { sndLetterSwap, sndScrambleSolved } from "../audio";
 import { useStore } from "../store";
 import { EnigmaPicker } from "./EnigmaPicker";
 
@@ -57,6 +57,45 @@ export function LetterScramble() {
   const ghostRef = useRef<HTMLDivElement>(null);
   const lettersRef = useRef(letters);
   lettersRef.current = letters;
+  const flipSnapshotRef = useRef<Map<number, DOMRect>>(new Map());
+
+  // FLIP: après chaque changement de `letters`, animer les lettres vers leur nouvelle position
+  useLayoutEffect(() => {
+    const container = containerRef.current;
+    const snapshot = flipSnapshotRef.current;
+    if (!container || snapshot.size === 0) return;
+
+    flipSnapshotRef.current = new Map();
+
+    const cards = container.querySelectorAll<HTMLElement>("[data-lid]");
+    cards.forEach((el) => {
+      const id = Number(el.dataset.lid);
+      const prev = snapshot.get(id);
+      if (!prev) return;
+
+      const curr = el.getBoundingClientRect();
+      const dx = prev.left - curr.left;
+      const dy = prev.top - curr.top;
+      if (dx === 0 && dy === 0) return;
+
+      // Invert: replacer la lettre à son ancienne position
+      el.style.transition = "none";
+      el.style.transform = `translate(${dx}px, ${dy}px)`;
+
+      // Forcer le reflow pour que le navigateur prenne en compte la position initiale
+      el.getBoundingClientRect();
+
+      // Play: animer vers la position naturelle
+      el.style.transition = "transform 220ms cubic-bezier(0.25, 0.46, 0.45, 0.94)";
+      el.style.transform = "";
+
+      const cleanup = () => {
+        el.style.transition = "";
+        el.removeEventListener("transitionend", cleanup);
+      };
+      el.addEventListener("transitionend", cleanup);
+    });
+  }, [letters]);
 
   const getCardRects = useCallback(() => {
     const container = containerRef.current;
@@ -115,6 +154,16 @@ export function LetterScramble() {
         setDraggingId(null);
         setTargetIdx(null);
 
+        // First: capturer les positions actuelles avant le réordonnancement
+        const container = containerRef.current;
+        if (container) {
+          const snapshot = new Map<number, DOMRect>();
+          container.querySelectorAll<HTMLElement>("[data-lid]").forEach((el) => {
+            snapshot.set(Number(el.dataset.lid), el.getBoundingClientRect());
+          });
+          flipSnapshotRef.current = snapshot;
+        }
+
         setLetters((prev) => {
           const fromIdx = prev.findIndex((l) => l.id === letter.id);
 
@@ -139,7 +188,7 @@ export function LetterScramble() {
               const [item] = arr.splice(fromIdx, 1);
               arr.splice(closest, 0, item);
 
-              sndClick();
+              sndLetterSwap();
 
               const word = arr.map((l) => l.char).join("");
               if (word === SOLUTION) {

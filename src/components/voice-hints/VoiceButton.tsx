@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useStore } from "../../store";
 import { WaveformIcon } from "./WaveformIcon";
 import { MAX_PLAYS, type VoiceHint } from "./constants";
+import { PlayCountDot } from "../PlayCountDot";
 
 export function VoiceButton({ hint }: { hint: VoiceHint }) {
   const count = useStore((s) => s.audioPlayCounts[hint.key] ?? 0);
@@ -92,20 +93,7 @@ export function VoiceButton({ hint }: { hint: VoiceHint }) {
       </span>
 
       {/* play-count dots */}
-      <div className="relative flex gap-1.5">
-        {Array.from({ length: MAX_PLAYS }, (_, i) => (
-          <span
-            key={i}
-            className={`w-1.5 h-1.5 rounded-full transition-colors duration-300 ${
-              success
-                ? "bg-success/50"
-                : i < remaining
-                  ? "bg-accent/45"
-                  : "bg-white/8"
-            }`}
-          />
-        ))}
-      </div>
+      <PlayCountDot total={MAX_PLAYS} remaining={remaining} solved={success} />
     </button>
   );
 }

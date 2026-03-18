@@ -3,6 +3,7 @@ import { useStore, isAttemptUsedToday, msUntilMidnight } from "../store";
 import { getEntityState } from "../ha";
 import { sndAnalysis } from "../audio";
 import { EnigmaPicker } from "./EnigmaPicker";
+import { PlayCountDot } from "./PlayCountDot";
 import darkVadorSrc from "../assets/audios/pascale-dark_vador-enigme.mp3";
 
 const ENTITY_ID = "input_boolean.gift_grimoire_aimant";
@@ -196,10 +197,7 @@ export function DarkVadorButton() {
           <span className="relative text-[0.58rem] font-semibold tracking-[0.22em] uppercase text-accent/80">
             Écouter le secret
           </span>
-          <span className="relative flex items-center gap-1.5 text-[0.48rem] tracking-[0.1em] text-success/40">
-            <span className="w-1 h-1 rounded-full bg-success/50 animate-pulse" />
-            1 écoute disponible
-          </span>
+          <PlayCountDot total={1} remaining={1} />
         </button>
       </div>
     );
@@ -292,9 +290,11 @@ export function DarkVadorButton() {
         <div className={`absolute bottom-[6px] left-[6px] w-2 h-2 border-b border-l opacity-50 ${cornerColor}`} />
         <div className={`absolute bottom-[6px] right-[6px] w-2 h-2 border-b border-r opacity-50 ${cornerColor}`} />
 
-        <div className={`relative w-full px-1 ${isChecking || showPicker ? "" : "opacity-35"}`}>
-          <WideWaveform playing={isChecking} color={barColor} />
-        </div>
+        {(isChecking || showPicker || hasError) && (
+          <div className={`relative w-full px-1 ${isChecking || showPicker ? "" : "opacity-35"}`}>
+            <WideWaveform playing={isChecking} color={barColor} />
+          </div>
+        )}
 
         <div className="relative flex items-center gap-2">
           {isChecking && (
@@ -319,7 +319,7 @@ export function DarkVadorButton() {
               : hasError
                 ? "Rien ne s'est produit"
                 : showPicker
-                  ? "Une nouvelle amitié s'est formée"
+                  ? "Une nouvelle amitié s'est formée !"
                   : "Tenter un rapprochement"}
           </span>
         </div>
@@ -328,7 +328,7 @@ export function DarkVadorButton() {
           <div className="relative flex flex-col items-center gap-1">
             {countdown && (
               <span className="text-[0.5rem] tracking-[0.15em] text-accent/25 font-mono">
-                réinitialisation dans {countdown}
+                Répéter l'énigme dans {countdown}
               </span>
             )}
           </div>
