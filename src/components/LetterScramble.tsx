@@ -230,8 +230,8 @@ export function LetterScramble() {
               transition-all duration-150
               ${draggingId === l.id ? "opacity-25 scale-90" : ""}
               ${targetIdx === i && draggingId !== l.id ? "border-gold scale-110 shadow-[0_0_12px_#e8c96a40]" : "border-locked-border"}
-              ${solved ? "border-success shadow-[0_0_10px_#4ecca330]" : ""}
-              bg-gradient-to-br from-[#130f26] to-[#0b0917]
+              ${solved ? "border-solved-border/50 shadow-[0_0_22px_#4ecca325]" : ""}
+              ${solved ? "bg-gradient-to-br from-[#0a1f1a] to-[#080f0c]" : "bg-gradient-to-br from-[#130f26] to-[#0b0917]"}
               text-text
             `}
           >

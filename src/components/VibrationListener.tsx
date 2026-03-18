@@ -88,8 +88,8 @@ export function VibrationListener() {
             />
           </svg>
           <div
-            className="absolute inset-[8px] rounded-full flex items-center justify-center border border-success/40 shadow-[0_0_28px_#4ecca330]"
-            style={{ background: "radial-gradient(circle at 45% 40%, #0f2a22, #080f0c)" }}
+            className="absolute inset-[8px] rounded-full flex items-center justify-center border border-solved-border/50 shadow-[0_0_22px_#4ecca325]"
+            style={{ background: "radial-gradient(circle at 45% 40%, #0a1f1a, #080f0c)" }}
           >
             <span className="text-success text-lg font-bold">✓</span>
           </div>
@@ -192,7 +192,7 @@ export function VibrationListener() {
         <div
           className={`absolute inset-[8px] rounded-full flex items-center justify-center transition-all duration-500 ${
             phase === "detected"
-              ? "border border-success/40 shadow-[0_0_28px_#4ecca330]"
+              ? "border border-solved-border/50 shadow-[0_0_22px_#4ecca325]"
               : phase === "failed"
                 ? "border border-danger/30"
                 : phase === "listening"
@@ -202,7 +202,7 @@ export function VibrationListener() {
           style={{
             background:
               phase === "detected"
-                ? "radial-gradient(circle at 45% 40%, #0f2a22, #080f0c)"
+                ? "radial-gradient(circle at 45% 40%, #0a1f1a, #080f0c)"
                 : phase === "listening"
                   ? "radial-gradient(circle at 45% 40%, #1a1235, #0d0a1a)"
                   : "radial-gradient(circle at 45% 40%, #13102a, #0b0917)",

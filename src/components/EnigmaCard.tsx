@@ -84,7 +84,7 @@ export function EnigmaCard({ enigma, isAdmin }: { enigma: Enigma; isAdmin: boole
     "aspect-[2/3] rounded-[18px] border-[1.5px] relative overflow-hidden flex flex-col items-center justify-center p-3 px-2 select-none transition-all duration-400";
 
   const stateClass = isSolved
-    ? "border-solved-border shadow-[0_0_22px_#4ecca340,inset_0_0_16px_#4ecca310] cursor-pointer"
+    ? "border-solved-border/50 shadow-[0_0_22px_#4ecca325] cursor-pointer"
     : state.unlocked
       ? "border-unlocked-border cursor-pointer active:scale-[0.94]"
       : "border-locked-border grayscale brightness-[0.55]";
@@ -94,7 +94,9 @@ export function EnigmaCard({ enigma, isAdmin }: { enigma: Enigma; isAdmin: boole
       ref={ref}
       className={`${base} ${stateClass}`}
       style={{
-        background: "linear-gradient(155deg, #130f26, #0b0917)",
+        background: isSolved
+          ? "linear-gradient(155deg, #0a1f1a, #080f0c)"
+          : "linear-gradient(155deg, #130f26, #0b0917)",
         ...(isNew && {
           background: "linear-gradient(155deg, rgb(11 9 23), rgb(42 28 122))",
           animation: "newly-unlocked-pulse 2s ease-in-out infinite",
@@ -104,15 +106,22 @@ export function EnigmaCard({ enigma, isAdmin }: { enigma: Enigma; isAdmin: boole
       onClick={handleClick}
     >
       {/* Radial glow overlay */}
-      <div className="absolute inset-0 pointer-events-none bg-[radial-gradient(ellipse_at_50%_10%,#3a2a5a18,transparent_65%)]" />
+      <div
+        className="absolute inset-0 pointer-events-none"
+        style={{
+          background: isSolved
+            ? "radial-gradient(ellipse at 50% 50%, #4ecca318, transparent 65%)"
+            : "radial-gradient(ellipse at 50% 10%, #3a2a5a18, transparent 65%)",
+        }}
+      />
 
       {/* Corner decorations */}
       {!isLocked && (
         <>
-          <div className="absolute top-[7px] left-[7px] w-2.5 h-2.5 border-unlocked-border border-t border-l opacity-45" />
-          <div className="absolute top-[7px] right-[7px] w-2.5 h-2.5 border-unlocked-border border-t border-r opacity-45" />
-          <div className="absolute bottom-[7px] left-[7px] w-2.5 h-2.5 border-unlocked-border border-b border-l opacity-45" />
-          <div className="absolute bottom-[7px] right-[7px] w-2.5 h-2.5 border-unlocked-border border-b border-r opacity-45" />
+          <div className={`absolute top-[7px] left-[7px] w-2.5 h-2.5 border-t border-l opacity-45 ${isSolved ? "border-solved-border/50" : "border-unlocked-border"}`} />
+          <div className={`absolute top-[7px] right-[7px] w-2.5 h-2.5 border-t border-r opacity-45 ${isSolved ? "border-solved-border/50" : "border-unlocked-border"}`} />
+          <div className={`absolute bottom-[7px] left-[7px] w-2.5 h-2.5 border-b border-l opacity-45 ${isSolved ? "border-solved-border/50" : "border-unlocked-border"}`} />
+          <div className={`absolute bottom-[7px] right-[7px] w-2.5 h-2.5 border-b border-r opacity-45 ${isSolved ? "border-solved-border/50" : "border-unlocked-border"}`} />
         </>
       )}
 

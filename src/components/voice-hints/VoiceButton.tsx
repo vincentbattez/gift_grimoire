@@ -33,7 +33,7 @@ export function VoiceButton({ hint }: { hint: VoiceHint }) {
   const accentColor = success ? "var(--color-success)" : "var(--color-accent)";
 
   const borderClass = success
-    ? "border-solved-border/40 shadow-[0_0_18px_#4ecca320]"
+    ? "border-solved-border/50 shadow-[0_0_22px_#4ecca325]"
     : isPlaying
       ? "border-accent/50 shadow-[0_0_20px_#9b6dff25]"
       : exhausted
@@ -41,13 +41,13 @@ export function VoiceButton({ hint }: { hint: VoiceHint }) {
         : "border-unlocked-border/25 hover:border-unlocked-border/50 active:scale-[0.96]";
 
   const labelClass = success
-    ? "text-success/70"
+    ? "text-success"
     : exhausted
       ? "text-muted/30"
       : "text-accent/80";
 
   const cornerBorder = success
-    ? "border-solved-border"
+    ? "border-solved-border/50"
     : "border-unlocked-border";
 
   return (
@@ -55,14 +55,18 @@ export function VoiceButton({ hint }: { hint: VoiceHint }) {
       onClick={handlePlay}
       disabled={exhausted}
       className={`flex-1 relative overflow-hidden flex flex-col items-center gap-2 py-3.5 px-3 rounded-[14px] border-[1.5px] transition-all duration-300 select-none cursor-pointer ${borderClass}`}
-      style={{ background: "linear-gradient(155deg, #130f26, #0b0917)" }}
+      style={{
+        background: success
+          ? "linear-gradient(155deg, #0a1f1a, #080f0c)"
+          : "linear-gradient(155deg, #130f26, #0b0917)",
+      }}
     >
       {/* radial glow */}
       <div
         className="absolute inset-0 pointer-events-none"
         style={{
           background: success
-            ? "radial-gradient(ellipse at 50% 10%, #4ecca315, transparent 60%)"
+            ? "radial-gradient(ellipse at 50% 50%, #4ecca318, transparent 65%)"
             : "radial-gradient(ellipse at 50% 10%, #3a2a5a18, transparent 60%)",
         }}
       />
