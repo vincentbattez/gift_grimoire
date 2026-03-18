@@ -5,6 +5,7 @@ import { sndClick, sndVictory } from "../audio";
 import { spawnCelebration } from "../particles";
 import { CELEBRATION_SCROLL_SETTLE_MS, CELEBRATION_DURATION_MS } from "../timings";
 import { triggerUnlockEffect } from "../unlock";
+import { LockIcon } from "./LockIcon";
 
 export function EnigmaCard({ enigma, isAdmin }: { enigma: Enigma; isAdmin: boolean }) {
   const state = useStore((s) => s.enigmas[enigma.id]);
@@ -121,7 +122,7 @@ export function EnigmaCard({ enigma, isAdmin }: { enigma: Enigma; isAdmin: boole
       {/* Card content */}
       {isLocked ? (
         <>
-          <div className="text-2xl text-muted mb-1.5 opacity-60">🔒</div>
+          <LockIcon />
           <div className="text-[0.6rem] tracking-[0.2em] text-muted uppercase">
             Énigme {enigma.id}
           </div>

@@ -151,6 +151,84 @@ body {
   }
 }
 
+/* ── Lock icon animations ── */
+
+@keyframes lock-float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-3px); }
+}
+
+@keyframes lock-keyhole-pulse {
+  0%, 100% { opacity: 0.5; filter: drop-shadow(0 0 2px #9b6dff); }
+  50% { opacity: 1; filter: drop-shadow(0 0 8px #9b6dff) drop-shadow(0 0 16px #9b6dff60); }
+}
+
+@keyframes lock-orbit-spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+@keyframes lock-dot-fade {
+  0%, 100% { opacity: 0.1; transform: scale(0.6); }
+  50% { opacity: 0.7; transform: scale(1); }
+}
+
+.lock-icon-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 52px;
+  height: 52px;
+}
+
+.lock-svg {
+  animation: lock-float 3s ease-in-out infinite;
+  filter: drop-shadow(0 0 6px #9b6dff20);
+}
+
+.lock-keyhole {
+  animation: lock-keyhole-pulse 2.5s ease-in-out infinite;
+}
+
+.lock-keyhole-glow {
+  animation: lock-keyhole-pulse 2.5s ease-in-out infinite;
+}
+
+.lock-shackle {
+  transform-origin: 50% 100%;
+}
+
+.lock-orbit {
+  position: absolute;
+  inset: -4px;
+  animation: lock-orbit-spin 8s linear infinite;
+}
+
+.lock-orbit-dot {
+  position: absolute;
+  width: 3px;
+  height: 3px;
+  border-radius: 50%;
+  background: #9b6dff;
+  animation: lock-dot-fade 2.5s ease-in-out infinite;
+}
+
+.lock-orbit-dot:nth-child(1) {
+  top: 0; left: 50%;
+  animation-delay: 0s;
+}
+
+.lock-orbit-dot:nth-child(2) {
+  bottom: 15%; right: 0;
+  animation-delay: 0.8s;
+}
+
+.lock-orbit-dot:nth-child(3) {
+  bottom: 15%; left: 0;
+  animation-delay: 1.6s;
+}
+
 @keyframes newly-unlocked-pulse {
   0%,
   100% {

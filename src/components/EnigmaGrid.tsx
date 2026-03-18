@@ -7,7 +7,7 @@ export function EnigmaGrid({ isAdmin }: { isAdmin: boolean }) {
     <>
       <VoiceHints />
       <div className="text-center text-[0.6rem] tracking-[0.35em] text-muted my-4 uppercase">
-        — Les Six Énigmes —
+        — Les Six Mystères Scellés —
       </div>
       <div className="grid grid-cols-2 gap-3">
         {ENIGMAS.map((e) => (

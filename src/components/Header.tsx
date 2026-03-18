@@ -17,10 +17,10 @@ export function Header() {
       <h1 className="font-[var(--font-cinzel-decorative)] text-[1.55rem] text-gold leading-tight tracking-wide drop-shadow-[0_0_30px_#e8c96a55]">
         Le Grimoire
         <br />
-        de Léa
+        Ensorcelé de Léa
       </h1>
       <p className="text-[0.72rem] text-muted mt-2.5 tracking-[0.15em] uppercase">
-        Pars à la chasse aux runes cachées
+        Un sort protège chaque rune… sauras-tu le briser ?
       </p>
       <div className="mx-auto mt-4 w-3/4 h-[3px] bg-[#1e1530] rounded-sm overflow-hidden">
         <div
