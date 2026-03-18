@@ -8,11 +8,14 @@ import { EnigmaModal } from "./components/EnigmaModal";
 import { Toast } from "./components/Toast";
 import { UnlockOverlay } from "./components/UnlockOverlay";
 import { SuccessModal } from "./components/SuccessModal";
+import { IntroModal } from "./components/IntroModal";
 import { triggerUnlockEffect } from "./unlock";
 import { initAdmin, useAdmin } from "./useAdmin";
 import { fireEvent } from "./ha";
 
 initAdmin();
+
+let shouldShowIntro = false;
 
 function initGrimoireInit() {
   const params = new URLSearchParams(location.search);
@@ -21,6 +24,7 @@ function initGrimoireInit() {
   const qs = params.toString();
   history.replaceState({}, "", location.pathname + (qs ? `?${qs}` : ""));
   fireEvent("gift_grimoire-init");
+  shouldShowIntro = true;
 }
 
 initGrimoireInit();
@@ -110,6 +114,7 @@ export default function App() {
   useQRUnlock();
   const resetAttempt = useStore((s) => s.resetAttempt);
   const isAdmin = useAdmin();
+  const [showIntro, setShowIntro] = useState(shouldShowIntro);
 
   return (
     <>
@@ -130,6 +135,7 @@ export default function App() {
       <Toast />
       <UnlockOverlay />
       <SuccessModal />
+      {showIntro && <IntroModal onClose={() => setShowIntro(false)} />}
     </>
   );
 }

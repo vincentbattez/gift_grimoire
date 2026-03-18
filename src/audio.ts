@@ -303,6 +303,67 @@ export function sndDeepListen(): () => void {
   };
 }
 
+/** Modern slide transition — clean digital tick + airy swipe */
+export const sndPageTurn = () => {
+  const c = getCtx();
+  const t = c.currentTime;
+
+  // Clean digital tick — short sine pop
+  const pop = c.createOscillator();
+  const popG = c.createGain();
+  pop.connect(popG);
+  popG.connect(c.destination);
+  pop.type = "sine";
+  pop.frequency.setValueAtTime(1400, t);
+  pop.frequency.exponentialRampToValueAtTime(600, t + 0.04);
+  popG.gain.setValueAtTime(0.12, t);
+  popG.gain.exponentialRampToValueAtTime(0.0001, t + 0.06);
+  pop.start(t);
+  pop.stop(t + 0.07);
+
+  // Soft harmonic tail
+  tone(880, "sine", 0.04, 0.1, 0.02);
+};
+
+/** Grimoire open — cinematic bass drop + crystal reveal */
+export const sndGrimoireOpen = () => {
+  const c = getCtx();
+  const t = c.currentTime;
+
+  // Sub bass impact — modern "drop" feel
+  const sub = c.createOscillator();
+  const subG = c.createGain();
+  sub.connect(subG);
+  subG.connect(c.destination);
+  sub.type = "sine";
+  sub.frequency.setValueAtTime(120, t);
+  sub.frequency.exponentialRampToValueAtTime(40, t + 0.3);
+  subG.gain.setValueAtTime(0.2, t);
+  subG.gain.exponentialRampToValueAtTime(0.0001, t + 0.5);
+  sub.start(t);
+  sub.stop(t + 0.5);
+
+  // Crystal ping — two-note interval (modern UI reveal)
+  tone(1320, "sine", 0.1, 0.4, 0.08);
+  tone(1760, "sine", 0.08, 0.5, 0.16);
+
+  // Soft pad chord — warm digital glow
+  [440, 554, 660].forEach((f, i) => {
+    const o = c.createOscillator();
+    const g = c.createGain();
+    o.connect(g);
+    g.connect(c.destination);
+    o.type = "sine";
+    o.frequency.value = f;
+    const start = t + 0.12 + i * 0.02;
+    g.gain.setValueAtTime(0, start);
+    g.gain.linearRampToValueAtTime(0.05, start + 0.15);
+    g.gain.exponentialRampToValueAtTime(0.0001, start + 1.2);
+    o.start(start);
+    o.stop(start + 1.2);
+  });
+};
+
 /** Ambient tension drone — crescendo over ~3s, returns stop function */
 export function sndAmbientTension(): () => void {
   const c = getCtx();
