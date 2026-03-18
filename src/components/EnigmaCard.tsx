@@ -132,6 +132,33 @@ export function EnigmaCard({ enigma, isAdmin }: { enigma: Enigma; isAdmin: boole
         </div>
       )}
 
+      {/* Golden letter notification */}
+      {isSolved && (
+        <div className="absolute top-1.5 left-1.5">
+          <div
+            className="w-[26px] h-[26px] rounded-full flex items-center justify-center text-[0.62rem] leading-none"
+            style={{
+              background: "radial-gradient(circle at 38% 32%, #f5d87a, #c9a032)",
+              animation: "golden-ball-glow 2.2s ease-in-out infinite",
+            }}
+          >
+            ✉
+          </div>
+          <div
+            className="absolute -top-1 -right-1.5 w-[5px] h-[5px] rounded-full bg-gold"
+            style={{ animation: "golden-sparkle 1.6s ease-in-out infinite" }}
+          />
+          <div
+            className="absolute -bottom-1 -left-1 w-[3px] h-[3px] rounded-full bg-gold"
+            style={{ animation: "golden-sparkle 1.6s ease-in-out 0.5s infinite" }}
+          />
+          <div
+            className="absolute top-[-3px] left-1/2 w-[3px] h-[3px] rounded-full bg-gold"
+            style={{ animation: "golden-sparkle 1.6s ease-in-out 1.1s infinite" }}
+          />
+        </div>
+      )}
+
       {/* Card content */}
       {isLocked ? (
         <>

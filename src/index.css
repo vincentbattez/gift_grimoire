@@ -229,6 +229,53 @@ body {
   }
 }
 
+/* ── Golden letter ball on solved cards ── */
+
+@keyframes golden-ball-glow {
+  0%, 100% {
+    box-shadow: 0 0 6px #e8c96a70, 0 0 14px #e8c96a35;
+    transform: scale(1);
+  }
+  50% {
+    box-shadow: 0 0 10px #e8c96aA0, 0 0 22px #e8c96a55, 0 0 34px #e8c96a20;
+    transform: scale(1.1);
+  }
+}
+
+@keyframes golden-sparkle {
+  0%, 100% { opacity: 0.2; transform: scale(0.4); }
+  50% { opacity: 1; transform: scale(1); }
+}
+
+/* ── Envelope button shimmer ── */
+
+@keyframes envelope-shimmer {
+  0% { background-position: -200% center; }
+  100% { background-position: 200% center; }
+}
+
+@keyframes envelope-breathe {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(0.96); }
+}
+
+/* ── Love letter modal ── */
+
+@keyframes love-letter-enter {
+  0% { opacity: 0; transform: scale(0.82) translateY(24px); }
+  100% { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+@keyframes love-particle-float {
+  0%, 100% { transform: translateY(0) scale(0.6); opacity: 0.25; }
+  50% { transform: translateY(-12px) scale(1); opacity: 0.6; }
+}
+
+@keyframes love-letter-overlay-in {
+  0% { opacity: 0; }
+  100% { opacity: 1; }
+}
+
 /* ── Unlock Overlay — Drag & Drop ── */
 
 .unlock-overlay {

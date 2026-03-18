@@ -23,6 +23,7 @@ type GrimoireStore = {
   vibrationSolved: boolean;
   successBoxNumber: number | null;
   successHaEvent: string | null;
+  loveLetterEnigmaId: EnigmaId | null;
 
   unlock: (id: EnigmaId) => void;
   solve: (id: EnigmaId) => void;
@@ -45,6 +46,8 @@ type GrimoireStore = {
   solveVibration: () => void;
   showSuccessBox: (boxNumber: number, haEvent: string) => void;
   hideSuccessBox: () => void;
+  openLoveLetter: (id: EnigmaId) => void;
+  closeLoveLetter: () => void;
 };
 
 const initialEnigmas: Record<EnigmaId, EnigmaState> = {};
@@ -71,6 +74,7 @@ export const useStore = create<GrimoireStore>()(
       vibrationSolved: false,
       successBoxNumber: null,
       successHaEvent: null,
+      loveLetterEnigmaId: null,
 
       unlock: (id) =>
         set((s) => {
@@ -139,6 +143,8 @@ export const useStore = create<GrimoireStore>()(
       solveVibration: () => set({ vibrationSolved: true }),
       showSuccessBox: (boxNumber, haEvent) => set({ successBoxNumber: boxNumber, successHaEvent: haEvent }),
       hideSuccessBox: () => set({ successBoxNumber: null, successHaEvent: null }),
+      openLoveLetter: (id) => set({ loveLetterEnigmaId: id }),
+      closeLoveLetter: () => set({ loveLetterEnigmaId: null }),
     }),
     {
       name: "grimoire_v3",

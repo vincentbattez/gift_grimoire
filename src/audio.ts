@@ -364,6 +364,48 @@ export const sndGrimoireOpen = () => {
   });
 };
 
+/** Warm romantic reveal — music-box arpeggio + sustained pad + shimmer */
+export const sndLoveReveal = () => {
+  const c = getCtx();
+  const t = c.currentTime;
+
+  // Music-box arpeggio (C major, gentle)
+  [523, 659, 784, 1047].forEach((f, i) => {
+    const o = c.createOscillator();
+    const g = c.createGain();
+    o.connect(g);
+    g.connect(c.destination);
+    o.type = "sine";
+    o.frequency.value = f;
+    const start = t + i * 0.14;
+    g.gain.setValueAtTime(0, start);
+    g.gain.linearRampToValueAtTime(0.13, start + 0.025);
+    g.gain.exponentialRampToValueAtTime(0.0001, start + 1.4);
+    o.start(start);
+    o.stop(start + 1.4);
+  });
+
+  // Warm sustained pad chord
+  [523, 659, 784].forEach((f, i) => {
+    const o = c.createOscillator();
+    const g = c.createGain();
+    o.connect(g);
+    g.connect(c.destination);
+    o.type = "triangle";
+    o.frequency.value = f;
+    const start = t + 0.5 + i * 0.02;
+    g.gain.setValueAtTime(0, start);
+    g.gain.linearRampToValueAtTime(0.055, start + 0.35);
+    g.gain.exponentialRampToValueAtTime(0.0001, start + 2.8);
+    o.start(start);
+    o.stop(start + 2.8);
+  });
+
+  // High shimmer sparkles
+  tone(2093, "sine", 0.035, 1.6, 0.55);
+  tone(2637, "sine", 0.025, 1.3, 0.75);
+};
+
 /** Ambient tension drone — crescendo over ~3s, returns stop function */
 export function sndAmbientTension(): () => void {
   const c = getCtx();

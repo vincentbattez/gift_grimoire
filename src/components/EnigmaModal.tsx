@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect } from "react";
 import { useStore, isAttemptUsedToday, msUntilMidnight } from "../store";
 import { ENIGMAS, type Enigma } from "../config";
-import { sndOk, sndBad, sndClick } from "../audio";
+import { sndOk, sndBad, sndClick, sndLoveReveal } from "../audio";
 import { SOLVE_FEEDBACK_MS, INPUT_FOCUS_DELAY_MS, ERROR_FEEDBACK_MS } from "../timings";
 
 function normalize(s: string): string {
@@ -30,6 +30,7 @@ function ModalBody({
   const solve = useStore((s) => s.solve);
   const recordAttempt = useStore((s) => s.recordAttempt);
   const celebrate = useStore((s) => s.celebrate);
+  const openLoveLetter = useStore((s) => s.openLoveLetter);
 
   const [value, setValue] = useState("");
   const [feedback, setFeedback] = useState<"ok" | "err" | null>(
@@ -242,19 +243,50 @@ function ModalBody({
         </div>
       )}
 
-      <button
-        onClick={submit}
-        disabled={isSolved || attemptUsed}
-        className={`w-full mt-3 py-4 border-none rounded-[14px] text-white font-[var(--font-cinzel)] text-[0.85rem] font-semibold tracking-[0.12em] uppercase cursor-pointer transition-all duration-200 active:scale-[0.97] ${
-          isSolved
-            ? "bg-gradient-to-br from-[#2a6a4a] to-success shadow-[0_4px_22px_#4ecca328]"
-            : attemptUsed
+      {isSolved ? (
+        <>
+          <div className="flex items-center justify-center gap-2 mt-2 mb-1 py-1.5 px-3 rounded-full bg-success/10 border border-success/20 w-fit mx-auto">
+            <span className="w-1.5 h-1.5 rounded-full bg-success" />
+            <span className="text-[0.72rem] text-success font-semibold tracking-wide">
+              Énigme résolue
+            </span>
+          </div>
+          <button
+            onClick={() => { sndLoveReveal(); openLoveLetter(enigma.id); }}
+            className="w-full mt-3 py-4 border-none rounded-[14px] text-[#3a2a1a] font-[var(--font-cinzel)] text-[0.85rem] font-semibold tracking-[0.12em] uppercase cursor-pointer relative overflow-hidden"
+            style={{
+              background: "linear-gradient(135deg, #f5d87a, #e8c96a, #c9a032)",
+              boxShadow: "0 4px 22px #e8c96a40, 0 0 40px #e8c96a20",
+              animation: "envelope-breathe 2.5s ease-in-out infinite",
+            }}
+          >
+            <div
+              className="absolute inset-0 pointer-events-none"
+              style={{
+                background: "linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.4) 50%, transparent 100%)",
+                backgroundSize: "200% 100%",
+                animation: "envelope-shimmer 3s ease-in-out infinite",
+              }}
+            />
+            <span className="relative z-1 flex items-center justify-center gap-2">
+              <span className="text-[1.1rem]">✉</span>
+              Ouvrir ta lettre
+            </span>
+          </button>
+        </>
+      ) : (
+        <button
+          onClick={submit}
+          disabled={attemptUsed}
+          className={`w-full mt-3 py-4 border-none rounded-[14px] text-white font-[var(--font-cinzel)] text-[0.85rem] font-semibold tracking-[0.12em] uppercase cursor-pointer transition-all duration-200 active:scale-[0.97] ${
+            attemptUsed
               ? "bg-gradient-to-br from-[#3a3a4a] to-[#2a2a3a] opacity-50 cursor-not-allowed"
               : "bg-gradient-to-br from-[#6b4a97] to-accent shadow-[0_4px_22px_#9b6dff28]"
-        }`}
-      >
-        {isSolved ? "✦ Énigme Résolue ✦" : attemptUsed ? "Essai épuisé" : "Valider la Réponse ✦"}
-      </button>
+          }`}
+        >
+          {attemptUsed ? "Essai épuisé" : "Valider la Réponse ✦"}
+        </button>
+      )}
     </div>
   );
 }
