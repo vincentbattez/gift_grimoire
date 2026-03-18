@@ -1,9 +1,11 @@
 import { ENIGMAS } from "../config";
 import { EnigmaCard } from "./EnigmaCard";
+import { VoiceHints } from "./voice-hints/VoiceHints";
 
 export function EnigmaGrid({ isAdmin }: { isAdmin: boolean }) {
   return (
     <>
+      <VoiceHints />
       <div className="text-center text-[0.6rem] tracking-[0.35em] text-muted my-4 uppercase">
         — Les Six Énigmes —
       </div>

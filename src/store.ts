@@ -9,6 +9,7 @@ type EnigmaState = { unlocked: boolean; solved: boolean };
 type GrimoireStore = {
   enigmas: Record<EnigmaId, EnigmaState>;
   lastAttempt: number | null;
+  audioPlayCounts: Record<string, number>;
   toastMessage: string | null;
   modalEnigmaId: EnigmaId | null;
   modalClosingId: EnigmaId | null;
@@ -20,6 +21,7 @@ type GrimoireStore = {
   relock: (id: EnigmaId) => void;
   recordAttempt: () => void;
   resetAttempt: () => void;
+  incrementAudioPlay: (key: string) => void;
   acknowledgeUnlock: (id: EnigmaId) => void;
   openModal: (id: EnigmaId) => void;
   closeModal: () => void;
@@ -39,6 +41,7 @@ export const useStore = create<GrimoireStore>()(
     (set, get) => ({
       enigmas: initialEnigmas,
       lastAttempt: null,
+      audioPlayCounts: {},
       toastMessage: null,
       modalEnigmaId: null,
       modalClosingId: null,
@@ -81,7 +84,11 @@ export const useStore = create<GrimoireStore>()(
         }),
 
       recordAttempt: () => set({ lastAttempt: Date.now() }),
-      resetAttempt: () => set({ lastAttempt: null }),
+      resetAttempt: () => set({ lastAttempt: null, audioPlayCounts: {} }),
+      incrementAudioPlay: (key) =>
+        set((s) => ({
+          audioPlayCounts: { ...s.audioPlayCounts, [key]: (s.audioPlayCounts[key] ?? 0) + 1 },
+        })),
 
       acknowledgeUnlock: (id) =>
         set((s) => {
@@ -103,7 +110,7 @@ export const useStore = create<GrimoireStore>()(
     }),
     {
       name: "grimoire_v3",
-      partialize: (s) => ({ enigmas: s.enigmas, lastAttempt: s.lastAttempt }),
+      partialize: (s) => ({ enigmas: s.enigmas, lastAttempt: s.lastAttempt, audioPlayCounts: s.audioPlayCounts }),
     },
   ),
 );
