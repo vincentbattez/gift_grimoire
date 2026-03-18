@@ -427,25 +427,52 @@ body {
   50% { opacity: 1; }
 }
 
-/* ── Title text ── */
-.unlock-text {
+/* ── Enigma reveal ── */
+.unlock-reveal {
   margin-top: 2rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  opacity: 0;
+}
+
+.unlock-reveal.is-visible {
+  animation: unlock-reveal-in 0.8s ease-out 0.2s both;
+}
+
+@keyframes unlock-reveal-in {
+  0%   { opacity: 0; transform: translateY(50%); }
+  100% { opacity: 1; transform: translateY(-150%); }
+}
+
+.unlock-reveal-label {
+  font-family: var(--font-cinzel);
+  font-size: 0.6rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--color-muted);
+}
+
+.unlock-reveal-icon {
+  font-size: 2.5rem;
+  line-height: 1;
+  filter: drop-shadow(0 0 12px rgba(155, 109, 255, 0.6));
+  animation: unlock-icon-bob 2s ease-in-out 1s infinite;
+}
+
+@keyframes unlock-icon-bob {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-5px); }
+}
+
+.unlock-reveal-title {
   font-family: var(--font-cinzel-decorative);
   font-size: 1rem;
   color: #e8c96a;
   letter-spacing: 0.15em;
   text-align: center;
-  opacity: 0;
   text-shadow: 0 0 20px #e8c96a60;
-}
-
-.unlock-text.is-visible {
-  animation: unlock-text-reveal 0.8s ease-out 0.2s both;
-}
-
-@keyframes unlock-text-reveal {
-  0%   { opacity: 0; transform: translateY(10px); letter-spacing: 0.4em; }
-  100% { opacity: 1; transform: translateY(0); letter-spacing: 0.15em; }
 }
 
 /* ── Overlay fade ── */

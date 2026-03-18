@@ -1,5 +1,6 @@
 import { useEffect, useCallback, useRef, useState } from "react";
 import { useStore } from "../store";
+import { ENIGMAS } from "../config";
 import { sndKeyInsert, sndLockOpen, sndUnlock, sndAmbientTension, sndClick } from "../audio";
 import { spawnParticles } from "../particles";
 import { triggerUnlockReveal } from "../unlock";
@@ -26,6 +27,12 @@ export function UnlockOverlay() {
   const overlayRef = useRef<HTMLDivElement>(null);
   const dragOffset = useRef({ x: 0, y: 0 });
   const prevIdRef = useRef<string | null>(null);
+
+  // Refs to avoid stale closures in setTimeout callbacks
+  const unlockingIdRef = useRef(unlockingId);
+  const unlockingTitleRef = useRef(unlockingTitle);
+  unlockingIdRef.current = unlockingId;
+  unlockingTitleRef.current = unlockingTitle;
 
   // Reset state when a new unlock starts
   useEffect(() => {
@@ -171,8 +178,11 @@ export function UnlockOverlay() {
       spawnParticles(keyholeCenter.x, keyholeCenter.y, 50, "#9b6dff");
       setTimeout(() => spawnParticles(keyholeCenter.x, keyholeCenter.y, 40, "#e8c96a"), 150);
 
-      if (unlockingId) {
-        triggerUnlockReveal(unlockingId, unlockingTitle ?? "");
+      // Read from refs to avoid stale closure
+      const id = unlockingIdRef.current;
+      const title = unlockingTitleRef.current;
+      if (id) {
+        triggerUnlockReveal(id, title ?? "");
       }
 
       setPhase("done");
@@ -185,7 +195,7 @@ export function UnlockOverlay() {
       clearTimeout(t1);
       clearTimeout(t2);
     };
-  }, [unlockingId, unlockingTitle, clearUnlocking]);
+  }, [clearUnlocking]);
 
   if (!unlockingId) return null;
 
@@ -322,12 +332,23 @@ export function UnlockOverlay() {
         </div>
       )}
 
-      {/* Title revealed after unlock */}
-      {isDone && (
-        <div className="unlock-text is-visible">
-          {unlockingTitle}
-        </div>
-      )}
+      {/* Enigma reveal after unlock */}
+      {isDone && (() => {
+        const enigma = ENIGMAS.find((e) => e.id === unlockingIdRef.current);
+        return (
+          <div className="unlock-reveal is-visible">
+            <div className="unlock-reveal-label">
+              Énigme {enigma?.id}
+            </div>
+            <div className="unlock-reveal-icon">
+              {enigma?.icon}
+            </div>
+            <div className="unlock-reveal-title">
+              {unlockingTitle}
+            </div>
+          </div>
+        );
+      })()}
 
       {/* Draggable key */}
       {!isDone && (
