@@ -7,6 +7,7 @@ import { EnigmaGrid } from "./components/EnigmaGrid";
 import { EnigmaModal } from "./components/EnigmaModal";
 import { Toast } from "./components/Toast";
 import { UnlockOverlay } from "./components/UnlockOverlay";
+import { SuccessModal } from "./components/SuccessModal";
 import { triggerUnlockEffect } from "./unlock";
 import { initAdmin, useAdmin } from "./useAdmin";
 import { fireEvent } from "./ha";
@@ -38,6 +39,8 @@ function useQRUnlock() {
 }
 
 function AttemptBadge() {
+  const enigmas = useStore((s) => s.enigmas);
+  const hasUnlocked = Object.values(enigmas).some((e) => e.unlocked || e.solved);
   const lastAttempt = useStore((s) => s.lastAttempt);
   const attemptUsed = isAttemptUsedToday(lastAttempt);
   const [countdown, setCountdown] = useState("");
@@ -55,6 +58,8 @@ function AttemptBadge() {
     const id = setInterval(tick, 1_000);
     return () => clearInterval(id);
   }, [attemptUsed]);
+
+  if (!hasUnlocked) return null;
 
   return (
     <div className="fixed bottom-5 left-1/2 -translate-x-1/2 z-50">
@@ -124,6 +129,7 @@ export default function App() {
       <EnigmaModal />
       <Toast />
       <UnlockOverlay />
+      <SuccessModal />
     </>
   );
 }

@@ -14,6 +14,7 @@ export function EnigmaCard({ enigma, isAdmin }: { enigma: Enigma; isAdmin: boole
   const relock = useStore((s) => s.relock);
   const isCelebrating = useStore((s) => s.celebrateCardId === enigma.id);
   const clearCelebrate = useStore((s) => s.clearCelebrate);
+  const showSuccessBox = useStore((s) => s.showSuccessBox);
   const isNew = useStore((s) => s.newlyUnlocked.has(enigma.id));
   const ref = useRef<HTMLDivElement>(null);
 
@@ -49,8 +50,11 @@ export function EnigmaCard({ enigma, isAdmin }: { enigma: Enigma; isAdmin: boole
       const r = card.getBoundingClientRect();
       spawnCelebration(r.left + r.width / 2, r.top + r.height / 2);
 
-      // Nettoyage après la célébration
-      clearTimer = setTimeout(() => clearCelebrate(), CELEBRATION_DURATION_MS);
+      // Nettoyage après la célébration puis affichage de la modal succès
+      clearTimer = setTimeout(() => {
+        clearCelebrate();
+        showSuccessBox(enigma.boxNumber);
+      }, CELEBRATION_DURATION_MS);
     }, CELEBRATION_SCROLL_SETTLE_MS);
 
     return () => {
@@ -83,7 +87,7 @@ export function EnigmaCard({ enigma, isAdmin }: { enigma: Enigma; isAdmin: boole
     ? "border-solved-border shadow-[0_0_22px_#4ecca340,inset_0_0_16px_#4ecca310] cursor-pointer"
     : state.unlocked
       ? "border-unlocked-border cursor-pointer active:scale-[0.94]"
-      : "border-locked-border grayscale brightness-[0.35]";
+      : "border-locked-border grayscale brightness-[0.55]";
 
   return (
     <div

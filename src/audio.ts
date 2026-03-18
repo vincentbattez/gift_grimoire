@@ -42,6 +42,18 @@ export const sndBad = () => {
 
 export const sndClick = () => tone(900, "sine", 0.09, 0.1);
 
+/** Shimmering chime — scramble solved */
+export const sndScrambleSolved = () => {
+  // Quick ascending sparkle
+  [784, 988, 1175, 1568].forEach((f, i) =>
+    tone(f, "sine", 0.15, 0.4, i * 0.08),
+  );
+  // Sustained resolve chord
+  [1047, 1319, 1568].forEach((f, i) =>
+    tone(f, "triangle", 0.12, 1.4, 0.35 + i * 0.03),
+  );
+};
+
 export const sndVictory = () => {
   // Arpège ascendant rapide (Do-Mi-Sol-Do-Mi)
   [523, 659, 784, 1047, 1319].forEach((f, i) =>

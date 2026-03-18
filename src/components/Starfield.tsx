@@ -1,7 +1,7 @@
 import { useEffect, useRef } from "react";
 import { particles } from "../particles";
 
-type Star = { x: number; y: number; r: number; phase: number; spd: number };
+type Star = { x: number; y: number; r: number; phase: number; spd: number; vx: number; vy: number };
 
 export function Starfield() {
   const starRef = useRef<HTMLCanvasElement>(null);
@@ -19,13 +19,19 @@ export function Starfield() {
       starCv.height = window.innerHeight;
       partCv.width = window.innerWidth;
       partCv.height = window.innerHeight;
-      stars = Array.from({ length: 140 }, () => ({
-        x: Math.random() * starCv.width,
-        y: Math.random() * starCv.height,
-        r: Math.random() * 1.4 + 0.3,
-        phase: Math.random() * Math.PI * 2,
-        spd: Math.random() * 0.006 + 0.002,
-      }));
+      stars = Array.from({ length: 180 }, () => {
+        const angle = Math.random() * Math.PI * 2;
+        const speed = Math.random() * 0.12 + 0.03;
+        return {
+          x: Math.random() * starCv.width,
+          y: Math.random() * starCv.height,
+          r: Math.random() * 1.6 + 0.3,
+          phase: Math.random() * Math.PI * 2,
+          spd: Math.random() * 0.02 + 0.008,
+          vx: Math.cos(angle) * speed,
+          vy: Math.sin(angle) * speed,
+        };
+      });
     }
 
     function draw(t: number) {
@@ -33,7 +39,26 @@ export function Starfield() {
       partCtx.clearRect(0, 0, partCv.width, partCv.height);
 
       for (const s of stars) {
-        const a = 0.2 + 0.8 * Math.abs(Math.sin(t * 0.001 * s.spd * 160 + s.phase));
+        // Déplacement avec wrap-around
+        s.x += s.vx;
+        s.y += s.vy;
+        if (s.x < -2) s.x = starCv.width + 2;
+        else if (s.x > starCv.width + 2) s.x = -2;
+        if (s.y < -2) s.y = starCv.height + 2;
+        else if (s.y > starCv.height + 2) s.y = -2;
+
+        // Clignotement plus intense (min 0.05, amplitude complète)
+        const flicker = Math.sin(t * 0.001 * s.spd * 400 + s.phase);
+        const a = 0.05 + 0.95 * (flicker * flicker);
+
+        // Glow subtil pour les grosses étoiles
+        if (s.r > 1) {
+          starCtx.beginPath();
+          starCtx.arc(s.x, s.y, s.r * 3, 0, Math.PI * 2);
+          starCtx.fillStyle = `rgba(180,160,255,${a * 0.08})`;
+          starCtx.fill();
+        }
+
         starCtx.beginPath();
         starCtx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
         starCtx.fillStyle = `rgba(210,190,255,${a})`;
