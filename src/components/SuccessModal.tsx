@@ -1,9 +1,11 @@
 import { useEffect, useState } from "react";
 import { useStore } from "../store";
 import { sndClick } from "../audio";
+import { fireEvent } from "../ha";
 
 export function SuccessModal() {
   const boxNumber = useStore((s) => s.successBoxNumber);
+  const haEvent = useStore((s) => s.successHaEvent);
   const hideSuccessBox = useStore((s) => s.hideSuccessBox);
   const [entered, setEntered] = useState(false);
 
@@ -18,6 +20,7 @@ export function SuccessModal() {
 
   function handleClose() {
     sndClick();
+    if (haEvent) fireEvent(haEvent);
     hideSuccessBox();
   }
 

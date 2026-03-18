@@ -9,6 +9,7 @@ type EnigmaState = { unlocked: boolean; solved: boolean };
 type GrimoireStore = {
   enigmas: Record<EnigmaId, EnigmaState>;
   lastAttempt: number | null;
+  darkVadorPlayedAt: number | null;
   audioPlayCounts: Record<string, number>;
   toastMessage: string | null;
   modalEnigmaId: EnigmaId | null;
@@ -18,13 +19,16 @@ type GrimoireStore = {
   unlockingCardId: EnigmaId | null;
   unlockingTitle: string | null;
   scrambleSolved: boolean;
+  magnetSolved: boolean;
   successBoxNumber: number | null;
+  successHaEvent: string | null;
 
   unlock: (id: EnigmaId) => void;
   solve: (id: EnigmaId) => void;
   relock: (id: EnigmaId) => void;
   recordAttempt: () => void;
   resetAttempt: () => void;
+  recordDarkVadorPlay: () => void;
   incrementAudioPlay: (key: string) => void;
   acknowledgeUnlock: (id: EnigmaId) => void;
   openModal: (id: EnigmaId) => void;
@@ -36,7 +40,8 @@ type GrimoireStore = {
   startUnlocking: (id: EnigmaId, title: string) => void;
   clearUnlocking: () => void;
   solveScramble: () => void;
-  showSuccessBox: (boxNumber: number) => void;
+  solveMagnet: () => void;
+  showSuccessBox: (boxNumber: number, haEvent: string) => void;
   hideSuccessBox: () => void;
 };
 
@@ -50,6 +55,7 @@ export const useStore = create<GrimoireStore>()(
     (set, get) => ({
       enigmas: initialEnigmas,
       lastAttempt: null,
+      darkVadorPlayedAt: null,
       audioPlayCounts: {},
       toastMessage: null,
       modalEnigmaId: null,
@@ -59,7 +65,9 @@ export const useStore = create<GrimoireStore>()(
       unlockingCardId: null,
       unlockingTitle: null,
       scrambleSolved: false,
+      magnetSolved: false,
       successBoxNumber: null,
+      successHaEvent: null,
 
       unlock: (id) =>
         set((s) => {
@@ -97,7 +105,8 @@ export const useStore = create<GrimoireStore>()(
         }),
 
       recordAttempt: () => set({ lastAttempt: Date.now() }),
-      resetAttempt: () => set({ lastAttempt: null, audioPlayCounts: {} }),
+      resetAttempt: () => set({ lastAttempt: null, darkVadorPlayedAt: null, audioPlayCounts: {} }),
+      recordDarkVadorPlay: () => set({ darkVadorPlayedAt: Date.now() }),
       incrementAudioPlay: (key) =>
         set((s) => ({
           audioPlayCounts: { ...s.audioPlayCounts, [key]: (s.audioPlayCounts[key] ?? 0) + 1 },
@@ -123,12 +132,13 @@ export const useStore = create<GrimoireStore>()(
       startUnlocking: (id, title) => set({ unlockingCardId: id, unlockingTitle: title }),
       clearUnlocking: () => set({ unlockingCardId: null, unlockingTitle: null }),
       solveScramble: () => set({ scrambleSolved: true }),
-      showSuccessBox: (boxNumber) => set({ successBoxNumber: boxNumber }),
-      hideSuccessBox: () => set({ successBoxNumber: null }),
+      solveMagnet: () => set({ magnetSolved: true }),
+      showSuccessBox: (boxNumber, haEvent) => set({ successBoxNumber: boxNumber, successHaEvent: haEvent }),
+      hideSuccessBox: () => set({ successBoxNumber: null, successHaEvent: null }),
     }),
     {
       name: "grimoire_v3",
-      partialize: (s) => ({ enigmas: s.enigmas, lastAttempt: s.lastAttempt, audioPlayCounts: s.audioPlayCounts, scrambleSolved: s.scrambleSolved }),
+      partialize: (s) => ({ enigmas: s.enigmas, lastAttempt: s.lastAttempt, darkVadorPlayedAt: s.darkVadorPlayedAt, audioPlayCounts: s.audioPlayCounts, scrambleSolved: s.scrambleSolved, magnetSolved: s.magnetSolved }),
     },
   ),
 );

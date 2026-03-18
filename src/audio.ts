@@ -121,6 +121,63 @@ export const sndLockOpen = () => {
   tone(280, "triangle", 0.08, 0.3, 0.2);
 };
 
+/** Radar analysis scan — 5 pings over ~5s, auto-fades */
+export function sndAnalysis(): void {
+  const c = getCtx();
+  const t = c.currentTime;
+
+  // Low background drone — full 5.5s
+  const drone = c.createOscillator();
+  const droneG = c.createGain();
+  drone.connect(droneG);
+  droneG.connect(c.destination);
+  drone.type = "sine";
+  drone.frequency.value = 85;
+  droneG.gain.setValueAtTime(0, t);
+  droneG.gain.linearRampToValueAtTime(0.05, t + 0.5);
+  droneG.gain.setValueAtTime(0.05, t + 4.2);
+  droneG.gain.exponentialRampToValueAtTime(0.0001, t + 5.5);
+  drone.start(t);
+  drone.stop(t + 5.5);
+
+  // 5 radar pings — one every ~0.9s
+  for (let i = 0; i < 5; i++) {
+    const pt = t + i * 0.92;
+
+    // Ascending chirp
+    const o = c.createOscillator();
+    const g = c.createGain();
+    o.connect(g);
+    g.connect(c.destination);
+    o.type = "sine";
+    o.frequency.setValueAtTime(900 + i * 60, pt);
+    o.frequency.exponentialRampToValueAtTime(2200 + i * 80, pt + 0.18);
+    g.gain.setValueAtTime(0.0001, pt);
+    g.gain.linearRampToValueAtTime(0.13, pt + 0.02);
+    g.gain.exponentialRampToValueAtTime(0.0001, pt + 0.45);
+    o.start(pt);
+    o.stop(pt + 0.45);
+
+    // Echo at +100ms, softer
+    const oE = c.createOscillator();
+    const gE = c.createGain();
+    oE.connect(gE);
+    gE.connect(c.destination);
+    oE.type = "sine";
+    oE.frequency.setValueAtTime(900 + i * 60, pt + 0.1);
+    oE.frequency.exponentialRampToValueAtTime(2200 + i * 80, pt + 0.28);
+    gE.gain.setValueAtTime(0.0001, pt + 0.1);
+    gE.gain.linearRampToValueAtTime(0.045, pt + 0.12);
+    gE.gain.exponentialRampToValueAtTime(0.0001, pt + 0.55);
+    oE.start(pt + 0.1);
+    oE.stop(pt + 0.55);
+  }
+
+  // Final resolve beep at 4.8s
+  tone(1047, "triangle", 0.14, 0.5, 4.8);
+  tone(1319, "sine", 0.08, 0.4, 4.88);
+}
+
 /** Ambient tension drone — crescendo over ~3s, returns stop function */
 export function sndAmbientTension(): () => void {
   const c = getCtx();

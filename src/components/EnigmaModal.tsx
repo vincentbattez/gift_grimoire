@@ -2,7 +2,6 @@ import { useState, useRef, useEffect } from "react";
 import { useStore, isAttemptUsedToday, msUntilMidnight } from "../store";
 import { ENIGMAS, type Enigma } from "../config";
 import { sndOk, sndBad, sndClick } from "../audio";
-import { fireEvent } from "../ha";
 import { SOLVE_FEEDBACK_MS, INPUT_FOCUS_DELAY_MS, ERROR_FEEDBACK_MS } from "../timings";
 
 function normalize(s: string): string {
@@ -123,7 +122,6 @@ function ModalBody({
       sndOk();
       recordAttempt();
       solve(enigma.id);
-      fireEvent(enigma.haEvent);
 
       // Fermer la modale, puis déclencher la célébration visible
       setTimeout(() => {

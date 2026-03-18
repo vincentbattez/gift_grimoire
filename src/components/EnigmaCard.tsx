@@ -53,7 +53,7 @@ export function EnigmaCard({ enigma, isAdmin }: { enigma: Enigma; isAdmin: boole
       // Nettoyage après la célébration puis affichage de la modal succès
       clearTimer = setTimeout(() => {
         clearCelebrate();
-        showSuccessBox(enigma.boxNumber);
+        showSuccessBox(enigma.boxNumber, enigma.haEvent);
       }, CELEBRATION_DURATION_MS);
     }, CELEBRATION_SCROLL_SETTLE_MS);
 

@@ -2,6 +2,7 @@ import { ENIGMAS } from "../config";
 import { EnigmaCard } from "./EnigmaCard";
 import { LetterScramble } from "./LetterScramble";
 import { VoiceHints } from "./voice-hints/VoiceHints";
+import { DarkVadorButton } from "./DarkVadorButton";
 
 export function EnigmaGrid({ isAdmin }: { isAdmin: boolean }) {
   return (
@@ -14,6 +15,10 @@ export function EnigmaGrid({ isAdmin }: { isAdmin: boolean }) {
         — Le Maillon des Égarés —
       </div>
       <LetterScramble />
+      <div className="text-center text-[0.6rem] tracking-[0.35em] text-muted my-4 uppercase mt-16">
+        — L'Énigme de l'Aimant —
+      </div>
+      <DarkVadorButton />
       <div className="text-center text-[0.6rem] tracking-[0.35em] text-muted my-4 uppercase mt-16">
         — Les Six Mystères Scellés —
       </div>
