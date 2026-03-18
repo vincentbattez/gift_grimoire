@@ -3,6 +3,7 @@ import { EnigmaCard } from "./EnigmaCard";
 import { LetterScramble } from "./LetterScramble";
 import { VoiceHints } from "./voice-hints/VoiceHints";
 import { DarkVadorButton } from "./DarkVadorButton";
+import { VibrationListener } from "./VibrationListener";
 
 export function EnigmaGrid({ isAdmin }: { isAdmin: boolean }) {
   return (
@@ -16,9 +17,13 @@ export function EnigmaGrid({ isAdmin }: { isAdmin: boolean }) {
       </div>
       <LetterScramble />
       <div className="text-center text-[0.6rem] tracking-[0.35em] text-muted my-4 uppercase mt-16">
-        — L'Énigme de l'Aimant —
+        — L'Arc-en-ciel dans le Noir —
       </div>
       <DarkVadorButton />
+      <div className="text-center text-[0.6rem] tracking-[0.35em] text-muted my-4 uppercase mt-16">
+        — Le Murmure Invisible —
+      </div>
+      <VibrationListener />
       <div className="text-center text-[0.6rem] tracking-[0.35em] text-muted my-4 uppercase mt-16">
         — Les Six Mystères Scellés —
       </div>

@@ -17,6 +17,34 @@ export async function getEntityState(entityId: string): Promise<string | null> {
   }
 }
 
+/** Poll a binary_sensor until it matches targetState, or timeout */
+export function pollEntityState(
+  entityId: string,
+  targetState: string,
+  timeoutMs: number,
+  intervalMs = 500,
+): Promise<boolean> {
+  return new Promise((resolve) => {
+    let resolved = false;
+    const done = (result: boolean) => {
+      if (resolved) return;
+      resolved = true;
+      clearTimeout(timer);
+      clearInterval(poller);
+      resolve(result);
+    };
+
+    const timer = setTimeout(() => done(false), timeoutMs);
+    const poller = setInterval(async () => {
+      const state = await getEntityState(entityId);
+      if (state === targetState) done(true);
+    }, intervalMs);
+
+    // Check immediately
+    getEntityState(entityId).then((s) => { if (s === targetState) done(true); });
+  });
+}
+
 export async function fireEvent(event: string) {
   try {
     const { HA_URL, HA_TOKEN } = env;

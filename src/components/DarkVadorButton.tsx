@@ -137,7 +137,6 @@ export function DarkVadorButton() {
             border-solved-border/50 shadow-[0_0_22px_#4ecca325]"
           style={{
             background: "linear-gradient(155deg, #0a1f1a, #080f0c)",
-            animation: "solved-glow 3s ease-in-out infinite",
           }}
         >
           <div
@@ -198,7 +197,7 @@ export function DarkVadorButton() {
             <WideWaveform playing={false} color="#7a55cc" />
           </div>
           <span className="relative text-[0.58rem] font-semibold tracking-[0.22em] uppercase text-accent/50">
-            Écouter l'énigme cachée
+            Écouter le secret
           </span>
         </button>
       </div>

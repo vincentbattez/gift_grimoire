@@ -20,6 +20,7 @@ type GrimoireStore = {
   unlockingTitle: string | null;
   scrambleSolved: boolean;
   magnetSolved: boolean;
+  vibrationSolved: boolean;
   successBoxNumber: number | null;
   successHaEvent: string | null;
 
@@ -41,6 +42,7 @@ type GrimoireStore = {
   clearUnlocking: () => void;
   solveScramble: () => void;
   solveMagnet: () => void;
+  solveVibration: () => void;
   showSuccessBox: (boxNumber: number, haEvent: string) => void;
   hideSuccessBox: () => void;
 };
@@ -66,6 +68,7 @@ export const useStore = create<GrimoireStore>()(
       unlockingTitle: null,
       scrambleSolved: false,
       magnetSolved: false,
+      vibrationSolved: false,
       successBoxNumber: null,
       successHaEvent: null,
 
@@ -133,12 +136,13 @@ export const useStore = create<GrimoireStore>()(
       clearUnlocking: () => set({ unlockingCardId: null, unlockingTitle: null }),
       solveScramble: () => set({ scrambleSolved: true }),
       solveMagnet: () => set({ magnetSolved: true }),
+      solveVibration: () => set({ vibrationSolved: true }),
       showSuccessBox: (boxNumber, haEvent) => set({ successBoxNumber: boxNumber, successHaEvent: haEvent }),
       hideSuccessBox: () => set({ successBoxNumber: null, successHaEvent: null }),
     }),
     {
       name: "grimoire_v3",
-      partialize: (s) => ({ enigmas: s.enigmas, lastAttempt: s.lastAttempt, darkVadorPlayedAt: s.darkVadorPlayedAt, audioPlayCounts: s.audioPlayCounts, scrambleSolved: s.scrambleSolved, magnetSolved: s.magnetSolved }),
+      partialize: (s) => ({ enigmas: s.enigmas, lastAttempt: s.lastAttempt, darkVadorPlayedAt: s.darkVadorPlayedAt, audioPlayCounts: s.audioPlayCounts, scrambleSolved: s.scrambleSolved, magnetSolved: s.magnetSolved, vibrationSolved: s.vibrationSolved }),
     },
   ),
 );

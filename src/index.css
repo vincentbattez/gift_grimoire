@@ -81,16 +81,6 @@ body {
   }
 }
 
-@keyframes solved-glow {
-  0%,
-  100% {
-    box-shadow: 0 0 22px #4ecca340;
-  }
-  50% {
-    box-shadow: 0 0 45px #4ecca370, 0 0 90px #4ecca325;
-  }
-}
-
 @keyframes solve-celebrate {
   0% {
     transform: scale(1);
