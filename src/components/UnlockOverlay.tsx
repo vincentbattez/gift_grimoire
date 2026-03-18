@@ -1,0 +1,370 @@
+import { useEffect, useCallback, useRef, useState } from "react";
+import { useStore } from "../store";
+import { sndKeyInsert, sndLockOpen, sndUnlock, sndAmbientTension, sndClick } from "../audio";
+import { spawnParticles } from "../particles";
+import { triggerUnlockReveal } from "../unlock";
+
+/** Distance (px) at which the key snaps into the keyhole */
+const SNAP_THRESHOLD = 60;
+
+type Phase = "drag" | "unlocking" | "done";
+
+export function UnlockOverlay() {
+  const unlockingId = useStore((s) => s.unlockingCardId);
+  const unlockingTitle = useStore((s) => s.unlockingTitle);
+  const clearUnlocking = useStore((s) => s.clearUnlocking);
+
+  const [phase, setPhase] = useState<Phase>("drag");
+  const [keyPos, setKeyPos] = useState<{ x: number; y: number } | null>(null);
+  const [dragging, setDragging] = useState(false);
+  const [proximity, setProximity] = useState(0); // 0-1, how close to keyhole
+  const [sceneVisible, setSceneVisible] = useState(true);
+
+  const stopAmbientRef = useRef<(() => void) | null>(null);
+  const keyholeRef = useRef<SVGCircleElement>(null);
+  const lockSvgRef = useRef<SVGSVGElement>(null);
+  const overlayRef = useRef<HTMLDivElement>(null);
+  const dragOffset = useRef({ x: 0, y: 0 });
+  const prevIdRef = useRef<string | null>(null);
+
+  // Reset state when a new unlock starts
+  useEffect(() => {
+    if (unlockingId && unlockingId !== prevIdRef.current) {
+      setPhase("drag");
+      setKeyPos(null);
+      setDragging(false);
+      setProximity(0);
+      setSceneVisible(true);
+    }
+    prevIdRef.current = unlockingId;
+  }, [unlockingId]);
+
+  // Ambient drone while overlay is visible
+  useEffect(() => {
+    if (!unlockingId) return;
+    stopAmbientRef.current = sndAmbientTension();
+    return () => {
+      stopAmbientRef.current?.();
+      stopAmbientRef.current = null;
+    };
+  }, [unlockingId]);
+
+  const getKeyholeCenter = useCallback((): { x: number; y: number } | null => {
+    if (!keyholeRef.current || !lockSvgRef.current) return null;
+    const svgRect = lockSvgRef.current.getBoundingClientRect();
+    // Keyhole is at SVG coords (40, 60) in a viewBox of 80x96, rendered at 120x144
+    const scaleX = svgRect.width / 105;
+    const scaleY = svgRect.height / 105;
+    return {
+      x: svgRect.left + 40 * scaleX,
+      y: svgRect.top + 60 * scaleY,
+    };
+  }, []);
+
+  const getDistToKeyhole = useCallback((px: number, py: number) => {
+    const kh = getKeyholeCenter();
+    if (!kh) return Infinity;
+    return Math.hypot(px - kh.x, py - kh.y);
+  }, [getKeyholeCenter]);
+
+  // ── Drag handlers (touch + mouse) ──
+
+  const onDragStart = useCallback((clientX: number, clientY: number, elRect: DOMRect) => {
+    if (phase !== "drag") return;
+    dragOffset.current = {
+      x: clientX - elRect.left - elRect.width / 2,
+      y: clientY - elRect.top - elRect.height / 2,
+    };
+    setDragging(true);
+    sndClick();
+  }, [phase]);
+
+  const onDragMove = useCallback((clientX: number, clientY: number) => {
+    if (phase !== "drag") return;
+    const x = clientX - dragOffset.current.x;
+    const y = clientY - dragOffset.current.y;
+    setKeyPos({ x, y });
+
+    const dist = getDistToKeyhole(x, y);
+    setProximity(Math.max(0, Math.min(1, 1 - dist / 200)));
+  }, [phase, getDistToKeyhole]);
+
+  const onDragEnd = useCallback((clientX: number, clientY: number) => {
+    if (phase !== "drag") return;
+    setDragging(false);
+
+    const dist = getDistToKeyhole(clientX - dragOffset.current.x, clientY - dragOffset.current.y);
+
+    if (dist < SNAP_THRESHOLD) {
+      // Snap to keyhole — offset so the teeth (bottom of key) align with the keyhole.
+      // Key SVG is 150px tall, teeth are at ~83%. With translate(-50%,-50%) the center
+      // is at 75px. Teeth offset from center = 150*0.83 - 75 = 50px.
+      // So we position the key 50px above the keyhole.
+      const kh = getKeyholeCenter();
+      if (kh) {
+        setKeyPos({ x: kh.x, y: kh.y - 50 });
+        setPhase("unlocking");
+        triggerUnlockSequence(kh);
+      }
+    } else {
+      // Spring back
+      setKeyPos(null);
+      setProximity(0);
+    }
+  }, [phase, getDistToKeyhole, getKeyholeCenter]);
+
+  // Mouse handlers
+  const onMouseDown = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    const rect = e.currentTarget.getBoundingClientRect();
+    onDragStart(e.clientX, e.clientY, rect);
+
+    const onMove = (ev: MouseEvent) => onDragMove(ev.clientX, ev.clientY);
+    const onUp = (ev: MouseEvent) => {
+      onDragEnd(ev.clientX, ev.clientY);
+      window.removeEventListener("mousemove", onMove);
+      window.removeEventListener("mouseup", onUp);
+    };
+    window.addEventListener("mousemove", onMove);
+    window.addEventListener("mouseup", onUp);
+  }, [onDragStart, onDragMove, onDragEnd]);
+
+  // Touch handlers
+  const onTouchStart = useCallback((e: React.TouchEvent<HTMLDivElement>) => {
+    const t = e.touches[0];
+    const rect = e.currentTarget.getBoundingClientRect();
+    onDragStart(t.clientX, t.clientY, rect);
+  }, [onDragStart]);
+
+  const onTouchMove = useCallback((e: React.TouchEvent) => {
+    const t = e.touches[0];
+    onDragMove(t.clientX, t.clientY);
+  }, [onDragMove]);
+
+  const onTouchEnd = useCallback((e: React.TouchEvent) => {
+    const t = e.changedTouches[0];
+    onDragEnd(t.clientX, t.clientY);
+  }, [onDragEnd]);
+
+  // ── Unlock sequence after snap ──
+
+  const triggerUnlockSequence = useCallback((keyholeCenter: { x: number; y: number }) => {
+    // 0ms — key insert click
+    sndKeyInsert();
+    navigator.vibrate?.(30);
+
+    // 600ms — key rotate (handled by CSS class)
+    // 1100ms — lock open sound
+    const t1 = setTimeout(() => {
+      sndLockOpen();
+      navigator.vibrate?.(50);
+    }, 1100);
+
+    // 1600ms — burst + unlock
+    const t2 = setTimeout(() => {
+      sndUnlock();
+      stopAmbientRef.current?.();
+      stopAmbientRef.current = null;
+      navigator.vibrate?.(200);
+
+      // Particles
+      spawnParticles(keyholeCenter.x, keyholeCenter.y, 50, "#9b6dff");
+      setTimeout(() => spawnParticles(keyholeCenter.x, keyholeCenter.y, 40, "#e8c96a"), 150);
+
+      if (unlockingId) {
+        triggerUnlockReveal(unlockingId, unlockingTitle ?? "");
+      }
+
+      setPhase("done");
+      // Hide lock/keyhole scene after a short dissolve, well before overlay fades
+      setTimeout(() => setSceneVisible(false), 500);
+      setTimeout(() => clearUnlocking(), 3000);
+    }, 1600);
+
+    return () => {
+      clearTimeout(t1);
+      clearTimeout(t2);
+    };
+  }, [unlockingId, unlockingTitle, clearUnlocking]);
+
+  if (!unlockingId) return null;
+
+  // Key resting position (bottom center)
+  const restX = typeof window !== "undefined" ? window.innerWidth / 2 : 200;
+  const restY = typeof window !== "undefined" ? window.innerHeight - 120 : 600;
+  const currentX = keyPos?.x ?? restX;
+  const currentY = keyPos?.y ?? restY;
+
+  const isUnlocking = phase === "unlocking";
+  const isDone = phase === "done";
+
+  return (
+    <div
+      ref={overlayRef}
+      className="unlock-overlay"
+      style={{
+        animation: isDone
+          ? "unlock-ov-in 0.5s ease-out forwards, unlock-ov-out 0.8s ease-in 2.2s forwards"
+          : "unlock-ov-in 0.5s ease-out forwards",
+      }}
+    >
+      {/* Lock */}
+      <div
+        className="unlock-scene"
+        style={{
+          opacity: sceneVisible ? 1 : 0,
+          transform: sceneVisible ? "scale(1)" : "scale(1.2)",
+          filter: sceneVisible ? "none" : "blur(6px)",
+          transition: "opacity 0.4s ease-out, transform 0.4s ease-out, filter 0.4s ease-out",
+        }}
+      >
+        <svg
+          ref={lockSvgRef}
+          className="unlock-lock-svg"
+          viewBox="0 0 80 96"
+          width="120"
+          height="144"
+          fill="none"
+        >
+          <defs>
+            <linearGradient id="ulBody" x1="8" y1="40" x2="72" y2="96">
+              <stop offset="0%" stopColor="#2a1f4e" />
+              <stop offset="100%" stopColor="#150e2e" />
+            </linearGradient>
+            <radialGradient id="ulKeyGlow" cx="50%" cy="50%" r="50%">
+              <stop offset="0%" stopColor="#9b6dff" stopOpacity="0.8" />
+              <stop offset="100%" stopColor="#9b6dff" stopOpacity="0" />
+            </radialGradient>
+            <filter id="ulKeyholeGlow">
+              <feGaussianBlur stdDeviation="2.5" result="b" />
+              <feMerge>
+                <feMergeNode in="b" />
+                <feMergeNode in="SourceGraphic" />
+              </feMerge>
+            </filter>
+            <filter id="ulBigGlow">
+              <feGaussianBlur stdDeviation="8" result="b" />
+              <feMerge>
+                <feMergeNode in="b" />
+                <feMergeNode in="SourceGraphic" />
+              </feMerge>
+            </filter>
+          </defs>
+
+          {/* Shackle */}
+          <path
+            className={`unlock-shackle ${isUnlocking || isDone ? "is-opening" : ""}`}
+            d="M22 40 V28 A18 18 0 0 1 58 28 V40"
+            stroke="#5a4f6a"
+            strokeWidth="3"
+            strokeLinecap="round"
+            fill="none"
+          />
+
+          {/* Body */}
+          <rect
+            className={`unlock-body ${isUnlocking ? "is-reacting" : ""} ${isDone ? "is-dissolving" : ""}`}
+            x="10"
+            y="40"
+            width="60"
+            height="48"
+            rx="10"
+            fill="url(#ulBody)"
+            stroke="#5a4f6a"
+            strokeWidth="1.5"
+          />
+
+          {/* Keyhole glow — intensity follows proximity */}
+          <circle
+            ref={keyholeRef}
+            cx="40"
+            cy="64"
+            r="14"
+            fill="url(#ulKeyGlow)"
+            style={{ opacity: 0.3 + proximity * 0.7 }}
+          />
+
+          {/* Keyhole */}
+          <g filter="url(#ulKeyholeGlow)" style={{ opacity: 0.6 + proximity * 0.4 }}>
+            <circle cx="40" cy="60" r="6" fill="#9b6dff" />
+            <path d="M37 64 L40 80 L43 64" fill="#9b6dff" />
+          </g>
+
+          {/* Burst flash */}
+          <circle
+            className={`unlock-burst ${isDone ? "is-bursting" : ""}`}
+            cx="40"
+            cy="55"
+            r="60"
+            fill="#9b6dff"
+            opacity="0"
+            filter="url(#ulBigGlow)"
+          />
+        </svg>
+
+        {/* Shatter fragments */}
+        {isDone && [...Array(8)].map((_, i) => (
+          <div
+            key={i}
+            className="unlock-fragment is-flying"
+            style={{
+              "--frag-angle": `${(360 / 8) * i}deg`,
+              "--frag-dist": `${80 + Math.random() * 40}px`,
+            } as React.CSSProperties}
+          />
+        ))}
+      </div>
+
+      {/* Hint text */}
+      {phase === "drag" && (
+        <div className="unlock-hint">
+          Glisse la clé dans la serrure
+        </div>
+      )}
+
+      {/* Title revealed after unlock */}
+      {isDone && (
+        <div className="unlock-text is-visible">
+          {unlockingTitle}
+        </div>
+      )}
+
+      {/* Draggable key */}
+      {!isDone && (
+        <div
+          className={`unlock-key-draggable ${dragging ? "is-dragging" : ""} ${isUnlocking ? "is-inserted" : ""}`}
+          style={{
+            left: currentX,
+            top: currentY,
+            // Glow increases with proximity
+            filter: `drop-shadow(0 0 ${8 + proximity * 20}px rgba(232, 201, 106, ${0.4 + proximity * 0.6}))`,
+          }}
+          onMouseDown={onMouseDown}
+          onTouchStart={onTouchStart}
+          onTouchMove={onTouchMove}
+          onTouchEnd={onTouchEnd}
+        >
+          <svg viewBox="0 0 40 120" width="50" height="150" fill="none">
+            <defs>
+              <filter id="keyGlow">
+                <feGaussianBlur stdDeviation="2" result="b" />
+                <feMerge>
+                  <feMergeNode in="b" />
+                  <feMergeNode in="SourceGraphic" />
+                </feMerge>
+              </filter>
+            </defs>
+            <g filter="url(#keyGlow)">
+              <circle cx="20" cy="16" r="12" stroke="#e8c96a" strokeWidth="3" fill="none" />
+              <circle cx="20" cy="16" r="5" stroke="#e8c96a" strokeWidth="2" fill="none" />
+              <line x1="20" y1="28" x2="20" y2="100" stroke="#e8c96a" strokeWidth="3" strokeLinecap="round" />
+              <line x1="20" y1="80" x2="30" y2="80" stroke="#e8c96a" strokeWidth="3" strokeLinecap="round" />
+              <line x1="20" y1="90" x2="28" y2="90" stroke="#e8c96a" strokeWidth="3" strokeLinecap="round" />
+              <line x1="20" y1="100" x2="26" y2="100" stroke="#e8c96a" strokeWidth="3" strokeLinecap="round" />
+            </g>
+          </svg>
+        </div>
+      )}
+    </div>
+  );
+}

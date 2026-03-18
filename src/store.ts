@@ -15,6 +15,8 @@ type GrimoireStore = {
   modalClosingId: EnigmaId | null;
   newlyUnlocked: Set<EnigmaId>;
   celebrateCardId: EnigmaId | null;
+  unlockingCardId: EnigmaId | null;
+  unlockingTitle: string | null;
 
   unlock: (id: EnigmaId) => void;
   solve: (id: EnigmaId) => void;
@@ -29,6 +31,8 @@ type GrimoireStore = {
   hideToast: () => void;
   celebrate: (id: EnigmaId) => void;
   clearCelebrate: () => void;
+  startUnlocking: (id: EnigmaId, title: string) => void;
+  clearUnlocking: () => void;
 };
 
 const initialEnigmas: Record<EnigmaId, EnigmaState> = {};
@@ -47,6 +51,8 @@ export const useStore = create<GrimoireStore>()(
       modalClosingId: null,
       newlyUnlocked: new Set(),
       celebrateCardId: null,
+      unlockingCardId: null,
+      unlockingTitle: null,
 
       unlock: (id) =>
         set((s) => {
@@ -107,6 +113,8 @@ export const useStore = create<GrimoireStore>()(
       hideToast: () => set({ toastMessage: null }),
       celebrate: (id) => set({ celebrateCardId: id }),
       clearCelebrate: () => set({ celebrateCardId: null }),
+      startUnlocking: (id, title) => set({ unlockingCardId: id, unlockingTitle: title }),
+      clearUnlocking: () => set({ unlockingCardId: null, unlockingTitle: null }),
     }),
     {
       name: "grimoire_v3",

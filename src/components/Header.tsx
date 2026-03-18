@@ -20,7 +20,7 @@ export function Header() {
         Ensorcelé de Léa
       </h1>
       <p className="text-[0.72rem] text-muted mt-2.5 tracking-[0.15em] uppercase">
-        Un sort protège chaque rune… sauras-tu le briser ?
+        Un sort protège chaque rune… <br/> sauras-tu le briser ?
       </p>
       <div className="mx-auto mt-4 w-3/4 h-[3px] bg-[#1e1530] rounded-sm overflow-hidden">
         <div

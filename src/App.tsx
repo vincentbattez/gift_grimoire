@@ -6,6 +6,7 @@ import { Header } from "./components/Header";
 import { EnigmaGrid } from "./components/EnigmaGrid";
 import { EnigmaModal } from "./components/EnigmaModal";
 import { Toast } from "./components/Toast";
+import { UnlockOverlay } from "./components/UnlockOverlay";
 import { triggerUnlockEffect } from "./unlock";
 import { initAdmin, useAdmin } from "./useAdmin";
 import { fireEvent } from "./ha";
@@ -122,6 +123,7 @@ export default function App() {
       <AttemptBadge />
       <EnigmaModal />
       <Toast />
+      <UnlockOverlay />
     </>
   );
 }
