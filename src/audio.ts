@@ -97,6 +97,28 @@ export const sndVictory = () => {
   tone(2093, "sine", 0.12, 1.5, 0.6);
 };
 
+/** Gentle close — descending music-box + warm settle */
+export const sndLoveClose = () => {
+  const c = getCtx();
+  const t = c.currentTime;
+
+  // Descending music-box arpeggio (mirror of sndLoveReveal)
+  [523, 659, 784, 1047, 1203, 1402].forEach((f, i) => {
+    const o = c.createOscillator();
+    const g = c.createGain();
+    o.connect(g);
+    g.connect(c.destination);
+    o.type = "sine";
+    o.frequency.value = f;
+    const start = t + i * 0.11;
+    g.gain.setValueAtTime(0, start);
+    g.gain.linearRampToValueAtTime(0.09, start + 0.02);
+    g.gain.exponentialRampToValueAtTime(0.0001, start + 0.9);
+    o.start(start);
+    o.stop(start + 0.9);
+  });
+};
+
 /** Metallic click — key inserting into keyhole */
 export const sndKeyInsert = () => {
   const c = getCtx();
