@@ -160,10 +160,7 @@ export function DarkVadorButton() {
           </div>
 
           <span className="relative text-[0.58rem] font-semibold tracking-[0.22em] uppercase text-success">
-            Énigme de l'aimant résolue
-          </span>
-          <span className="relative text-[0.5rem] tracking-[0.12em] text-success/50">
-            Le signal magnétique a été détecté
+            Dark Vador a trouvé un nouvel ami
           </span>
         </div>
       </div>
@@ -196,8 +193,12 @@ export function DarkVadorButton() {
           <div className="relative w-full px-1">
             <WideWaveform playing={false} color="#7a55cc" />
           </div>
-          <span className="relative text-[0.58rem] font-semibold tracking-[0.22em] uppercase text-accent/50">
+          <span className="relative text-[0.58rem] font-semibold tracking-[0.22em] uppercase text-accent/80">
             Écouter le secret
+          </span>
+          <span className="relative flex items-center gap-1.5 text-[0.48rem] tracking-[0.1em] text-success/40">
+            <span className="w-1 h-1 rounded-full bg-success/50 animate-pulse" />
+            1 écoute disponible
           </span>
         </button>
       </div>
@@ -245,17 +246,17 @@ export function DarkVadorButton() {
       ? "border-solved-border/55 shadow-[0_0_22px_#4ecca328]"
       : isChecking
         ? "border-gold/50 shadow-[0_0_18px_#e8c96a20]"
-        : "border-gold/25 hover:border-gold/45 active:scale-[0.98]";
+        : "border-accent/35 hover:border-accent/60 shadow-[0_0_18px_#9b6dff20] hover:shadow-[0_0_28px_#9b6dff35] active:scale-[0.98]";
 
-  const barColor = hasError ? "#ff6b8a" : showPicker ? "#4ecca3" : "#e8c96a";
+  const barColor = hasError ? "#ff6b8a" : showPicker ? "#4ecca3" : isChecking ? "#e8c96a" : "#9b6dff";
   const bgStyle = hasError
     ? "radial-gradient(ellipse at 50% 50%, #ff6b8a18, transparent 65%)"
     : showPicker
       ? "radial-gradient(ellipse at 50% 50%, #4ecca318, transparent 65%)"
       : isChecking
         ? "radial-gradient(ellipse at 50% 50%, #e8c96a12, transparent 65%)"
-        : "radial-gradient(ellipse at 50% 20%, #e8c96a08, transparent 60%)";
-  const cornerColor = showPicker ? "border-solved-border/50" : "border-gold/25";
+        : "radial-gradient(ellipse at 50% 50%, #9b6dff12, transparent 60%)";
+  const cornerColor = showPicker ? "border-solved-border/50" : isChecking ? "border-gold/25" : "border-accent/25";
 
   return (
     <div className="mt-6">
@@ -272,7 +273,9 @@ export function DarkVadorButton() {
         style={{
           background: showPicker
             ? "linear-gradient(155deg, #0a1f1a, #080f0c)"
-            : "linear-gradient(155deg, #16110a, #0b0a07)",
+            : isChecking
+              ? "linear-gradient(155deg, #16110a, #0b0a07)"
+              : "linear-gradient(155deg, #130f26, #0b0917)",
         }}
       >
         <div className="absolute inset-0 pointer-events-none" style={{ background: bgStyle }} />
@@ -308,29 +311,27 @@ export function DarkVadorButton() {
                   ? "text-success"
                   : isChecking
                     ? "text-gold/90"
-                    : "text-gold/40"
+                    : "text-accent/80"
             }`}
           >
             {isChecking
-              ? "Analyse du signal…"
+              ? "Les forces convergent…"
               : hasError
-                ? "Signal absent — réessayez"
+                ? "Rien ne s'est produit"
                 : showPicker
-                  ? "Signal magnétique détecté"
-                  : "Vérifier le signal magnétique"}
+                  ? "Une nouvelle amitié s'est formée"
+                  : "Tenter un rapprochement"}
           </span>
         </div>
 
-        {showPicker && (
-          <span className="relative text-[0.5rem] tracking-[0.12em] text-success/50">
-            Choisissez l'énigme à déverrouiller ci-dessous
-          </span>
-        )}
-
-        {!isChecking && !showPicker && countdown && (
-          <span className="relative text-[0.5rem] tracking-[0.15em] text-gold/25 font-mono">
-            réinitialisation dans {countdown}
-          </span>
+        {!isChecking && !showPicker && (
+          <div className="relative flex flex-col items-center gap-1">
+            {countdown && (
+              <span className="text-[0.5rem] tracking-[0.15em] text-accent/25 font-mono">
+                réinitialisation dans {countdown}
+              </span>
+            )}
+          </div>
         )}
       </button>
 

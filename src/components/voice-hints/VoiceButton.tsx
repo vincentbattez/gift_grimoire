@@ -43,7 +43,7 @@ export function VoiceButton({ hint }: { hint: VoiceHint }) {
     ? "text-success/70"
     : exhausted
       ? "text-muted/30"
-      : "text-accent/70";
+      : "text-accent/80";
 
   const cornerBorder = success
     ? "border-solved-border"
