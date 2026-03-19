@@ -123,9 +123,13 @@ export default function App() {
       <div className="relative z-1 max-w-[430px] mx-auto px-4 pb-12">
         <Header />
         <EnigmaGrid isAdmin={isAdmin} />
+        <p className="mt-6 text-center text-[0.6rem] text-muted/80">
+          {/* color amour avec du rouge */}
+          <span className="text-danger/50 font-bold">❤</span> Imaginé et developpé <span className="text-danger/50 font-bold">avec amour</span> pour Léamour - 2026 <span className="text-danger/50 font-bold">❤</span>
+        </p>
         <button
           onClick={resetAttempt}
-          className="w-full mt-20 py-2 text-[0.5rem] text-muted/20 bg-transparent border-none cursor-default select-none"
+          className="w-full mt-2 mb-4 py-2 text-[0.5rem] text-muted/20 bg-transparent border-none cursor-default select-none"
         >
           reset
         </button>
