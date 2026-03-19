@@ -1,4 +1,4 @@
-import { useRef, useEffect } from "react";
+import { useRef, useEffect, useState } from "react";
 import type { Enigma } from "../config";
 import { useStore } from "../store";
 import { sndClick, sndVictory } from "../audio";
@@ -6,6 +6,7 @@ import { spawnCelebration } from "../particles";
 import { CELEBRATION_SCROLL_SETTLE_MS, CELEBRATION_DURATION_MS } from "../timings";
 import { triggerUnlockEffect } from "../unlock";
 import { LockIcon } from "./LockIcon";
+import { LockedModal } from "./LockedModal";
 
 export function EnigmaCard({ enigma, isAdmin }: { enigma: Enigma; isAdmin: boolean }) {
   const state = useStore((s) => s.enigmas[enigma.id]);
@@ -17,6 +18,7 @@ export function EnigmaCard({ enigma, isAdmin }: { enigma: Enigma; isAdmin: boole
   const showSuccessBox = useStore((s) => s.showSuccessBox);
   const isNew = useStore((s) => s.newlyUnlocked.has(enigma.id));
   const ref = useRef<HTMLDivElement>(null);
+  const [showLocked, setShowLocked] = useState(false);
 
   const isLocked = !state.unlocked && !state.solved;
   const isSolved = state.solved;
@@ -64,7 +66,10 @@ export function EnigmaCard({ enigma, isAdmin }: { enigma: Enigma; isAdmin: boole
   }, [isCelebrating, clearCelebrate]);
 
   function handleClick() {
-    if (isLocked) return;
+    if (isLocked) {
+      setShowLocked(true);
+      return;
+    }
     if (isNew) acknowledgeUnlock(enigma.id);
     sndClick();
     openModal(enigma.id);
@@ -196,6 +201,8 @@ export function EnigmaCard({ enigma, isAdmin }: { enigma: Enigma; isAdmin: boole
       <div className={`absolute bottom-2.5 text-[0.65rem] opacity-20 tracking-[0.1em] ${isSolved ? "text-gold" : "text-accent"}`}>
         {enigma.rune}
       </div>
+
+      {showLocked && <LockedModal onClose={() => setShowLocked(false)} />}
     </div>
   );
 }

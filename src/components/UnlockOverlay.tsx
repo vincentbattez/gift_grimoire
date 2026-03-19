@@ -4,6 +4,7 @@ import { ENIGMAS } from "../config";
 import { sndKeyInsert, sndLockOpen, sndUnlock, sndAmbientTension, sndClick } from "../audio";
 import { spawnParticles } from "../particles";
 import { triggerUnlockReveal } from "../unlock";
+import { LockIcon } from "./LockIcon";
 
 /** Distance (px) at which the key snaps into the keyhole */
 const SNAP_THRESHOLD = 60;
@@ -59,12 +60,12 @@ export function UnlockOverlay() {
   const getKeyholeCenter = useCallback((): { x: number; y: number } | null => {
     if (!keyholeRef.current || !lockSvgRef.current) return null;
     const svgRect = lockSvgRef.current.getBoundingClientRect();
-    // Keyhole is at SVG coords (40, 60) in a viewBox of 80x96, rendered at 120x144
-    const scaleX = svgRect.width / 105;
-    const scaleY = svgRect.height / 105;
+    // Keyhole glow is at SVG coords (20, 32) in viewBox 40x48
+    const scaleX = svgRect.width / 40;
+    const scaleY = svgRect.height / 48;
     return {
-      x: svgRect.left + 40 * scaleX,
-      y: svgRect.top + 60 * scaleY,
+      x: svgRect.left + 20 * scaleX,
+      y: svgRect.top + 32 * scaleY,
     };
   }, []);
 
@@ -228,89 +229,16 @@ export function UnlockOverlay() {
           transition: "opacity 0.4s ease-out, transform 0.4s ease-out, filter 0.4s ease-out",
         }}
       >
-        <svg
-          ref={lockSvgRef}
-          className="unlock-lock-svg"
-          viewBox="0 0 80 96"
-          width="120"
-          height="144"
-          fill="none"
-        >
-          <defs>
-            <linearGradient id="ulBody" x1="8" y1="40" x2="72" y2="96">
-              <stop offset="0%" stopColor="#2a1f4e" />
-              <stop offset="100%" stopColor="#150e2e" />
-            </linearGradient>
-            <radialGradient id="ulKeyGlow" cx="50%" cy="50%" r="50%">
-              <stop offset="0%" stopColor="#9b6dff" stopOpacity="0.8" />
-              <stop offset="100%" stopColor="#9b6dff" stopOpacity="0" />
-            </radialGradient>
-            <filter id="ulKeyholeGlow">
-              <feGaussianBlur stdDeviation="2.5" result="b" />
-              <feMerge>
-                <feMergeNode in="b" />
-                <feMergeNode in="SourceGraphic" />
-              </feMerge>
-            </filter>
-            <filter id="ulBigGlow">
-              <feGaussianBlur stdDeviation="8" result="b" />
-              <feMerge>
-                <feMergeNode in="b" />
-                <feMergeNode in="SourceGraphic" />
-              </feMerge>
-            </filter>
-          </defs>
-
-          {/* Shackle */}
-          <path
-            className={`unlock-shackle ${isUnlocking || isDone ? "is-opening" : ""}`}
-            d="M22 40 V28 A18 18 0 0 1 58 28 V40"
-            stroke="#5a4f6a"
-            strokeWidth="3"
-            strokeLinecap="round"
-            fill="none"
-          />
-
-          {/* Body */}
-          <rect
-            className={`unlock-body ${isUnlocking ? "is-reacting" : ""} ${isDone ? "is-dissolving" : ""}`}
-            x="10"
-            y="40"
-            width="60"
-            height="48"
-            rx="10"
-            fill="url(#ulBody)"
-            stroke="#5a4f6a"
-            strokeWidth="1.5"
-          />
-
-          {/* Keyhole glow — intensity follows proximity */}
-          <circle
-            ref={keyholeRef}
-            cx="40"
-            cy="64"
-            r="14"
-            fill="url(#ulKeyGlow)"
-            style={{ opacity: 0.3 + proximity * 0.7 }}
-          />
-
-          {/* Keyhole */}
-          <g filter="url(#ulKeyholeGlow)" style={{ opacity: 0.6 + proximity * 0.4 }}>
-            <circle cx="40" cy="60" r="6" fill="#9b6dff" />
-            <path d="M37 64 L40 80 L43 64" fill="#9b6dff" />
-          </g>
-
-          {/* Burst flash */}
-          <circle
-            className={`unlock-burst ${isDone ? "is-bursting" : ""}`}
-            cx="40"
-            cy="55"
-            r="60"
-            fill="#9b6dff"
-            opacity="0"
-            filter="url(#ulBigGlow)"
-          />
-        </svg>
+        <LockIcon
+          id="ul"
+          width={120}
+          height={144}
+          orbit={false}
+          overflow
+          svgRef={lockSvgRef}
+          keyholeRef={keyholeRef}
+          unlock={{ phase, proximity }}
+        />
 
         {/* Shatter fragments */}
         {isDone && [...Array(8)].map((_, i) => (
@@ -365,9 +293,9 @@ export function UnlockOverlay() {
           onTouchMove={onTouchMove}
           onTouchEnd={onTouchEnd}
         >
-          <svg viewBox="0 0 40 120" width="50" height="150" fill="none">
+          <svg viewBox="0 0 40 120" width="50" height="150" fill="none" overflow="visible">
             <defs>
-              <filter id="keyGlow">
+              <filter id="keyGlow" x="-50%" y="-50%" width="200%" height="200%">
                 <feGaussianBlur stdDeviation="2" result="b" />
                 <feMerge>
                   <feMergeNode in="b" />

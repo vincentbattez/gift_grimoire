@@ -25,6 +25,7 @@ type GrimoireStore = {
   successHaEvent: string | null;
   loveLetterEnigmaId: EnigmaId | null;
   audioWarningAcknowledged: boolean;
+  forgeRevealed: Record<string, boolean>;
 
   unlock: (id: EnigmaId) => void;
   solve: (id: EnigmaId) => void;
@@ -50,6 +51,7 @@ type GrimoireStore = {
   openLoveLetter: (id: EnigmaId) => void;
   closeLoveLetter: () => void;
   acknowledgeAudioWarning: () => void;
+  revealForge: (key: string) => void;
 };
 
 const initialEnigmas: Record<EnigmaId, EnigmaState> = {};
@@ -78,6 +80,7 @@ export const useStore = create<GrimoireStore>()(
       successHaEvent: null,
       loveLetterEnigmaId: null,
       audioWarningAcknowledged: false,
+      forgeRevealed: {},
 
       unlock: (id) =>
         set((s) => {
@@ -149,10 +152,14 @@ export const useStore = create<GrimoireStore>()(
       openLoveLetter: (id) => set({ loveLetterEnigmaId: id }),
       closeLoveLetter: () => set({ loveLetterEnigmaId: null }),
       acknowledgeAudioWarning: () => set({ audioWarningAcknowledged: true }),
+      revealForge: (key) =>
+        set((s) => ({
+          forgeRevealed: { ...s.forgeRevealed, [key]: true },
+        })),
     }),
     {
       name: "grimoire_v3",
-      partialize: (s) => ({ enigmas: s.enigmas, lastAttempt: s.lastAttempt, darkVadorPlayedAt: s.darkVadorPlayedAt, audioPlayCounts: s.audioPlayCounts, scrambleSolved: s.scrambleSolved, magnetSolved: s.magnetSolved, vibrationSolved: s.vibrationSolved, audioWarningAcknowledged: s.audioWarningAcknowledged }),
+      partialize: (s) => ({ enigmas: s.enigmas, lastAttempt: s.lastAttempt, darkVadorPlayedAt: s.darkVadorPlayedAt, audioPlayCounts: s.audioPlayCounts, scrambleSolved: s.scrambleSolved, magnetSolved: s.magnetSolved, vibrationSolved: s.vibrationSolved, audioWarningAcknowledged: s.audioWarningAcknowledged, forgeRevealed: s.forgeRevealed }),
     },
   ),
 );

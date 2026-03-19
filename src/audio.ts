@@ -453,6 +453,68 @@ export const sndLoveReveal = () => {
   tone(2637, "sine", 0.025, 1.3, 0.75);
 };
 
+/** Forge seal break — arcane seal cracking + crystalline shatter + mystical resolve */
+export const sndForgeReveal = () => {
+  const c = getCtx();
+  const t = c.currentTime;
+
+  // Phase 1: Deep arcane rumble — the seal strains
+  const rumble = c.createOscillator();
+  const rumbleG = c.createGain();
+  rumble.connect(rumbleG);
+  rumbleG.connect(c.destination);
+  rumble.type = "sawtooth";
+  rumble.frequency.setValueAtTime(60, t);
+  rumble.frequency.exponentialRampToValueAtTime(35, t + 0.4);
+  rumbleG.gain.setValueAtTime(0.18, t);
+  rumbleG.gain.exponentialRampToValueAtTime(0.0001, t + 0.5);
+  rumble.start(t);
+  rumble.stop(t + 0.5);
+
+  // Phase 2: Crystalline shatter — rapid descending pings like glass breaking
+  [3800, 3200, 2600, 2100, 1700].forEach((f, i) => {
+    const o = c.createOscillator();
+    const g = c.createGain();
+    o.connect(g);
+    g.connect(c.destination);
+    o.type = "sine";
+    o.frequency.setValueAtTime(f, t + 0.15 + i * 0.035);
+    o.frequency.exponentialRampToValueAtTime(f * 0.4, t + 0.15 + i * 0.035 + 0.2);
+    const start = t + 0.15 + i * 0.035;
+    g.gain.setValueAtTime(0, start);
+    g.gain.linearRampToValueAtTime(0.09, start + 0.005);
+    g.gain.exponentialRampToValueAtTime(0.0001, start + 0.25);
+    o.start(start);
+    o.stop(start + 0.25);
+  });
+
+  // Phase 3: Mystical ascending resolve — the forge awakens
+  [392, 494, 587, 784, 988].forEach((f, i) => {
+    const start = t + 0.4 + i * 0.08;
+    tone(f, "triangle", 0.12, 0.9, 0.4 + i * 0.08);
+  });
+
+  // Sustained ethereal chord — warmth settling in
+  [784, 988, 1175].forEach((f, i) => {
+    const o = c.createOscillator();
+    const g = c.createGain();
+    o.connect(g);
+    g.connect(c.destination);
+    o.type = "sine";
+    o.frequency.value = f;
+    const start = t + 0.7 + i * 0.03;
+    g.gain.setValueAtTime(0, start);
+    g.gain.linearRampToValueAtTime(0.07, start + 0.2);
+    g.gain.exponentialRampToValueAtTime(0.0001, start + 2.2);
+    o.start(start);
+    o.stop(start + 2.2);
+  });
+
+  // Final high shimmer — magic dust
+  tone(2349, "sine", 0.03, 1.5, 0.85);
+  tone(3136, "sine", 0.02, 1.2, 0.95);
+};
+
 /** Ambient tension drone — crescendo over ~3s, returns stop function */
 export function sndAmbientTension(): () => void {
   const c = getCtx();
