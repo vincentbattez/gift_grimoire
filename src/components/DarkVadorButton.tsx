@@ -4,6 +4,8 @@ import { getEntityState } from "../ha";
 import { sndAnalysis } from "../audio";
 import { EnigmaPicker } from "./EnigmaPicker";
 import { PlayCountDot } from "./PlayCountDot";
+import { AudioWarningModal } from "./AudioWarningModal";
+import { LastAttemptModal } from "./LastAttemptModal";
 import darkVadorSrc from "../assets/audios/pascale-dark_vador-enigme.mp3";
 
 const ENTITY_ID = "input_boolean.gift_grimoire_aimant";
@@ -78,17 +80,19 @@ export function DarkVadorButton() {
   const recordDarkVadorPlay = useStore((s) => s.recordDarkVadorPlay);
   const magnetSolved = useStore((s) => s.magnetSolved);
   const solveMagnet = useStore((s) => s.solveMagnet);
+  const audioWarningAcknowledged = useStore((s) => s.audioWarningAcknowledged);
   const playedToday = isAttemptUsedToday(darkVadorPlayedAt);
 
   const [isPlaying, setIsPlaying] = useState(false);
   const [isChecking, setIsChecking] = useState(false);
   const [hasError, setHasError] = useState(false);
   const [showPicker, setShowPicker] = useState(false);
+  const [showWarning, setShowWarning] = useState(false);
+  const [showLastAttempt, setShowLastAttempt] = useState(false);
   const shakeRef = useRef<HTMLButtonElement>(null);
   const countdown = useCountdown();
 
-  async function handlePlay() {
-    if (isPlaying) return;
+  async function playAudio() {
     const audio = new Audio(darkVadorSrc);
     setIsPlaying(true);
     audio.addEventListener("ended", () => {
@@ -100,6 +104,19 @@ export function DarkVadorButton() {
     } catch {
       setIsPlaying(false);
     }
+  }
+
+  function confirmAndPlay() {
+    setShowLastAttempt(true);
+  }
+
+  function handlePlay() {
+    if (isPlaying) return;
+    if (!audioWarningAcknowledged) {
+      setShowWarning(true);
+      return;
+    }
+    confirmAndPlay();
   }
 
   async function handleCheck() {
@@ -199,6 +216,8 @@ export function DarkVadorButton() {
           </span>
           <PlayCountDot total={1} remaining={1} />
         </button>
+        {showWarning && <AudioWarningModal onConfirm={() => { setShowWarning(false); confirmAndPlay(); }} />}
+        {showLastAttempt && <LastAttemptModal onConfirm={() => { setShowLastAttempt(false); playAudio(); }} />}
       </div>
     );
   }

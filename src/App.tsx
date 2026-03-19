@@ -124,7 +124,6 @@ export default function App() {
         <Header />
         <EnigmaGrid isAdmin={isAdmin} />
         <p className="mt-6 text-center text-[0.6rem] text-muted/80">
-          {/* color amour avec du rouge */}
           <span className="text-danger/50 font-bold">❤</span> Imaginé et developpé <span className="text-danger/50 font-bold">avec amour</span> pour Léamour - 2026 <span className="text-danger/50 font-bold">❤</span>
         </p>
         <button
