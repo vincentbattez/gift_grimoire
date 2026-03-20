@@ -9,7 +9,7 @@ const BURST_COUNT = 40;
 function buildBurst(emojis: string[]) {
   const items: { emoji: string; left: number; delay: number; size: number; rot: number; pitch: number }[] = [];
   let cumDelay = 0.15;
-  let gap = 0.28;
+  let gap = 0.2;
   for (let i = 0; i < BURST_COUNT; i++) {
     items.push({
       emoji: emojis[i % emojis.length],
@@ -20,14 +20,14 @@ function buildBurst(emojis: string[]) {
       pitch: -300 + Math.random() * 600,
     });
     cumDelay += gap;
-    gap *= 0.92;
+    gap *= 0.97;
   }
   return items;
 }
 
 const GOLD_PARTICLES = Array.from({ length: 20 }, (_, i) => ({
-  left: `${8 + i * 9}%`,
-  top: `${6 + (i % 4) * 24}%`,
+  left: `${5 + (i % 5) * 22}%`,
+  top: `${5 + Math.floor(i / 5) * 23}%`,
   size: 2 + (i % 3) * 1.5,
   delay: i * 0.35,
 }));
@@ -142,7 +142,6 @@ export function LoveLetterModal() {
 
           {/* Corner decorations */}
           <div className="absolute top-[10px] left-[10px] w-3 h-3 border-t border-l border-[#c9a03260] opacity-60" />
-          <div className="absolute top-[10px] right-[10px] w-3 h-3 border-t border-r border-[#c9a03260] opacity-60" />
           <div className="absolute bottom-[10px] left-[10px] w-3 h-3 border-b border-l border-[#c9a03260] opacity-60" />
           <div className="absolute bottom-[10px] right-[10px] w-3 h-3 border-b border-r border-[#c9a03260] opacity-60" />
 
@@ -154,7 +153,7 @@ export function LoveLetterModal() {
             ✕
           </button>
 
-          <div className="relative px-7 pt-8 pb-9">
+          <div className="relative z-10 px-7 pt-8 pb-9">
             {/* Character icon */}
             <div
               className="text-[2.8rem] text-center mb-2 leading-none"
