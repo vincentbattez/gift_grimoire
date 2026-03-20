@@ -181,9 +181,8 @@ export function UnlockOverlay() {
 
       // Read from refs to avoid stale closure
       const id = unlockingIdRef.current;
-      const title = unlockingTitleRef.current;
       if (id) {
-        triggerUnlockReveal(id, title ?? "");
+        triggerUnlockReveal(id);
       }
 
       setPhase("done");

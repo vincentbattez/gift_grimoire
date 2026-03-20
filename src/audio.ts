@@ -586,7 +586,6 @@ export const sndForgeReveal = () => {
 
   // Phase 3: Mystical ascending resolve — the forge awakens
   [392, 494, 587, 784, 988].forEach((f, i) => {
-    const start = t + 0.4 + i * 0.08;
     tone(f, "triangle", 0.12, 0.9, 0.4 + i * 0.08);
   });
 

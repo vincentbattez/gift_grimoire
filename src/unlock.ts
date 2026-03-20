@@ -10,7 +10,7 @@ export function triggerUnlockEffect(id: string, enigmaTitle: string) {
 }
 
 /** Called by UnlockOverlay when the animation reaches its climax — actually unlocks the card */
-export function triggerUnlockReveal(id: string, enigmaTitle: string) {
+export function triggerUnlockReveal(id: string) {
   const store = useStore.getState();
   if (!store.enigmas[id] || store.enigmas[id].unlocked || store.enigmas[id].solved) return;
 
