@@ -286,7 +286,7 @@ function ModalBody({
               }}
             />
             <span className="relative z-1 flex items-center justify-center gap-2">
-              <span className="text-[1.1rem]">✉</span>
+              <span className="text-[1.1rem]">💌</span>
               Ouvrir ta lettre
             </span>
           </button>

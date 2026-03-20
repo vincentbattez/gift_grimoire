@@ -4,18 +4,28 @@ import { ENIGMAS } from "../config";
 import { sndLoveClose, sndHeartPop } from "../audio";
 
 const CLOSE_MS = 500;
-const HEART_COUNT = 14;
+const BURST_COUNT = 40;
 
-const HEARTS = Array.from({ length: HEART_COUNT }, (_, i) => ({
-  emoji: i % 3 === 0 ? "\u2764\uFE0F" : i % 3 === 1 ? "\u{1F9E1}" : "\u{1F49B}",
-  left: 10 + Math.random() * 80,
-  delay: 0.15 + i * 0.12,
-  size: 0.75 + Math.random() * 0.55,
-  rot: -20 + Math.random() * 40,
-  pitch: -300 + Math.random() * 600,
-}));
+function buildBurst(emojis: string[]) {
+  const items: { emoji: string; left: number; delay: number; size: number; rot: number; pitch: number }[] = [];
+  let cumDelay = 0.15;
+  let gap = 0.28;
+  for (let i = 0; i < BURST_COUNT; i++) {
+    items.push({
+      emoji: emojis[i % emojis.length],
+      left: 10 + Math.random() * 80,
+      delay: cumDelay,
+      size: 1.75 + Math.random() * 0.55,
+      rot: -20 + Math.random() * 40,
+      pitch: -300 + Math.random() * 600,
+    });
+    cumDelay += gap;
+    gap *= 0.92;
+  }
+  return items;
+}
 
-const GOLD_PARTICLES = Array.from({ length: 10 }, (_, i) => ({
+const GOLD_PARTICLES = Array.from({ length: 20 }, (_, i) => ({
   left: `${8 + i * 9}%`,
   top: `${6 + (i % 4) * 24}%`,
   size: 2 + (i % 3) * 1.5,
@@ -30,6 +40,7 @@ export function LoveLetterModal() {
   const [showHearts, setShowHearts] = useState(false);
   const closingEnigmaRef = useRef<string | null>(null);
   const popTimers = useRef<ReturnType<typeof setTimeout>[]>([]);
+  const burstRef = useRef(buildBurst(["❤️"]));
 
   useEffect(() => {
     if (!enigmaId) {
@@ -38,12 +49,14 @@ export function LoveLetterModal() {
       return;
     }
     closingEnigmaRef.current = enigmaId;
+    const currentEnigma = ENIGMAS.find((e) => e.id === enigmaId);
+    burstRef.current = buildBurst(currentEnigma?.loveLetter.emojis ?? ["❤️"]);
     setClosing(false);
     const raf = requestAnimationFrame(() => setEntered(true));
 
     // Launch heart burst with staggered pops
     const showTimer = setTimeout(() => setShowHearts(true), 400);
-    popTimers.current = HEARTS.map((h) =>
+    popTimers.current = burstRef.current.map((h) =>
       setTimeout(() => sndHeartPop(h.pitch), h.delay * 1000 + 400),
     );
 
@@ -81,7 +94,7 @@ export function LoveLetterModal() {
       onClick={handleClose}
     >
       {/* Heart burst */}
-      {showHearts && HEARTS.map((h, i) => (
+      {showHearts && burstRef.current.map((h, i) => (
         <div
           key={i}
           className="absolute pointer-events-none z-10"

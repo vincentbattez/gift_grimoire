@@ -140,7 +140,7 @@ export function EnigmaCard({ enigma, isAdmin }: { enigma: Enigma; isAdmin: boole
               animation: "golden-ball-glow 2.2s ease-in-out infinite",
             }}
           >
-            ✉
+            💌
           </div>
           <div
             className="absolute -top-1 -right-1.5 w-[5px] h-[5px] rounded-full bg-gold"

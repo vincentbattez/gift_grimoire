@@ -12,6 +12,7 @@ export const enigmaSchema = z.object({
   loveLetter: z.object({
     signature: z.string(),
     message: z.string(),
+    emojis: z.array(z.string()).min(1),
   }),
 });
 
@@ -28,6 +29,7 @@ export const ENIGMAS: Enigma[] = z.array(enigmaSchema).parse([
     rune: "ᚠ",
     boxNumber: 5,
     loveLetter: {
+      emojis: ["🦋", "❤️"],
       signature: "Le plus beau don qui existe",
       message: "Tu es Mirabel. Tu n'as besoin d'aucun pouvoir magique pour être extraordinaire — tu l'es dans chaque regard attentif, chaque mot juste, chaque moment où tu vois ce que personne d'autre ne voit.\n\nTu es celle qui répare les fissures invisibles, qui tient tout ensemble par la seule force de son cœur.\n\nEt ça, mon amour, c'est le plus beau don qui existe.",
     },
@@ -42,6 +44,7 @@ export const ENIGMAS: Enigma[] = z.array(enigmaSchema).parse([
     rune: "ᚲ",
     boxNumber: 2,
     loveLetter: {
+      emojis: ["🏮", "❤️"],
       signature: "Mon plus beau rêve éveillé",
       message: "Tu es ma Raiponce. Il y a en toi cette lumière que rien ne peut éteindre, cette curiosité qui transforme chaque jour en aventure.\n\nTu rêves les yeux ouverts, et le plus beau, c'est que tes rêves donnent envie aux autres de rêver aussi.\n\nChaque moment avec toi ressemble à ces lanternes qui s'élèvent dans le ciel — un émerveillement qui ne vieillit jamais. Tu es mon plus beau rêve, celui que je vis éveillé.",
     },
@@ -56,6 +59,7 @@ export const ENIGMAS: Enigma[] = z.array(enigmaSchema).parse([
     rune: "ᚨ",
     boxNumber: 6,
     loveLetter: {
+      emojis: ["💃", "🤖", "❤️"],
       signature: "Ma plus belle petite chose",
       message: "Comme Wall-E, tu me rappelles que l'amour, c'est simple. C'est être là, juste là, à côté de l'autre. Pas besoin d'être parfait, pas besoin de tout comprendre.\n\nJuste être présent, avec cette maladresse magnifique qui me fait fondre à chaque fois.\n\nTu m'as appris à voir la beauté dans les petites choses. Et la plus belle de toutes ces petites choses, c'est toi.",
     },
@@ -70,6 +74,7 @@ export const ENIGMAS: Enigma[] = z.array(enigmaSchema).parse([
     rune: "ᚦ",
     boxNumber: 1,
     loveLetter: {
+      emojis: ["🔮", "❤️"],
       signature: "Celle qui voit l'invisible",
       message: "Comme Bruno, tu possèdes ce don rare de voir au-delà des apparences. Là où les autres regardent, toi tu observes. Là où les autres entendent, toi tu écoutes vraiment.\n\nOn ne comprend pas toujours ta profondeur, et parfois ça te pèse — mais c'est exactement cette sensibilité qui fait de toi quelqu'un d'irremplaçable.\n\nTu es mon cadre doré, celle qui voit l'invisible et qui rend visible l'essentiel.",
     },
@@ -84,6 +89,7 @@ export const ENIGMAS: Enigma[] = z.array(enigmaSchema).parse([
     rune: "ᚢ",
     boxNumber: 3,
     loveLetter: {
+      emojis: ["💪", "🌹", "❤️"],
       signature: "Ta force la plus belle",
       message: "Comme Luisa, tu portes le monde avec grâce. Tu es toujours là pour les autres, la première à tendre la main, la dernière à montrer que parfois, toi aussi, tu fatigues.\n\nMais je veux que tu saches quelque chose : avec moi, tu n'as pas besoin d'être forte. Tu peux tout poser.\n\nTa vulnérabilité n'est pas une faiblesse — c'est ta plus grande beauté. Et je serai toujours là pour porter avec toi.",
     },
@@ -98,6 +104,7 @@ export const ENIGMAS: Enigma[] = z.array(enigmaSchema).parse([
     rune: "ᚱ",
     boxNumber: 4,
     loveLetter: {
+      emojis: ["🤖", "❤️"],
       signature: "Chaque matin, je te choisis",
       message: "Comme EVE, tu as cette grâce qui me désarme à chaque fois. Tu es brillante, déterminée, capable de tout — et pourtant, c'est dans tes gestes les plus doux que je te reconnais le mieux.\n\nUn regard, un sourire, une main posée sur la mienne.\n\nTu m'as appris que l'amour n'est pas écrit dans un programme — c'est un choix qu'on fait chaque matin. Et chaque matin, mon cœur te choisit.",
     },
