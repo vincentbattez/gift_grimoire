@@ -10,3 +10,19 @@
 
 - **Enigma IDs are tied to physical QR codes.** IDs in `src/config.ts` (`"5"`, `"Y"`, `"2g"`, `"F"`, `"X"`, `"2d"`) are encoded in printed QR codes. Changing or removing an ID breaks the corresponding physical card.
 - **Zustand store persists to localStorage under key `grimoire_v3`.** Changing the persisted state shape (`enigmas`, `lastAttempt`) without a migration strategy will silently reset all user progress.
+
+## Design & tone — non-negotiable
+
+> **Context:** This site is a romantic gift — the sole audience is the creator's wife. She must feel like the heroine of a story written for her. Every decision serves that.
+
+### Interaction design
+
+- **4-state model.** Interactive element can handle **idle, disable, doing, failing, successful**, each with its own visual treatment AND sound effect.
+- **VFX on everything.** Particles, glows, shakes, scale pulses. Transitions are animated (no opacity-only fades, no instant swaps). Prefer spring/physics-based easing over linear/ease-in-out.
+- **SFX on everything.** Every user action produces a sound. Success is celebratory, failure is expressive (not punishing), idle has subtle ambient cues where appropriate.
+
+### Copy & writing
+
+- **She is the heroine.** All user-facing text is written as if narrating her personal adventure — uncovering secrets, traversing enigmas. Second person, present tense.
+- **Poetic, never utilitarian.** No generic labels ("Submit", "Error", "Loading"). Rewrite them to fit the narrative.
+- **Romantic register.** Vocabulary must evoke wonder, intimacy, mystery. No tech jargon, no dry instructions.
