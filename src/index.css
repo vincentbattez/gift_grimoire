@@ -256,8 +256,14 @@ body {
 }
 
 @keyframes envelope-breathe {
-  0%, 100% { transform: scale(1); }
-  50% { transform: scale(0.96); }
+  0%, 100% {
+    transform: scale(1);
+    box-shadow: 0 0 50px #e8c96a80, 0 0 120px #e8c96a50, 0 0 220px #e8c96a30, inset 0 1px 0 #ffffff80;
+  }
+  50% {
+    transform: scale(0.97);
+    box-shadow: 0 0 30px #e8c96a50, 0 0 80px #e8c96a30, 0 0 160px #e8c96a18, inset 0 1px 0 #ffffff60;
+  }
 }
 
 /* ── Love letter modal ── */
@@ -265,6 +271,15 @@ body {
 @keyframes love-letter-enter {
   0% { opacity: 0; transform: scale(0.82) translateY(24px); }
   100% { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+@keyframes love-glow-shine {
+  0%, 100% {
+    box-shadow: 0 0 30px #e8c96a50, 0 0 80px #e8c96a30, 0 0 160px #e8c96a18, inset 0 1px 0 #ffffff60;
+  }
+  50% {
+    box-shadow: 0 0 50px #e8c96a80, 0 0 120px #e8c96a50, 0 0 220px #e8c96a30, inset 0 1px 0 #ffffff80;
+  }
 }
 
 @keyframes love-particle-float {

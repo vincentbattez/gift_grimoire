@@ -119,7 +119,8 @@ export function LoveLetterModal() {
             background: "linear-gradient(165deg, #fdf8ec, #f5e6c8, #ede0c0)",
             border: "1.5px solid #d4a94280",
             boxShadow:
-              "0 0 50px #e8c96a30, 0 0 100px #e8c96a15, inset 0 1px 0 #ffffff60",
+              "0 0 30px #e8c96a50, 0 0 80px #e8c96a30, 0 0 160px #e8c96a18, inset 0 1px 0 #ffffff60",
+            animation: "love-glow-shine 4s ease-in-out infinite",
             transitionTimingFunction: "cubic-bezier(.22,1,.36,1)",
           }}
           onClick={(e) => e.stopPropagation()}
@@ -148,7 +149,7 @@ export function LoveLetterModal() {
           {/* Close button */}
           <button
             onClick={handleClose}
-            className="absolute top-3 right-3 w-[28px] h-[28px] rounded-full flex items-center justify-center cursor-pointer text-[0.75rem] z-10 border border-[#c9a03230] bg-[#f5e6c8] text-[#8a7040] hover:bg-[#ede0c0] transition-colors"
+            className="absolute top-3 right-3 w-[28px] h-[28px] rounded-full flex items-center justify-center cursor-pointer text-[0.75rem] z-20 border border-[#c9a03230] bg-[#f5e6c8] text-[#8a7040] hover:bg-[#ede0c0] transition-colors"
           >
             ✕
           </button>
