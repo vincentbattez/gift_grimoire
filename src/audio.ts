@@ -520,6 +520,35 @@ export const sndLoveReveal = () => {
   tone(2637, "sine", 0.025, 1.3, 0.75);
 };
 
+/** Golden seal — warm chime when card reaches its final golden state */
+export const sndGoldenSeal = () => {
+  const c = getCtx();
+  const t = c.currentTime;
+
+  // Warm golden bell — two harmonics with slow decay
+  [659, 880].forEach((f, i) => {
+    const o = c.createOscillator();
+    const g = c.createGain();
+    o.connect(g);
+    g.connect(c.destination);
+    o.type = "sine";
+    o.frequency.value = f;
+    const start = t + i * 0.12;
+    g.gain.setValueAtTime(0, start);
+    g.gain.linearRampToValueAtTime(0.14, start + 0.03);
+    g.gain.exponentialRampToValueAtTime(0.0001, start + 1.8);
+    o.start(start);
+    o.stop(start + 1.8);
+  });
+
+  // Shimmering overtone — golden sparkle
+  tone(1760, "sine", 0.04, 1.2, 0.15);
+  tone(2217, "sine", 0.025, 0.9, 0.25);
+
+  // Sub warmth — weight and presence
+  tone(330, "triangle", 0.06, 1.4, 0.08);
+};
+
 /** Forge seal break — arcane seal cracking + crystalline shatter + mystical resolve */
 export const sndForgeReveal = () => {
   const c = getCtx();

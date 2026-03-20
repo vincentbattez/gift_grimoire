@@ -282,7 +282,7 @@ function ModalBody({
         {enigma.title}
       </h2>
       <p
-        className={`text-[0.88rem] leading-relaxed text-center mb-5 p-4 rounded-[14px] border italic ${
+        className={`text-[0.88rem] leading-relaxed text-center mb-5 p-4 rounded-[14px] whitespace-pre-line border italic ${
           isSolved
             ? "text-text bg-[#e8c96a06] border-[#c9a03220]"
             : "text-text bg-white/[0.03] border-[#2e2248]"

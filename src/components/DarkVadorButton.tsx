@@ -75,6 +75,21 @@ function useCountdown() {
   return label;
 }
 
+/**
+ * Énoncé de l'énigme:
+ * ```
+ * [mysterious][slow] Mon premier règne dans l'obscurité... qui ignore avoir créé la lumière. [long pause] Mon second est un animal... [whispers] qui porte le prénom d'un homme. [long pause]
+ *
+ * [intense]Mon premier inspire la terreur...[sinister] à quiconque croise son ombre. [long pause]
+ * [mysterious] Mon second disparaît sans jamais vraiment partir. [long pause]
+ *
+ * Mon tout est ce que personne n'aurait osé imaginer... [laughs] les ténèbres apaisées par mille couleurs silencieuses. [laughing]
+ *
+ * [whispers][slow] Rien de mieux qu'un câlin,[long pause] pour apaiser le mal. [long pause] N'est-ce pas ?
+ * ```
+ *
+ * Solution: Prendre Pascal aimanté près du tableau Dark Vador, et appuyer sur le bouton "Tenter un rapprochement" pour activer la détection de signal HA. Si le signal est détecté, l'énigme est résolue et une nouvelle amitié se forme entre Pascale et Dark Vador et une enigme est débloquée dans le grimoire.
+ */
 export function DarkVadorButton() {
   const darkVadorPlayedAt = useStore((s) => s.darkVadorPlayedAt);
   const recordDarkVadorPlay = useStore((s) => s.recordDarkVadorPlay);

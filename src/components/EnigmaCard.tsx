@@ -1,7 +1,7 @@
 import { useRef, useEffect, useState } from "react";
 import type { Enigma } from "../config";
 import { useStore } from "../store";
-import { sndClick, sndVictory, sndLoveReveal } from "../audio";
+import { sndClick, sndVictory, sndGoldenSeal } from "../audio";
 import { spawnCelebration } from "../particles";
 import { CELEBRATION_SCROLL_SETTLE_MS, CELEBRATION_DURATION_MS } from "../timings";
 import { triggerUnlockEffect, playUnlockCardEffect } from "../unlock";
@@ -11,7 +11,6 @@ import { LockedModal } from "./LockedModal";
 export function EnigmaCard({ enigma, isAdmin }: { enigma: Enigma; isAdmin: boolean }) {
   const state = useStore((s) => s.enigmas[enigma.id]);
   const openModal = useStore((s) => s.openModal);
-  const openLoveLetter = useStore((s) => s.openLoveLetter);
   const acknowledgeUnlock = useStore((s) => s.acknowledgeUnlock);
   const relock = useStore((s) => s.relock);
   const isCelebrating = useStore((s) => s.celebrateCardId === enigma.id);
@@ -23,9 +22,17 @@ export function EnigmaCard({ enigma, isAdmin }: { enigma: Enigma; isAdmin: boole
   const ref = useRef<HTMLDivElement>(null);
   const [showLocked, setShowLocked] = useState(false);
   const prevUnlockingRef = useRef(unlockingId);
+  const prevLetterReadRef = useRef(letterRead);
 
   const isLocked = !state.unlocked && !state.solved;
   const isSolved = state.solved;
+
+  // SFX quand la carte atteint son état doré final (lettre lue)
+  useEffect(() => {
+    const wasUnread = !prevLetterReadRef.current;
+    prevLetterReadRef.current = letterRead;
+    if (wasUnread && letterRead) sndGoldenSeal();
+  }, [letterRead]);
 
   // Quand l'overlay se ferme pour cette carte → scroll + flash + particules
   useEffect(() => {
@@ -34,7 +41,7 @@ export function EnigmaCard({ enigma, isAdmin }: { enigma: Enigma; isAdmin: boole
 
     if (wasUnlockingThis && unlockingId === null) {
       // Petit délai pour laisser l'overlay disparaître visuellement
-      const timer = setTimeout(() => playUnlockCardEffect(enigma.id), 150);
+      const timer = setTimeout(() => playUnlockCardEffect(enigma.id, enigma.title), 150);
       return () => clearTimeout(timer);
     }
   }, [unlockingId, enigma.id]);

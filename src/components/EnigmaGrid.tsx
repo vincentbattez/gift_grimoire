@@ -14,9 +14,21 @@ type ForgePhase = "locked" | "shaking" | "shattering" | "revealing" | "done";
 
 const RUNE_GLYPHS = ["ᚠ", "ᚢ", "ᚦ", "ᚨ", "ᚱ", "ᚲ", "ᚷ", "ᚹ"];
 
+const FORGE_SUCCESS_MESSAGES: Record<string, string> = {
+  scramble: "Les lettres égarées ont retrouvé leur place… Une nouvelle clé se forge dans la lumière.",
+  magnet: "Pascal changea les couleurs sombres du cœur de Dark Vador. Le seigneur des ténèbres posa enfin son sabre et sourit.",
+  vibration: "Le murmure s'est tu… mais son secret résonne encore. Une clé naît du silence.",
+};
+
 function ForgeSection({ forgeKey, title, children }: { forgeKey: string; title: string; children: React.ReactNode }) {
   const revealed = useStore((s) => s.forgeRevealed[forgeKey]);
   const revealForge = useStore((s) => s.revealForge);
+  const solved = useStore((s) =>
+    forgeKey === "scramble" ? s.scrambleSolved
+    : forgeKey === "magnet" ? s.magnetSolved
+    : forgeKey === "vibration" ? s.vibrationSolved
+    : false,
+  );
   const [phase, setPhase] = useState<ForgePhase>("locked");
   const containerRef = useRef<HTMLDivElement>(null);
   const lockRef = useRef<HTMLDivElement>(null);
@@ -24,13 +36,29 @@ function ForgeSection({ forgeKey, title, children }: { forgeKey: string; title: 
   if (revealed && phase !== "revealing") {
     return (
       <div
-        className="rounded-[18px] border border-locked-border overflow-hidden py-8 px-4"
-        style={{ background: "linear-gradient(155deg, #130f26, #0b0917)" }}
+        className="rounded-[18px] border overflow-hidden py-8 px-4 transition-colors duration-700"
+        style={{
+          borderColor: solved ? "var(--color-solved-border)" : "var(--color-locked-border)",
+          background: solved
+            ? "linear-gradient(155deg, #0d1a1a, #0b0917)"
+            : "linear-gradient(155deg, #130f26, #0b0917)",
+          boxShadow: solved ? "0 0 20px #4ecca320, inset 0 0 30px #4ecca308" : undefined,
+        }}
       >
-        <div className="text-center text-[0.5rem] tracking-[0.25em] text-muted/50 mb-2 uppercase">
+        <div className={`text-center text-[0.5rem] tracking-[0.25em] mb-2 uppercase transition-colors duration-700 ${solved ? "text-success/60" : "text-muted/50"}`}>
           {title}
         </div>
         {children}
+        {solved && (
+          <div className="mt-6 pt-4 border-t border-success/15 text-center animate-[forge-unblur_0.8s_ease-out_both]">
+            <div className="text-[0.5rem] text-success/40 tracking-[0.2em] uppercase mb-1.5">
+              ✦ Épreuve accomplie ✦
+            </div>
+            <p className="text-[0.6rem] text-success/55 leading-relaxed italic max-w-[260px] mx-auto">
+              {FORGE_SUCCESS_MESSAGES[forgeKey]}
+            </p>
+          </div>
+        )}
       </div>
     );
   }
@@ -233,11 +261,11 @@ export function EnigmaGrid({ isAdmin }: { isAdmin: boolean }) {
           </p>
 
           <div className="flex flex-col gap-10">
-            <ForgeSection forgeKey="scramble" title="Le Maillon des Égarés">
-              <LetterScramble />
-            </ForgeSection>
             <ForgeSection forgeKey="magnet" title="La chaleur de L'Arc-en-ciel">
               <DarkVadorButton />
+            </ForgeSection>
+            <ForgeSection forgeKey="scramble" title="Le Maillon des Égarés">
+              <LetterScramble />
             </ForgeSection>
             <ForgeSection forgeKey="vibration" title="Le Murmure Invisible">
               <VibrationListener />
