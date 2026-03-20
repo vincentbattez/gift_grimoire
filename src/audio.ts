@@ -199,27 +199,35 @@ export const sndLockOpen = () => {
 };
 
 /** Radar analysis scan — 5 pings over ~5s, auto-fades */
-export function sndAnalysis(): void {
+/** Suspenseful analysis sound — 7s with drone + radar pings + final beep.
+ *  Accepts offsetSec to resume from a given point. Returns a stop function. */
+export function sndAnalysis(offsetSec = 0): () => void {
   const c = getCtx();
   const t = c.currentTime;
+  const DUR = 7;
+  const allNodes: { o: OscillatorNode; g: GainNode }[] = [];
 
-  // Low background drone — full 5.5s
+  // Low background drone
   const drone = c.createOscillator();
   const droneG = c.createGain();
   drone.connect(droneG);
   droneG.connect(c.destination);
   drone.type = "sine";
   drone.frequency.value = 85;
-  droneG.gain.setValueAtTime(0, t);
-  droneG.gain.linearRampToValueAtTime(0.05, t + 0.5);
-  droneG.gain.setValueAtTime(0.05, t + 4.2);
-  droneG.gain.exponentialRampToValueAtTime(0.0001, t + 5.5);
+  const droneStart = Math.max(0, 0.5 - offsetSec);
+  droneG.gain.setValueAtTime(offsetSec >= 0.5 ? 0.05 : 0, t);
+  if (offsetSec < 0.5) droneG.gain.linearRampToValueAtTime(0.05, t + droneStart);
+  droneG.gain.setValueAtTime(0.05, t + Math.max(0, 5.8 - offsetSec));
+  droneG.gain.exponentialRampToValueAtTime(0.0001, t + Math.max(0.01, DUR - offsetSec));
   drone.start(t);
-  drone.stop(t + 5.5);
+  drone.stop(t + Math.max(0.02, DUR - offsetSec));
+  allNodes.push({ o: drone, g: droneG });
 
-  // 5 radar pings — one every ~0.9s
-  for (let i = 0; i < 5; i++) {
-    const pt = t + i * 0.92;
+  // 7 radar pings — one every ~0.85s
+  for (let i = 0; i < 7; i++) {
+    const pingTime = i * 0.85;
+    if (pingTime + 0.55 <= offsetSec) continue; // already played
+    const delay = Math.max(0, pingTime - offsetSec);
 
     // Ascending chirp
     const o = c.createOscillator();
@@ -227,32 +235,91 @@ export function sndAnalysis(): void {
     o.connect(g);
     g.connect(c.destination);
     o.type = "sine";
-    o.frequency.setValueAtTime(900 + i * 60, pt);
-    o.frequency.exponentialRampToValueAtTime(2200 + i * 80, pt + 0.18);
-    g.gain.setValueAtTime(0.0001, pt);
-    g.gain.linearRampToValueAtTime(0.13, pt + 0.02);
-    g.gain.exponentialRampToValueAtTime(0.0001, pt + 0.45);
-    o.start(pt);
-    o.stop(pt + 0.45);
+    o.frequency.setValueAtTime(900 + i * 45, t + delay);
+    o.frequency.exponentialRampToValueAtTime(2200 + i * 60, t + delay + 0.18);
+    g.gain.setValueAtTime(0.0001, t + delay);
+    g.gain.linearRampToValueAtTime(0.13, t + delay + 0.02);
+    g.gain.exponentialRampToValueAtTime(0.0001, t + delay + 0.45);
+    o.start(t + delay);
+    o.stop(t + delay + 0.45);
+    allNodes.push({ o, g });
 
-    // Echo at +100ms, softer
+    // Echo
     const oE = c.createOscillator();
     const gE = c.createGain();
     oE.connect(gE);
     gE.connect(c.destination);
     oE.type = "sine";
-    oE.frequency.setValueAtTime(900 + i * 60, pt + 0.1);
-    oE.frequency.exponentialRampToValueAtTime(2200 + i * 80, pt + 0.28);
-    gE.gain.setValueAtTime(0.0001, pt + 0.1);
-    gE.gain.linearRampToValueAtTime(0.045, pt + 0.12);
-    gE.gain.exponentialRampToValueAtTime(0.0001, pt + 0.55);
-    oE.start(pt + 0.1);
-    oE.stop(pt + 0.55);
+    oE.frequency.setValueAtTime(900 + i * 45, t + delay + 0.1);
+    oE.frequency.exponentialRampToValueAtTime(2200 + i * 60, t + delay + 0.28);
+    gE.gain.setValueAtTime(0.0001, t + delay + 0.1);
+    gE.gain.linearRampToValueAtTime(0.045, t + delay + 0.12);
+    gE.gain.exponentialRampToValueAtTime(0.0001, t + delay + 0.55);
+    oE.start(t + delay + 0.1);
+    oE.stop(t + delay + 0.55);
+    allNodes.push({ o: oE, g: gE });
   }
 
-  // Final resolve beep at 4.8s
-  tone(1047, "triangle", 0.14, 0.5, 4.8);
-  tone(1319, "sine", 0.08, 0.4, 4.88);
+
+  return () => {
+    const now = c.currentTime;
+    for (const { o, g } of allNodes) {
+      g.gain.cancelScheduledValues(now);
+      g.gain.setValueAtTime(g.gain.value, now);
+      g.gain.exponentialRampToValueAtTime(0.0001, now + 0.15);
+      o.stop(now + 0.2);
+    }
+  };
+}
+
+/** Curious questioning sound — ascending interval like a musical "hmm?" */
+export function sndDoubt(): void {
+  const c = getCtx();
+  const t = c.currentTime;
+
+  // Soft wondering hum — rising pitch
+  const hum = c.createOscillator();
+  const humG = c.createGain();
+  hum.connect(humG);
+  humG.connect(c.destination);
+  hum.type = "sine";
+  hum.frequency.setValueAtTime(220, t);
+  hum.frequency.linearRampToValueAtTime(330, t + 0.6);
+  humG.gain.setValueAtTime(0, t);
+  humG.gain.linearRampToValueAtTime(0.06, t + 0.08);
+  humG.gain.setValueAtTime(0.06, t + 0.4);
+  humG.gain.exponentialRampToValueAtTime(0.0001, t + 0.8);
+  hum.start(t);
+  hum.stop(t + 0.85);
+
+  // Two-note questioning motif — rising minor third (like "hm?")
+  for (const [freq, delay] of [[523, 0.15], [622, 0.4]] as const) {
+    const o = c.createOscillator();
+    const g = c.createGain();
+    o.connect(g);
+    g.connect(c.destination);
+    o.type = "triangle";
+    o.frequency.value = freq;
+    g.gain.setValueAtTime(0.0001, t + delay);
+    g.gain.linearRampToValueAtTime(0.08, t + delay + 0.03);
+    g.gain.exponentialRampToValueAtTime(0.0001, t + delay + 0.35);
+    o.start(t + delay);
+    o.stop(t + delay + 0.4);
+  }
+
+  // Final high questioning ping — ends on an unresolved note
+  const ping = c.createOscillator();
+  const pingG = c.createGain();
+  ping.connect(pingG);
+  pingG.connect(c.destination);
+  ping.type = "sine";
+  ping.frequency.setValueAtTime(1047, t + 0.65);
+  ping.frequency.linearRampToValueAtTime(1175, t + 0.9);
+  pingG.gain.setValueAtTime(0.0001, t + 0.65);
+  pingG.gain.linearRampToValueAtTime(0.05, t + 0.68);
+  pingG.gain.exponentialRampToValueAtTime(0.0001, t + 1.1);
+  ping.start(t + 0.65);
+  ping.stop(t + 1.15);
 }
 
 /** Deep listening drone — 10s meditative ambience, returns stop function */

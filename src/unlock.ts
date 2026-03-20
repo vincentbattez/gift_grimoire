@@ -15,22 +15,25 @@ export function triggerUnlockReveal(id: string, enigmaTitle: string) {
 
   store.unlock(id);
   store.showToast(`✦ « ${enigmaTitle} » déverrouillé !`);
+  // Le scroll + flash + particules seront déclenchés par EnigmaCard
+  // quand l'overlay se ferme (unlockingCardId → null)
+}
 
-  setTimeout(() => {
-    const el = document.querySelector(`[data-card-id="${id}"]`);
-    if (el) {
-      el.scrollIntoView({ behavior: "smooth", block: "center" });
+/** Called by EnigmaCard after the overlay has fully closed */
+export function playUnlockCardEffect(id: string) {
+  const el = document.querySelector(`[data-card-id="${id}"]`);
+  if (!el) return;
 
-      const card = el.firstElementChild as HTMLElement | null;
-      if (card) {
-        card.style.animation = "unlock-flash 0.7s ease-out";
-        card.addEventListener("animationend", () => {
-          card.style.animation = "";
-        }, { once: true });
-      }
+  el.scrollIntoView({ behavior: "smooth", block: "center" });
 
-      const r = el.getBoundingClientRect();
-      spawnParticles(r.left + r.width / 2, r.top + r.height / 2, 28, "#9b6dff");
-    }
-  }, 300);
+  const card = el.firstElementChild as HTMLElement | null;
+  if (card) {
+    card.style.animation = "unlock-flash 0.7s ease-out";
+    card.addEventListener("animationend", () => {
+      card.style.animation = "";
+    }, { once: true });
+  }
+
+  const r = el.getBoundingClientRect();
+  spawnParticles(r.left + r.width / 2, r.top + r.height / 2, 28, "#9b6dff");
 }

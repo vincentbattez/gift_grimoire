@@ -8,32 +8,45 @@ export function SuccessModal() {
   const haEvent = useStore((s) => s.successHaEvent);
   const hideSuccessBox = useStore((s) => s.hideSuccessBox);
   const [entered, setEntered] = useState(false);
+  const [closing, setClosing] = useState(false);
+  const [displayBoxNumber, setDisplayBoxNumber] = useState<number | null>(null);
 
   useEffect(() => {
     if (boxNumber === null) {
       setEntered(false);
       return;
     }
+    setClosing(false);
+    setDisplayBoxNumber(boxNumber);
     const raf = requestAnimationFrame(() => setEntered(true));
     return () => cancelAnimationFrame(raf);
   }, [boxNumber]);
 
   function handleClose() {
+    if (closing) return;
     sndClick();
     if (haEvent) fireEvent(haEvent);
-    hideSuccessBox();
+    setClosing(true);
+    setEntered(false);
+    setTimeout(() => {
+      hideSuccessBox();
+      setClosing(false);
+      setDisplayBoxNumber(null);
+    }, 500);
   }
+
+  const isVisible = boxNumber !== null || closing;
 
   return (
     <div
       className={`fixed inset-0 z-[110] bg-black/85 backdrop-blur-[6px] flex items-center justify-center transition-opacity duration-400 ${
-        boxNumber !== null ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"
+        isVisible && !closing ? "opacity-100 pointer-events-auto" : closing ? "opacity-0 pointer-events-none" : "opacity-0 pointer-events-none"
       }`}
       onClick={handleClose}
     >
       <div
         className={`max-w-[340px] w-[85%] rounded-2xl border border-success/30 px-6 py-8 text-center transition-all duration-500 ${
-          entered ? "scale-100 opacity-100" : "scale-90 opacity-0"
+          entered && !closing ? "scale-100 opacity-100" : "scale-90 opacity-0"
         }`}
         style={{
           background: "linear-gradient(155deg, #1c1438, #0f1a14)",
@@ -52,7 +65,7 @@ export function SuccessModal() {
           Tu peux maintenant ouvrir
         </p>
         <p className="text-[1.8rem] font-[var(--font-cinzel-decorative)] text-gold tracking-[0.08em] my-3 drop-shadow-[0_0_16px_#e8c96a40]">
-          la boîte n°{boxNumber}
+          la boîte n°{displayBoxNumber}
         </p>
         <button
           onClick={handleClose}

@@ -625,3 +625,39 @@ body {
   0%   { opacity: 1; }
   100% { opacity: 0; pointer-events: none; }
 }
+
+/* Doubt modal — grimoire divination */
+@keyframes doubt-orbit {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+@keyframes doubt-orbit-reverse {
+  from { transform: rotate(360deg); }
+  to   { transform: rotate(0deg); }
+}
+@keyframes doubt-glyph-pulse {
+  0%, 100% { opacity: 0.15; text-shadow: 0 0 6px #9b6dff00; }
+  50%      { opacity: 0.6;  text-shadow: 0 0 12px #9b6dff80; }
+}
+@keyframes doubt-core-breathe {
+  0%, 100% { transform: scale(1); filter: drop-shadow(0 0 15px #9b6dff40); }
+  50%      { transform: scale(1.08); filter: drop-shadow(0 0 30px #9b6dff80); }
+}
+@keyframes doubt-dust {
+  0%   { transform: translateY(0) translateX(0) scale(1); opacity: 0; }
+  15%  { opacity: 0.6; }
+  85%  { opacity: 0.3; }
+  100% { transform: translateY(-60px) translateX(20px) scale(0); opacity: 0; }
+}
+@keyframes doubt-line-grow {
+  from { transform: scaleX(0); }
+  to   { transform: scaleX(1); }
+}
+@keyframes doubt-text-in {
+  from { opacity: 0; transform: translateY(6px); filter: blur(4px); }
+  to   { opacity: 1; transform: translateY(0); filter: blur(0); }
+}
+@keyframes doubt-btn-in {
+  from { opacity: 0; transform: translateY(10px) scale(0.92); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
