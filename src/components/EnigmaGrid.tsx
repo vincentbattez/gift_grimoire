@@ -205,18 +205,6 @@ function ForgeSection({ forgeKey, title, children }: { forgeKey: string; title: 
   );
 }
 
-function CollapsedPrologue() {
-  return (
-    <div className="flex items-center gap-2.5 justify-center py-2.5 px-4 rounded-[12px] border border-solved-border/25">
-      <span className="w-3.5 h-3.5 rounded-full bg-success/90 flex items-center justify-center text-[0.4rem] shadow-[0_0_8px_#4ecca330]">
-        ✓
-      </span>
-      <span className="text-[0.55rem] tracking-[0.18em] text-success/60 uppercase font-semibold">
-        Prologue complété
-      </span>
-    </div>
-  );
-}
 
 export function EnigmaGrid({ isAdmin }: { isAdmin: boolean }) {
   const enigmas = useStore((s) => s.enigmas);
@@ -231,7 +219,7 @@ export function EnigmaGrid({ isAdmin }: { isAdmin: boolean }) {
       <div className="text-center text-[0.6rem] tracking-[0.35em] text-muted my-4 uppercase">
         — Prologue —
       </div>
-      {prologueCompleted ? <CollapsedPrologue /> : <VoiceHints />}
+      <VoiceHints />
 
       {/* ── Les Six Mystères ── */}
       <div className="text-center text-[0.6rem] tracking-[0.35em] text-muted my-4 uppercase mt-12">
