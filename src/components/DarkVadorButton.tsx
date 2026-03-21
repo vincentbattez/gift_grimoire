@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { useStore, isAttemptUsedToday, msUntilMidnight } from "../store";
 import { getEntityState } from "../ha";
-import { sndAnalysis } from "../audio";
+import { sndAnalysis, sndScrambleSolved } from "../audio";
 import { EnigmaPicker } from "./EnigmaPicker";
 import { PlayCountDot } from "./PlayCountDot";
 import { AudioWarningModal } from "./AudioWarningModal";
@@ -138,16 +138,28 @@ export function DarkVadorButton() {
     if (isChecking || showPicker) return;
     setHasError(false);
     setIsChecking(true);
-    sndAnalysis();
+    const stopAnalysis = sndAnalysis();
 
-    const [state] = await Promise.all([
-      getEntityState(ENTITY_ID),
-      new Promise<void>((resolve) => setTimeout(resolve, CHECK_DURATION_MS)),
-    ]);
+    const half = CHECK_DURATION_MS / 2;
 
+    // wait until mid-point
+    await new Promise<void>((r) => setTimeout(r, half));
+
+    // 1st check — middle
+    const state1 = await getEntityState(ENTITY_ID);
+    if (state1 === "on") { stopAnalysis(); setIsChecking(false); setShowPicker(true); sndScrambleSolved(); return; }
+
+    // wait until end
+    await new Promise<void>((r) => setTimeout(r, half));
+
+    // 3rd check — end
+    const state3 = await getEntityState(ENTITY_ID);
     setIsChecking(false);
-    if (state === "on") {
+
+    if (state3 === "on") {
+      stopAnalysis();
       setShowPicker(true);
+      sndScrambleSolved();
     } else {
       setHasError(true);
       const el = shakeRef.current;
