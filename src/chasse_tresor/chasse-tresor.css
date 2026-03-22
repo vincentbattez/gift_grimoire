@@ -2,8 +2,10 @@
 
 :root {
   --gold: #c9a84c;
+  --gold-bright: #e8d48b;
   --gold-dim: rgba(201, 168, 76, 0.25);
   --gold-glow: rgba(201, 168, 76, 0.08);
+  --gold-shimmer: rgba(232, 212, 139, 0.15);
   --ivory: #f5f0e1;
   --ivory-dim: rgba(245, 240, 225, 0.7);
   --card-bg: #0a0a0a;
@@ -21,22 +23,31 @@
   min-height: 100vh;
 }
 
-.ct-controls button {
+.tarot-card-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+
+.card-download-btn {
   background: transparent;
   color: var(--gold);
   border: 1px solid var(--gold-dim);
-  padding: 10px 24px;
+  padding: 4px 16px;
   font-family: 'Cinzel', serif;
-  font-size: 11px;
-  letter-spacing: 3px;
+  font-size: 9px;
+  letter-spacing: 2px;
   text-transform: uppercase;
   cursor: pointer;
   transition: all 0.3s;
+  opacity: 0.5;
 }
 
-.ct-controls button:hover {
+.card-download-btn:hover {
   background: var(--gold-glow);
   border-color: var(--gold);
+  opacity: 1;
 }
 
 /* ══════════════════════════════════════
@@ -52,19 +63,6 @@
   overflow: hidden;
 }
 
-/* Subtle noise texture overlay — clipped to frame */
-.tarot-card::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  border-radius: 3mm;
-  background:
-    radial-gradient(ellipse at 50% 0%, var(--gold-glow) 0%, transparent 60%),
-    radial-gradient(ellipse at 50% 100%, var(--gold-glow) 0%, transparent 60%);
-  pointer-events: none;
-  z-index: 3;
-}
-
 /* ── Ornate frame ── */
 .tarot-frame {
   position: absolute;
@@ -76,28 +74,53 @@
   border-radius: 3mm;
 }
 
+/* Inner border with subtle surface */
 .tarot-frame::before {
   content: '';
   position: absolute;
-  inset: 3mm;
+  inset: 4mm;
   border: 0.5px solid var(--gold-dim);
-  opacity: 0.4;
-  border-radius: 2mm;
+  background: rgba(255, 255, 255, 0.03);
+  border-radius: 4mm;
+}
+
+/* Ambient gold glow top & bottom */
+.tarot-frame::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 3mm;
+  background:
+    radial-gradient(ellipse at 50% -5%, var(--gold-shimmer) 0%, transparent 50%),
+    radial-gradient(ellipse at 50% 105%, var(--gold-shimmer) 0%, transparent 50%),
+    radial-gradient(ellipse at -5% 50%, rgba(201, 168, 76, 0.04) 0%, transparent 40%),
+    radial-gradient(ellipse at 105% 50%, rgba(201, 168, 76, 0.04) 0%, transparent 40%);
+  pointer-events: none;
 }
 
 /* ── Corner flourishes ── */
 .corner-flourish {
   position: absolute;
-  width: 20px;
-  height: 20px;
+  width: 36px;
+  height: 36px;
   z-index: 5;
   pointer-events: none;
+  opacity: 0.85;
 }
 
-.corner-fl-tl { top: 2mm; left: 2mm; }
-.corner-fl-tr { top: 2mm; right: 2mm; transform: scaleX(-1); }
-.corner-fl-bl { bottom: 2mm; left: 2mm; transform: scaleY(-1); }
-.corner-fl-br { bottom: 2mm; right: 2mm; transform: scale(-1, -1); }
+.corner-fl-tl { top: 1.5mm; left: 1.5mm; }
+.corner-fl-tr { top: 1.5mm; right: 1.5mm; transform: scaleX(-1); }
+.corner-fl-bl { bottom: 1.5mm; left: 1.5mm; transform: scaleY(-1); }
+.corner-fl-br { bottom: 1.5mm; right: 1.5mm; transform: scale(-1, -1); }
+
+/* ── Starfield constellation background ── */
+.tarot-starfield {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  pointer-events: none;
+  opacity: 0.6;
+}
 
 /* ── Content ── */
 .tarot-content {
@@ -107,73 +130,71 @@
   flex-direction: column;
   align-items: center;
   height: 100%;
-  padding: 8mm 7mm 6mm;
+  padding: 7mm 6mm 8mm;
   text-align: center;
 }
 
-/* ── Top: Numeral + subtitle ── */
+/* ── Top: Numeral ── */
 .tarot-top {
-  margin-bottom: 2px;
+  margin-bottom: 0;
+  position: relative;
 }
 
 .tarot-numeral {
   font-family: 'Cinzel Decorative', serif;
-  font-size: 28px;
+  font-size: 26px;
   font-weight: 900;
   color: var(--gold);
   line-height: 1;
   letter-spacing: 2px;
-  text-shadow: 0 0 20px var(--gold-glow);
+  text-shadow:
+    0 0 20px rgba(201, 168, 76, 0.3),
+    0 0 40px rgba(201, 168, 76, 0.1);
+  position: relative;
 }
 
-.tarot-subtitle {
-  font-family: 'Cinzel', serif;
-  font-size: 6.5px;
-  font-weight: 600;
-  color: var(--gold);
-  letter-spacing: 3px;
-  text-transform: uppercase;
-  opacity: 0.6;
-  margin-top: 2px;
-}
-
-/* ── Separator ── */
-.tarot-separator {
+/* ── Ornate separator ── */
+.tarot-separator-ornate {
   display: flex;
   align-items: center;
-  gap: 6px;
+  justify-content: center;
   width: 100%;
-  margin: 4px 0;
+  margin: 3px 0;
+  position: relative;
+}
+
+.separator-svg {
+  width: 100%;
+  height: 10px;
   color: var(--gold);
+  opacity: 0.6;
 }
 
-.tarot-separator::before,
-.tarot-separator::after {
-  content: '';
-  flex: 1;
-  height: 0.5px;
-  background: linear-gradient(to right, transparent, var(--gold-dim), transparent);
-}
-
-.sep-dot {
-  font-size: 6px;
-  opacity: 0.5;
-}
-
-/* ── Arcane symbol ── */
+/* ── Sacred geometry ring around symbol ── */
 .tarot-symbol-area {
   flex-shrink: 0;
   display: flex;
   align-items: center;
   justify-content: center;
   margin: 2px 0;
+  position: relative;
+}
+
+.sacred-geometry-ring {
+  position: absolute;
+  width: 90px;
+  height: 90px;
+  color: var(--gold);
+  opacity: 0.2;
 }
 
 .arcane-symbol {
   width: 50px;
   height: 50px;
   color: var(--gold);
-  filter: drop-shadow(0 0 6px var(--gold-glow));
+  filter: drop-shadow(0 0 8px rgba(201, 168, 76, 0.2));
+  position: relative;
+  z-index: 1;
 }
 
 /* ── Title ── */
@@ -184,7 +205,8 @@
   color: var(--ivory);
   line-height: 1.4;
   letter-spacing: 0.5px;
-  margin-bottom: 2px;
+  margin-bottom: 1px;
+  text-shadow: 0 0 12px rgba(245, 240, 225, 0.1);
 }
 
 /* ── Cartouche (riddle area) ── */
@@ -192,24 +214,23 @@
   flex: 1;
   display: flex;
   width: 100%;
-  padding: 4px 2mm;
+  padding: 16px 1mm;
   position: relative;
 }
 
-/* Subtle ivory background behind text */
-.tarot-cartouche::before {
-  content: '';
+/* Decorative cartouche border */
+.cartouche-frame {
   position: absolute;
-  inset: 0 -1mm;
-  background: linear-gradient(
-    180deg,
-    transparent 0%,
-    rgba(245, 240, 225, 0.03) 20%,
-    rgba(245, 240, 225, 0.04) 50%,
-    rgba(245, 240, 225, 0.03) 80%,
-    transparent 100%
-  );
-  border-radius: 2px;
+  inset: -2px -4px;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.cartouche-frame-svg {
+  width: 100%;
+  height: 100%;
+  color: var(--gold);
+  opacity: 0.2;
 }
 
 .tarot-riddle {
@@ -217,12 +238,13 @@
   font-size: 16px;
   font-style: italic;
   color: var(--ivory-dim);
-  line-height: 1.65;
+  line-height: 1.6;
   hyphens: auto;
   position: relative;
   white-space: pre-line;
   margin: 0;
   text-align: center;
+  z-index: 1;
 }
 
 /* ── Hint ── */
@@ -233,23 +255,77 @@
   font-family: 'Cormorant Garamond', serif;
   font-size: 7px;
   color: var(--gold);
-  opacity: 0.5;
+  opacity: 0.45;
   font-style: italic;
-  margin-top: 4px;
+  margin-top: 3px;
 }
 
 .hint-icon {
   font-size: 6px;
 }
 
-/* ── Bottom page number ── */
-.tarot-bottom {
+/* ── Bottom medallion ── */
+.tarot-bottom-medallion {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  margin-top: 3px;
+}
+
+.bottom-wing {
+  width: 24px;
+  height: 10px;
+  color: var(--gold);
+  opacity: 0.4;
+}
+
+.tarot-bottom-num {
   font-family: 'Cinzel', serif;
   font-size: 6px;
   color: var(--gold);
-  opacity: 0.35;
-  letter-spacing: 3px;
-  text-transform: uppercase;
-  margin-top: 4px;
-  margin-bottom: 16px;
+  opacity: 0.45;
+  letter-spacing: 2px;
+  text-align: center;
+  min-width: 16px;
 }
+
+/* ── Side decorative rails ── */
+.side-rail {
+  position: absolute;
+  z-index: 5;
+  pointer-events: none;
+  opacity: 0.15;
+  color: var(--gold);
+}
+
+.side-rail-left {
+  left: 2.5mm;
+  top: 20%;
+  height: 60%;
+  width: 6px;
+}
+
+.side-rail-right {
+  right: 2.5mm;
+  top: 20%;
+  height: 60%;
+  width: 6px;
+}
+
+/* ── Mid decorative dots between frames ── */
+.frame-dot {
+  position: absolute;
+  z-index: 5;
+  pointer-events: none;
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: var(--gold);
+  opacity: 0.25;
+}
+
+.frame-dot-top { top: 2mm; left: 50%; transform: translateX(-50%); }
+.frame-dot-bottom { bottom: 2mm; left: 50%; transform: translateX(-50%); }
+.frame-dot-left { left: 2mm; top: 50%; transform: translateY(-50%); }
+.frame-dot-right { right: 2mm; top: 50%; transform: translateY(-50%); }
