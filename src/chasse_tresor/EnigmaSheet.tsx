@@ -1,32 +1,32 @@
+import { forwardRef } from "react";
 import type { EnigmaData } from "./data";
 import { ArcaneSymbolSvg } from "./ArcaneSymbol";
 
-export function EnigmaSheet({ enigma, index }: { enigma: EnigmaData; index: number }) {
+export const EnigmaSheet = forwardRef<
+  HTMLDivElement,
+  { enigma: EnigmaData; index: number }
+>(function EnigmaSheet({ enigma, index }, ref) {
   return (
-    <div className="tarot-card">
+    <div className="tarot-card" ref={ref}>
       {/* Outer ornate frame */}
       <div className="tarot-frame" />
 
       {/* Corner flourishes */}
       <svg className="corner-flourish corner-fl-tl" viewBox="0 0 40 40">
-        <path d="M4 36 Q4 4 36 4" fill="none" stroke="var(--gold)" strokeWidth="1" />
-        <path d="M8 32 Q8 8 32 8" fill="none" stroke="var(--gold)" strokeWidth="0.5" opacity="0.4" />
-        <circle cx="6" cy="6" r="1.5" fill="var(--gold)" opacity="0.6" />
+        <path d="M4 36 Q4 4 36 4" fill="none" stroke="var(--gold)" strokeWidth="1.5" />
+        <circle cx="5" cy="5" r="2.5" fill="var(--gold)" opacity="0.8" />
       </svg>
       <svg className="corner-flourish corner-fl-tr" viewBox="0 0 40 40">
-        <path d="M4 36 Q4 4 36 4" fill="none" stroke="var(--gold)" strokeWidth="1" />
-        <path d="M8 32 Q8 8 32 8" fill="none" stroke="var(--gold)" strokeWidth="0.5" opacity="0.4" />
-        <circle cx="6" cy="6" r="1.5" fill="var(--gold)" opacity="0.6" />
+        <path d="M4 36 Q4 4 36 4" fill="none" stroke="var(--gold)" strokeWidth="1.5" />
+        <circle cx="5" cy="5" r="2.5" fill="var(--gold)" opacity="0.8" />
       </svg>
       <svg className="corner-flourish corner-fl-bl" viewBox="0 0 40 40">
-        <path d="M4 36 Q4 4 36 4" fill="none" stroke="var(--gold)" strokeWidth="1" />
-        <path d="M8 32 Q8 8 32 8" fill="none" stroke="var(--gold)" strokeWidth="0.5" opacity="0.4" />
-        <circle cx="6" cy="6" r="1.5" fill="var(--gold)" opacity="0.6" />
+        <path d="M4 36 Q4 4 36 4" fill="none" stroke="var(--gold)" strokeWidth="1.5" />
+        <circle cx="5" cy="5" r="2.5" fill="var(--gold)" opacity="0.8" />
       </svg>
       <svg className="corner-flourish corner-fl-br" viewBox="0 0 40 40">
-        <path d="M4 36 Q4 4 36 4" fill="none" stroke="var(--gold)" strokeWidth="1" />
-        <path d="M8 32 Q8 8 32 8" fill="none" stroke="var(--gold)" strokeWidth="0.5" opacity="0.4" />
-        <circle cx="6" cy="6" r="1.5" fill="var(--gold)" opacity="0.6" />
+        <path d="M4 36 Q4 4 36 4" fill="none" stroke="var(--gold)" strokeWidth="1.5" />
+        <circle cx="5" cy="5" r="2.5" fill="var(--gold)" opacity="0.8" />
       </svg>
 
       <div className="tarot-content">
@@ -71,4 +71,4 @@ export function EnigmaSheet({ enigma, index }: { enigma: EnigmaData; index: numb
       </div>
     </div>
   );
-}
+});

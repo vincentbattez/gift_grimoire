@@ -10,16 +10,8 @@
   --card-surface: #0f0e0e;
 }
 
-/* ── Page layout ── */
-@media print {
-  body { background: white !important; }
-  .ct-page { background: white; padding: 5mm; gap: 4mm; }
-  .tarot-card { box-shadow: none !important; }
-  .ct-controls { display: none !important; }
-}
-
 .ct-page {
-  background: #050505;
+  background: white;
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
@@ -55,31 +47,30 @@
 .tarot-card {
   width: 95mm;
   height: 145mm;
-  background: var(--card-bg);
+  background: transparent;
   position: relative;
   overflow: hidden;
-  box-shadow:
-    0 4px 20px rgba(0, 0, 0, 0.8),
-    0 0 1px var(--gold-dim);
 }
 
-/* Subtle noise texture overlay */
+/* Subtle noise texture overlay — clipped to frame */
 .tarot-card::before {
   content: '';
   position: absolute;
   inset: 0;
+  border-radius: 3mm;
   background:
     radial-gradient(ellipse at 50% 0%, var(--gold-glow) 0%, transparent 60%),
     radial-gradient(ellipse at 50% 100%, var(--gold-glow) 0%, transparent 60%);
   pointer-events: none;
-  z-index: 1;
+  z-index: 3;
 }
 
 /* ── Ornate frame ── */
 .tarot-frame {
   position: absolute;
-  inset: 4mm;
-  border: 1px solid var(--gold-dim);
+  inset: 0;
+  border: 2px solid var(--gold-dim);
+  background: var(--card-bg);
   pointer-events: none;
   z-index: 2;
   border-radius: 3mm;
@@ -88,10 +79,10 @@
 .tarot-frame::before {
   content: '';
   position: absolute;
-  inset: 2mm;
+  inset: 3mm;
   border: 0.5px solid var(--gold-dim);
   opacity: 0.4;
-  border-radius: 3mm;
+  border-radius: 2mm;
 }
 
 /* ── Corner flourishes ── */
@@ -99,14 +90,14 @@
   position: absolute;
   width: 20px;
   height: 20px;
-  z-index: 3;
+  z-index: 5;
   pointer-events: none;
 }
 
-.corner-fl-tl { top: 3mm; left: 3mm; }
-.corner-fl-tr { top: 3mm; right: 3mm; transform: scaleX(-1); }
-.corner-fl-bl { bottom: 3mm; left: 3mm; transform: scaleY(-1); }
-.corner-fl-br { bottom: 3mm; right: 3mm; transform: scale(-1, -1); }
+.corner-fl-tl { top: 2mm; left: 2mm; }
+.corner-fl-tr { top: 2mm; right: 2mm; transform: scaleX(-1); }
+.corner-fl-bl { bottom: 2mm; left: 2mm; transform: scaleY(-1); }
+.corner-fl-br { bottom: 2mm; right: 2mm; transform: scale(-1, -1); }
 
 /* ── Content ── */
 .tarot-content {
@@ -227,11 +218,11 @@
   font-style: italic;
   color: var(--ivory-dim);
   line-height: 1.65;
-  text-align: justify;
   hyphens: auto;
   position: relative;
   white-space: pre-line;
   margin: 0;
+  text-align: center;
 }
 
 /* ── Hint ── */
