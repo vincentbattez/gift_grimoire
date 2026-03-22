@@ -329,3 +329,42 @@
 .frame-dot-bottom { bottom: 2mm; left: 50%; transform: translateX(-50%); }
 .frame-dot-left { left: 2mm; top: 50%; transform: translateY(-50%); }
 .frame-dot-right { right: 2mm; top: 50%; transform: translateY(-50%); }
+
+/* ══════════════════════════════════════
+   TAROT CARD BACK
+   ══════════════════════════════════════ */
+
+.back-lattice {
+  position: absolute;
+  inset: 5mm;
+  z-index: 3;
+  pointer-events: none;
+}
+
+.back-content {
+  position: relative;
+  z-index: 4;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  padding: 10mm 6mm;
+  gap: 0;
+}
+
+.back-mandala {
+  width: 72mm;
+  height: 72mm;
+  flex-shrink: 0;
+}
+
+.back-banner {
+  width: 70mm;
+  height: auto;
+  flex-shrink: 0;
+}
+
+.back-banner-flip {
+  transform: rotate(180deg);
+}
