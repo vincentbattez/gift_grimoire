@@ -1,0 +1,338 @@
+@import url('https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@400;700;900&family=Cinzel:wght@400;600;700&family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400;1,600&family=MedievalSharp&display=swap');
+
+:root {
+  --parchment-bg: #f4e8c1;
+  --parchment-dark: #d4c09e;
+  --ink: #2c1810;
+  --ink-light: #5a3a28;
+  --ct-accent-gold: #b8860b;
+  --accent-red: #8b1a1a;
+  --border-ornate: #6b4226;
+}
+
+@media print {
+  .ct-page { background: white; padding: 5mm; gap: 5mm; }
+  .enigma-sheet { box-shadow: none !important; margin: 0; }
+  .ct-controls { display: none !important; }
+}
+
+.ct-page {
+  background: #1a1a1a;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  padding: 20px;
+  gap: 16px;
+  font-family: 'Cormorant Garamond', serif;
+  min-height: 100vh;
+}
+
+.ct-controls button {
+  background: var(--ct-accent-gold);
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  font-family: 'Cinzel', serif;
+  font-size: 12px;
+  cursor: pointer;
+  border-radius: 4px;
+  transition: background 0.3s;
+}
+
+.ct-controls button:hover { background: #9a7209; }
+
+/* ── Sheet (A5 minus 1cm margin = 138mm × 200mm → 4 per A4 page) ── */
+.enigma-sheet {
+  width: 138mm;
+  background: var(--parchment-bg);
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.5);
+  display: flex;
+  flex-direction: column;
+  padding: 0;
+}
+
+.enigma-sheet::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(ellipse at 20% 50%, rgba(139,90,43,0.08) 0%, transparent 50%),
+    radial-gradient(ellipse at 80% 20%, rgba(139,90,43,0.06) 0%, transparent 50%),
+    radial-gradient(ellipse at 50% 80%, rgba(139,90,43,0.1) 0%, transparent 40%);
+  pointer-events: none;
+  z-index: 1;
+}
+
+.enigma-sheet::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  box-shadow: inset 0 0 50px rgba(101,67,33,0.35), inset 0 0 100px rgba(101,67,33,0.15);
+  pointer-events: none;
+  z-index: 2;
+}
+
+.sheet-content {
+  position: relative;
+  z-index: 3;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  padding: 12mm;
+}
+
+/* ── Ornate border ── */
+.ornate-border {
+  position: absolute;
+  inset: 5mm;
+  border: 1.5px solid var(--border-ornate);
+  z-index: 3;
+  pointer-events: none;
+}
+
+.ornate-border::before {
+  content: '';
+  position: absolute;
+  inset: 2px;
+  border: 1px solid var(--border-ornate);
+  opacity: 0.5;
+}
+
+/* ── Corners ── */
+.corner {
+  position: absolute;
+  width: 22px;
+  height: 22px;
+  z-index: 4;
+}
+
+.corner svg { width: 100%; height: 100%; }
+.corner-tl { top: 4mm; left: 4mm; }
+.corner-tr { top: 4mm; right: 4mm; transform: scaleX(-1); }
+.corner-bl { bottom: 4mm; left: 4mm; transform: scaleY(-1); }
+.corner-br { bottom: 4mm; right: 4mm; transform: scale(-1, -1); }
+
+/* ── Header ── */
+.ct-header {
+  text-align: center;
+  margin-bottom: 10px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--border-ornate);
+  position: relative;
+}
+
+.ct-header::after {
+  content: '\25C6';
+  position: absolute;
+  bottom: -8px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--parchment-bg);
+  padding: 0 8px;
+  color: var(--ct-accent-gold);
+  font-size: 10px;
+}
+
+.series-title {
+  font-family: 'Cinzel Decorative', serif;
+  font-size: 9px;
+  letter-spacing: 4px;
+  text-transform: uppercase;
+  color: var(--ct-accent-gold);
+  margin-bottom: 8px;
+}
+
+.enigma-number {
+  font-family: 'Cinzel Decorative', serif;
+  font-size: 36px;
+  font-weight: 900;
+  color: var(--ink);
+  line-height: 1;
+  margin-bottom: 2px;
+  text-shadow: 1px 1px 0 rgba(184,134,11,0.15);
+}
+
+.enigma-subtitle {
+  font-family: 'Cinzel', serif;
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--ink-light);
+  letter-spacing: 2px;
+  text-transform: uppercase;
+}
+
+/* ── Transition badge ── */
+.transition-badge {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin: 6px auto 12px;
+  padding: 4px 12px;
+  font-family: 'Cinzel', serif;
+  font-size: 8px;
+  color: var(--ct-accent-gold);
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  position: relative;
+}
+
+.transition-badge::before,
+.transition-badge::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(to right, transparent, var(--ct-accent-gold), transparent);
+  max-width: 50px;
+}
+
+/* ── Title ── */
+.enigma-title-section {
+  text-align: center;
+  margin-bottom: 14px;
+}
+
+.enigma-title {
+  font-family: 'Cinzel Decorative', serif;
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--ink);
+  line-height: 1.3;
+  position: relative;
+  display: inline-block;
+}
+
+/* ── Riddle ── */
+.riddle-section {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 0 4mm;
+}
+
+.riddle-decoration {
+  text-align: center;
+  font-size: 16px;
+  color: var(--ct-accent-gold);
+  margin-bottom: 10px;
+  letter-spacing: 6px;
+}
+
+.riddle-text {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 12px;
+  font-style: italic;
+  color: var(--ink);
+  line-height: 1.75;
+  text-align: justify;
+  hyphens: auto;
+  position: relative;
+  padding: 12px 0;
+  white-space: pre-line;
+}
+
+.riddle-text::before {
+  content: '\275D';
+  font-size: 36px;
+  font-style: normal;
+  color: var(--ct-accent-gold);
+  opacity: 0.3;
+  position: absolute;
+  top: -4px;
+  left: -3mm;
+  font-family: serif;
+  line-height: 1;
+}
+
+.riddle-text::after {
+  content: '\275E';
+  font-size: 36px;
+  font-style: normal;
+  color: var(--ct-accent-gold);
+  opacity: 0.3;
+  position: absolute;
+  bottom: -10px;
+  right: -3mm;
+  font-family: serif;
+  line-height: 1;
+}
+
+.riddle-decoration-bottom {
+  text-align: center;
+  font-size: 16px;
+  color: var(--ct-accent-gold);
+  margin-top: 12px;
+  letter-spacing: 6px;
+}
+
+/* ── Footer ── */
+.ct-footer {
+  text-align: center;
+  margin-top: 16px;
+  margin-bottom: 30px;
+  padding-top: 10px;
+  border-top: 1px solid var(--border-ornate);
+  position: relative;
+}
+
+.ct-footer::before {
+  content: '\25C6';
+  position: absolute;
+  top: -8px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--parchment-bg);
+  padding: 0 8px;
+  color: var(--ct-accent-gold);
+  font-size: 10px;
+}
+
+.hint-label {
+  font-family: 'Cinzel', serif;
+  font-size: 7px;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: var(--ct-accent-gold);
+  margin-bottom: 4px;
+}
+
+.hint-text {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 10px;
+  color: var(--ink-light);
+  font-style: italic;
+  opacity: 0.7;
+}
+
+.page-number {
+  font-family: 'Cinzel', serif;
+  font-size: 8px;
+  color: var(--ct-accent-gold);
+  margin-top: 8px;
+  letter-spacing: 1.5px;
+}
+
+/* ── Wax seal ── */
+.wax-seal {
+  position: absolute;
+  bottom: 10mm;
+  right: 10mm;
+  width: 32px;
+  height: 32px;
+  z-index: 5;
+  opacity: 0.7;
+}
+
+/* ── Stains ── */
+.stain {
+  position: absolute;
+  border-radius: 50%;
+  background: radial-gradient(ellipse, rgba(139,90,43,0.07) 0%, transparent 70%);
+  pointer-events: none;
+  z-index: 2;
+}
+
+.stain-1 { width: 80px; height: 65px; top: 30%; right: 5%; }
+.stain-2 { width: 55px; height: 60px; bottom: 20%; left: 8%; }
