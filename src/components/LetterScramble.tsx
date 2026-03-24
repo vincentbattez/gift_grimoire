@@ -48,7 +48,8 @@ export function LetterScramble() {
     return shuffled;
   });
 
-  const solved = scrambleSolved;
+  const [localSolved, setLocalSolved] = useState(false);
+  const solved = scrambleSolved || localSolved;
   const [showPicker, setShowPicker] = useState(false);
   const [draggingId, setDraggingId] = useState<number | null>(null);
   const [targetIdx, setTargetIdx] = useState<number | null>(null);
@@ -192,7 +193,7 @@ export function LetterScramble() {
 
               const word = arr.map((l) => l.char).join("");
               if (word === SOLUTION) {
-                solveScramble();
+                setLocalSolved(true);
                 sndScrambleSolved();
                 setShowPicker(true);
               }
@@ -208,7 +209,7 @@ export function LetterScramble() {
       document.addEventListener("pointermove", onMove);
       document.addEventListener("pointerup", onUp);
     },
-    [solved, getCardRects, solveScramble],
+    [solved, getCardRects],
   );
 
   return (
@@ -241,7 +242,14 @@ export function LetterScramble() {
       </div>
 
       {/* Picker — choose which enigma to unlock */}
-      {showPicker && <EnigmaPicker onClose={() => setShowPicker(false)} />}
+      {showPicker && (
+        <EnigmaPicker
+          onClose={() => {
+            setShowPicker(false);
+            solveScramble();
+          }}
+        />
+      )}
 
       {/* Ghost — follows pointer during drag */}
       <div
