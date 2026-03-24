@@ -290,6 +290,31 @@ export function EnigmaGrid({ isAdmin }: { isAdmin: boolean }) {
       </div>
       <FinaleButton />
 
+      {isAdmin && (
+        <div className="flex gap-2 justify-center mb-3">
+          <button
+            onClick={() => {
+              const { unlock } = useStore.getState();
+              ENIGMAS.forEach((e) => unlock(e.id));
+            }}
+            className="px-3 py-1 text-[0.55rem] rounded-md border border-accent/30 text-accent/60 hover:text-accent hover:border-accent/60 bg-accent/5 transition-colors cursor-pointer"
+          >
+            ⚡ unlock all
+          </button>
+          <button
+            onClick={() => {
+              const s = useStore.getState();
+              ENIGMAS.forEach((e) => { s.unlock(e.id); s.solve(e.id); });
+              s.solveScramble(); s.solveMagnet(); s.solveVibration();
+              ["scramble", "magnet", "vibration"].forEach((k) => s.revealForge(k));
+            }}
+            className="px-3 py-1 text-[0.55rem] rounded-md border border-success/30 text-success/60 hover:text-success hover:border-success/60 bg-success/5 transition-colors cursor-pointer"
+          >
+            ✦ solve all
+          </button>
+        </div>
+      )}
+
       <div className="grid grid-cols-2 gap-3">
         {ENIGMAS.map((e) => (
           <div key={e.id} data-card-id={e.id}>
