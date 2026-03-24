@@ -726,7 +726,6 @@ export function FinaleModal() {
     useCelebration = true,
   ) => {
     const id = ++rocketIdRef.current;
-    const vw = window.innerWidth;
     const vh = window.innerHeight;
     const dy = `${-(vh - targetY - 40)}px`; // travel from bottom to target
 
