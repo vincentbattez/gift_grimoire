@@ -1,4 +1,4 @@
-import { useState, useRef, useCallback, useLayoutEffect } from "react";
+import { useState, useRef, useCallback, useLayoutEffect, useEffect } from "react";
 import { sndLetterSwap, sndScrambleSolved } from "../audio";
 import { useStore } from "../store";
 import { EnigmaPicker } from "./EnigmaPicker";
@@ -51,6 +51,20 @@ export function LetterScramble() {
   const [localSolved, setLocalSolved] = useState(false);
   const solved = scrambleSolved || localSolved;
   const [showPicker, setShowPicker] = useState(false);
+
+  useEffect(() => {
+    if (!scrambleSolved && localSolved) {
+      setLocalSolved(false);
+      setShowPicker(false);
+      setLetters(() => {
+        let shuffled = shuffle(INITIAL_LETTERS);
+        while (shuffled.map((l) => l.char).join("") === SOLUTION) {
+          shuffled = shuffle(INITIAL_LETTERS);
+        }
+        return shuffled;
+      });
+    }
+  }, [scrambleSolved]); // eslint-disable-line react-hooks/exhaustive-deps
   const [draggingId, setDraggingId] = useState<number | null>(null);
   const [targetIdx, setTargetIdx] = useState<number | null>(null);
 

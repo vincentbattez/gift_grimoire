@@ -11,7 +11,7 @@ import { SuccessModal } from "./components/SuccessModal";
 import { LoveLetterModal } from "./components/LoveLetterModal";
 import { IntroModal } from "./components/IntroModal";
 import { triggerUnlockEffect } from "./unlock";
-import { initAdmin, useAdmin } from "./useAdmin";
+import { initAdmin, logoutAdmin, useAdmin } from "./useAdmin";
 import { fireEvent } from "./ha";
 
 initAdmin();
@@ -132,6 +132,14 @@ export default function App() {
         >
           reset
         </button>
+        {isAdmin && (
+          <button
+            onClick={logoutAdmin}
+            className="w-full py-1 text-[0.55rem] text-amber-400/40 hover:text-amber-400/80 bg-transparent border border-amber-400/20 hover:border-amber-400/50 rounded transition-colors cursor-pointer"
+          >
+            ⚙ quitter le mode admin
+          </button>
+        )}
       </div>
       <ScreenFlash />
       <AttemptBadge />

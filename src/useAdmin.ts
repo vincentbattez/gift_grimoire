@@ -25,3 +25,8 @@ export function initAdmin() {
 export function useAdmin(): boolean {
   return useSyncExternalStore(subscribe, getSnapshot);
 }
+
+export function logoutAdmin() {
+  localStorage.removeItem(KEY);
+  window.dispatchEvent(new Event("storage"));
+}

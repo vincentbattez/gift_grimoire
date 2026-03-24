@@ -20,7 +20,7 @@ const FORGE_SUCCESS_MESSAGES: Record<string, string> = {
   vibration: "Le murmure s'est tu… mais son secret résonne encore. Une clé naît du silence.",
 };
 
-function ForgeSection({ forgeKey, title, children }: { forgeKey: string; title: string; children: React.ReactNode }) {
+function ForgeSection({ forgeKey, title, children, isAdmin }: { forgeKey: string; title: string; children: React.ReactNode; isAdmin?: boolean }) {
   const revealed = useStore((s) => s.forgeRevealed[forgeKey]);
   const revealForge = useStore((s) => s.revealForge);
   const solved = useStore((s) =>
@@ -28,6 +28,11 @@ function ForgeSection({ forgeKey, title, children }: { forgeKey: string; title: 
     : forgeKey === "magnet" ? s.magnetSolved
     : forgeKey === "vibration" ? s.vibrationSolved
     : false,
+  );
+  const resetAction = useStore((s) =>
+    forgeKey === "scramble" ? s.resetScramble
+    : forgeKey === "magnet" ? s.resetMagnet
+    : s.resetVibration,
   );
   const [phase, setPhase] = useState<ForgePhase>("locked");
   const containerRef = useRef<HTMLDivElement>(null);
@@ -57,6 +62,17 @@ function ForgeSection({ forgeKey, title, children }: { forgeKey: string; title: 
             <p className="text-[0.6rem] text-success/55 leading-relaxed italic max-w-[260px] mx-auto">
               {FORGE_SUCCESS_MESSAGES[forgeKey]}
             </p>
+            {isAdmin && (
+              <button
+                onClick={resetAction}
+                className="mt-3 px-3 py-1 rounded-md text-[0.55rem] tracking-[0.15em] uppercase
+                  border border-danger/30 text-danger/50 bg-danger/5
+                  hover:border-danger/60 hover:text-danger/80 hover:bg-danger/10
+                  transition-all duration-150 active:scale-95"
+              >
+                ↺ Re-lock
+              </button>
+            )}
           </div>
         )}
       </div>
@@ -249,13 +265,13 @@ export function EnigmaGrid({ isAdmin }: { isAdmin: boolean }) {
           </p>
 
           <div className="flex flex-col gap-10">
-            <ForgeSection forgeKey="magnet" title="La chaleur de L'Arc-en-ciel">
+            <ForgeSection forgeKey="magnet" title="La chaleur de L'Arc-en-ciel" isAdmin={isAdmin}>
               <DarkVadorButton />
             </ForgeSection>
-            <ForgeSection forgeKey="scramble" title="Le Maillon des Égarés">
+            <ForgeSection forgeKey="scramble" title="Le Maillon des Égarés" isAdmin={isAdmin}>
               <LetterScramble />
             </ForgeSection>
-            <ForgeSection forgeKey="vibration" title="Le Murmure Invisible">
+            <ForgeSection forgeKey="vibration" title="Le Murmure Invisible" isAdmin={isAdmin}>
               <VibrationListener />
             </ForgeSection>
           </div>
