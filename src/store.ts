@@ -28,6 +28,8 @@ type GrimoireStore = {
   audioWarningAcknowledged: boolean;
   forgeRevealed: Record<string, boolean>;
   readLetters: Record<EnigmaId, boolean>;
+  finaleActive: boolean;
+  finaleModalOpen: boolean;
 
   unlock: (id: EnigmaId) => void;
   solve: (id: EnigmaId) => void;
@@ -57,6 +59,9 @@ type GrimoireStore = {
   closeLoveLetter: () => void;
   acknowledgeAudioWarning: () => void;
   revealForge: (key: string) => void;
+  startFinale: () => void;
+  openFinaleModal: () => void;
+  closeFinaleModal: () => void;
 };
 
 const initialEnigmas: Record<EnigmaId, EnigmaState> = {};
@@ -88,6 +93,8 @@ export const useStore = create<GrimoireStore>()(
       audioWarningAcknowledged: false,
       forgeRevealed: {},
       readLetters: {},
+      finaleActive: false,
+      finaleModalOpen: false,
 
       unlock: (id) =>
         set((s) => {
@@ -193,6 +200,9 @@ export const useStore = create<GrimoireStore>()(
         set((s) => ({
           forgeRevealed: { ...s.forgeRevealed, [key]: true },
         })),
+      startFinale: () => set({ finaleActive: true }),
+      openFinaleModal: () => set({ finaleModalOpen: true }),
+      closeFinaleModal: () => set({ finaleActive: false, finaleModalOpen: false }),
     }),
     {
       name: "grimoire_v3",

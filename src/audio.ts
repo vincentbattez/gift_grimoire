@@ -610,6 +610,236 @@ export const sndForgeReveal = () => {
   tone(3136, "sine", 0.02, 1.2, 0.95);
 };
 
+/** Firework launch whistle — ascending pitch simulating a rocket rising */
+export const sndFireworkLaunch = (pitch = 1) => {
+  const c = getCtx();
+  const t = c.currentTime;
+
+  // Rising whistle
+  const o = c.createOscillator();
+  const g = c.createGain();
+  o.connect(g);
+  g.connect(c.destination);
+  o.type = "sine";
+  o.frequency.setValueAtTime(200 * pitch, t);
+  o.frequency.exponentialRampToValueAtTime(1800 * pitch, t + 0.7);
+  g.gain.setValueAtTime(0, t);
+  g.gain.linearRampToValueAtTime(0.07, t + 0.05);
+  g.gain.setValueAtTime(0.07, t + 0.5);
+  g.gain.exponentialRampToValueAtTime(0.0001, t + 0.75);
+  o.start(t);
+  o.stop(t + 0.8);
+
+  // Breathy noise layer — adds realism
+  const n = c.createOscillator();
+  const nG = c.createGain();
+  n.connect(nG);
+  nG.connect(c.destination);
+  n.type = "sawtooth";
+  n.frequency.setValueAtTime(400 * pitch, t);
+  n.frequency.exponentialRampToValueAtTime(3000 * pitch, t + 0.65);
+  nG.gain.setValueAtTime(0, t);
+  nG.gain.linearRampToValueAtTime(0.025, t + 0.05);
+  nG.gain.exponentialRampToValueAtTime(0.0001, t + 0.7);
+  n.start(t);
+  n.stop(t + 0.75);
+};
+
+/** Firework crackle — burst of rapid micro-pops simulating sparkler crackle */
+export const sndCrackle = (intensity = 1) => {
+  const c = getCtx();
+  const t = c.currentTime;
+
+  // Deep boom — massive low-end impact
+  const boom = c.createOscillator();
+  const boomG = c.createGain();
+  boom.connect(boomG);
+  boomG.connect(c.destination);
+  boom.type = "sine";
+  boom.frequency.setValueAtTime(80 * intensity, t);
+  boom.frequency.exponentialRampToValueAtTime(20, t + 0.4);
+  boomG.gain.setValueAtTime(0.22 * intensity, t);
+  boomG.gain.exponentialRampToValueAtTime(0.0001, t + 0.5);
+  boom.start(t);
+  boom.stop(t + 0.55);
+
+  // Sub-bass pressure wave — chest thump
+  const sub = c.createOscillator();
+  const subG = c.createGain();
+  sub.connect(subG);
+  subG.connect(c.destination);
+  sub.type = "sine";
+  sub.frequency.setValueAtTime(45, t);
+  sub.frequency.exponentialRampToValueAtTime(18, t + 0.35);
+  subG.gain.setValueAtTime(0.18 * intensity, t);
+  subG.gain.exponentialRampToValueAtTime(0.0001, t + 0.4);
+  sub.start(t);
+  sub.stop(t + 0.45);
+
+  // Mid rumble — distorted body
+  const rumble = c.createOscillator();
+  const rumbleG = c.createGain();
+  rumble.connect(rumbleG);
+  rumbleG.connect(c.destination);
+  rumble.type = "sawtooth";
+  rumble.frequency.setValueAtTime(120 * intensity, t + 0.02);
+  rumble.frequency.exponentialRampToValueAtTime(35, t + 0.3);
+  rumbleG.gain.setValueAtTime(0, t);
+  rumbleG.gain.linearRampToValueAtTime(0.1 * intensity, t + 0.015);
+  rumbleG.gain.exponentialRampToValueAtTime(0.0001, t + 0.35);
+  rumble.start(t);
+  rumble.stop(t + 0.4);
+
+  // Crackle debris — lower-pitched pops spread over longer tail
+  const count = Math.round(10 + intensity * 14);
+  for (let i = 0; i < count; i++) {
+    const delay = 0.04 + Math.random() * 0.4 * intensity;
+    const freq = 400 + Math.random() * 1800;
+    const o = c.createOscillator();
+    const g = c.createGain();
+    o.connect(g);
+    g.connect(c.destination);
+    o.type = i % 3 === 0 ? "sawtooth" : "square";
+    o.frequency.setValueAtTime(freq, t + delay);
+    o.frequency.exponentialRampToValueAtTime(freq * 0.15, t + delay + 0.06);
+    const vol = (0.04 + Math.random() * 0.06) * intensity;
+    g.gain.setValueAtTime(0, t + delay);
+    g.gain.linearRampToValueAtTime(vol, t + delay + 0.004);
+    g.gain.exponentialRampToValueAtTime(0.0001, t + delay + 0.05 + Math.random() * 0.05);
+    o.start(t + delay);
+    o.stop(t + delay + 0.12);
+  }
+
+  // Reverb tail — low sine echo that lingers
+  const tail = c.createOscillator();
+  const tailG = c.createGain();
+  tail.connect(tailG);
+  tailG.connect(c.destination);
+  tail.type = "sine";
+  tail.frequency.setValueAtTime(60, t + 0.1);
+  tail.frequency.exponentialRampToValueAtTime(30, t + 0.8);
+  tailG.gain.setValueAtTime(0, t + 0.1);
+  tailG.gain.linearRampToValueAtTime(0.06 * intensity, t + 0.15);
+  tailG.gain.exponentialRampToValueAtTime(0.0001, t + 0.8);
+  tail.start(t + 0.1);
+  tail.stop(t + 0.85);
+};
+
+/** Epic finale — 7-second cinematic climax: rumble → ascending arpeggios → full chord → music-box resolution */
+export const sndFinale = () => {
+  const c = getCtx();
+  const t = c.currentTime;
+
+  // Phase 1 (0-1.5s): Deep rumble crescendo
+  const rumble = c.createOscillator();
+  const rumbleG = c.createGain();
+  rumble.connect(rumbleG);
+  rumbleG.connect(c.destination);
+  rumble.type = "sawtooth";
+  rumble.frequency.setValueAtTime(40, t);
+  rumble.frequency.linearRampToValueAtTime(80, t + 1.5);
+  rumbleG.gain.setValueAtTime(0, t);
+  rumbleG.gain.linearRampToValueAtTime(0.12, t + 1.2);
+  rumbleG.gain.exponentialRampToValueAtTime(0.0001, t + 2);
+  rumble.start(t);
+  rumble.stop(t + 2);
+
+  // Sub bass pulse
+  const sub = c.createOscillator();
+  const subG = c.createGain();
+  sub.connect(subG);
+  subG.connect(c.destination);
+  sub.type = "sine";
+  sub.frequency.value = 55;
+  subG.gain.setValueAtTime(0, t);
+  subG.gain.linearRampToValueAtTime(0.15, t + 1);
+  subG.gain.exponentialRampToValueAtTime(0.0001, t + 2.5);
+  sub.start(t);
+  sub.stop(t + 2.5);
+
+  // Phase 2 (1.5-3.5s): Ascending pentatonic cascade — double speed
+  const cascade = [262, 330, 392, 523, 659, 784, 1047, 1319, 1568, 2093];
+  cascade.forEach((f, i) => {
+    const start = 1.2 + i * 0.12;
+    const o = c.createOscillator();
+    const g = c.createGain();
+    o.connect(g);
+    g.connect(c.destination);
+    o.type = "sine";
+    o.frequency.value = f;
+    g.gain.setValueAtTime(0, t + start);
+    g.gain.linearRampToValueAtTime(0.1 + i * 0.008, t + start + 0.03);
+    g.gain.exponentialRampToValueAtTime(0.0001, t + start + 0.8);
+    o.start(t + start);
+    o.stop(t + start + 0.85);
+  });
+
+  // Shimmer sparkles during cascade
+  [2637, 3136, 3520].forEach((f, i) => {
+    tone(f, "sine", 0.03, 0.6, 1.8 + i * 0.3);
+  });
+
+  // Phase 3 (3-5s): Full triumphant chord — C major with extensions
+  const chordFreqs = [523, 659, 784, 1047, 1319, 1568];
+  chordFreqs.forEach((f, i) => {
+    const o = c.createOscillator();
+    const g = c.createGain();
+    o.connect(g);
+    g.connect(c.destination);
+    o.type = i < 3 ? "triangle" : "sine";
+    o.frequency.value = f;
+    const start = t + 3.0 + i * 0.04;
+    g.gain.setValueAtTime(0, start);
+    g.gain.linearRampToValueAtTime(0.14, start + 0.1);
+    g.gain.setValueAtTime(0.14, start + 1.5);
+    g.gain.exponentialRampToValueAtTime(0.0001, start + 3.5);
+    o.start(start);
+    o.stop(start + 3.6);
+  });
+
+  // High crystalline shimmer over chord
+  tone(2093, "sine", 0.06, 2.5, 3.2);
+  tone(2637, "sine", 0.04, 2.0, 3.5);
+  tone(3520, "sine", 0.025, 1.8, 3.8);
+
+  // Phase 4 (5-7s): Music-box descending resolution
+  const musicBox = [1568, 1319, 1047, 784, 659, 523];
+  musicBox.forEach((f, i) => {
+    const o = c.createOscillator();
+    const g = c.createGain();
+    o.connect(g);
+    g.connect(c.destination);
+    o.type = "sine";
+    o.frequency.value = f;
+    const start = t + 5.0 + i * 0.18;
+    g.gain.setValueAtTime(0, start);
+    g.gain.linearRampToValueAtTime(0.09, start + 0.02);
+    g.gain.exponentialRampToValueAtTime(0.0001, start + 1.5);
+    o.start(start);
+    o.stop(start + 1.5);
+  });
+
+  // Final warm pad — peaceful resolution
+  [262, 330, 392].forEach((f, i) => {
+    const o = c.createOscillator();
+    const g = c.createGain();
+    o.connect(g);
+    g.connect(c.destination);
+    o.type = "triangle";
+    o.frequency.value = f;
+    const start = t + 5.8 + i * 0.03;
+    g.gain.setValueAtTime(0, start);
+    g.gain.linearRampToValueAtTime(0.06, start + 0.3);
+    g.gain.exponentialRampToValueAtTime(0.0001, start + 2.0);
+    o.start(start);
+    o.stop(start + 2.1);
+  });
+
+  // Final golden bell
+  tone(880, "sine", 0.08, 2.0, 6.2);
+  tone(1760, "sine", 0.03, 1.5, 6.3);
+};
+
 /** Ambient tension drone — crescendo over ~3s, returns stop function */
 export function sndAmbientTension(): () => void {
   const c = getCtx();

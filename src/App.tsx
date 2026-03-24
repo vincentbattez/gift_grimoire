@@ -9,6 +9,7 @@ import { Toast } from "./components/Toast";
 import { UnlockOverlay } from "./components/UnlockOverlay";
 import { SuccessModal } from "./components/SuccessModal";
 import { LoveLetterModal } from "./components/LoveLetterModal";
+import { FinaleModal } from "./components/FinaleModal";
 import { IntroModal } from "./components/IntroModal";
 import { triggerUnlockEffect } from "./unlock";
 import { initAdmin, logoutAdmin, useAdmin } from "./useAdmin";
@@ -148,6 +149,7 @@ export default function App() {
       <UnlockOverlay />
       <SuccessModal />
       <LoveLetterModal />
+      <FinaleModal />
       {showIntro && <IntroModal onClose={() => setShowIntro(false)} />}
     </>
   );

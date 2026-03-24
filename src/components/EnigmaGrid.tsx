@@ -222,6 +222,40 @@ function ForgeSection({ forgeKey, title, children, isAdmin }: { forgeKey: string
 }
 
 
+function FinaleButton() {
+  const enigmas = useStore((s) => s.enigmas);
+  const startFinale = useStore((s) => s.startFinale);
+  const finaleActive = useStore((s) => s.finaleActive);
+  const allSolved = Object.values(enigmas).every((e) => e.solved);
+
+  if (!allSolved || finaleActive) return null;
+
+  return (
+    <div className="mt-12 mb-6 flex justify-center" style={{ animation: "finale-btn-appear 0.8s ease-out both" }}>
+      <button
+        onClick={startFinale}
+        className="relative px-8 py-4 rounded-[16px] cursor-pointer border-none"
+        style={{
+          background: "linear-gradient(135deg, #1a1430, #2a1840, #1a1430)",
+          border: "1.5px solid #e8c96a50",
+          animation: "finale-btn-pulse 3s ease-in-out infinite",
+          fontFamily: "var(--font-cinzel-decorative)",
+        }}
+      >
+        <span
+          className="text-[0.75rem] tracking-[0.2em] uppercase"
+          style={{
+            color: "#e8c96a",
+            textShadow: "0 0 20px #e8c96a40",
+          }}
+        >
+          ✦ Terminer le Grimoire ✦
+        </span>
+      </button>
+    </div>
+  );
+}
+
 export function EnigmaGrid({ isAdmin }: { isAdmin: boolean }) {
   const enigmas = useStore((s) => s.enigmas);
   const prologueCompleted = Object.values(enigmas).some(
@@ -241,6 +275,8 @@ export function EnigmaGrid({ isAdmin }: { isAdmin: boolean }) {
       <div className="text-center text-[0.6rem] tracking-[0.35em] text-muted my-4 uppercase mt-12">
         — Les Six Mystères Scellés —
       </div>
+      <FinaleButton />
+
       <div className="grid grid-cols-2 gap-3">
         {ENIGMAS.map((e) => (
           <div key={e.id} data-card-id={e.id}>
@@ -277,6 +313,7 @@ export function EnigmaGrid({ isAdmin }: { isAdmin: boolean }) {
           </div>
         </>
       )}
+
     </>
   );
 }

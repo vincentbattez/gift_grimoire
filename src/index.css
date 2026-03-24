@@ -626,6 +626,120 @@ body {
   100% { opacity: 0; pointer-events: none; }
 }
 
+/* ── Finale celebration ── */
+
+@keyframes finale-screen-pulse {
+  0%, 100% { opacity: 0; }
+  50% { opacity: 1; }
+}
+
+@keyframes finale-radial-burst {
+  0% { transform: scale(0); opacity: 0.9; }
+  40% { opacity: 0.7; }
+  100% { transform: scale(4); opacity: 0; }
+}
+
+@keyframes finale-star-fall {
+  0% { transform: translateY(-100vh) rotate(0deg) scale(0); opacity: 0; }
+  20% { opacity: 1; transform: translateY(-60vh) rotate(90deg) scale(1); }
+  80% { opacity: 0.8; }
+  100% { transform: translateY(20vh) rotate(720deg) scale(0.3); opacity: 0; }
+}
+
+@keyframes finale-converge {
+  0% { transform: translate(var(--fx, 0), var(--fy, 0)) scale(1); opacity: 1; }
+  100% { transform: translate(0, 0) scale(0); opacity: 0; }
+}
+
+@keyframes finale-golden-nova {
+  0% { transform: scale(0); opacity: 0; }
+  30% { opacity: 1; }
+  60% { transform: scale(2.5); opacity: 0.6; }
+  100% { transform: scale(4); opacity: 0; }
+}
+
+@keyframes finale-rocket-rise {
+  0% {
+    transform: translateY(0) scale(1);
+    opacity: 1;
+  }
+  85% {
+    transform: translateY(var(--rocket-dy, -60vh)) scale(0.8);
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(var(--rocket-dy, -60vh)) scale(0);
+    opacity: 0;
+  }
+}
+
+@keyframes finale-rocket-trail {
+  0% {
+    height: 0;
+    opacity: 0.8;
+  }
+  30% {
+    height: 40px;
+    opacity: 0.6;
+  }
+  85% {
+    height: 20px;
+    opacity: 0.3;
+  }
+  100% {
+    height: 0;
+    opacity: 0;
+  }
+}
+
+@keyframes finale-rocket-glow {
+  0%, 100% { box-shadow: 0 0 6px var(--rocket-color, #e8c96a), 0 0 12px var(--rocket-color, #e8c96a); }
+  50% { box-shadow: 0 0 10px var(--rocket-color, #e8c96a), 0 0 20px var(--rocket-color, #e8c96a), 0 0 30px var(--rocket-color, #e8c96a); }
+}
+
+@keyframes finale-btn-pulse {
+  0%, 100% {
+    box-shadow: 0 0 20px #e8c96a40, 0 0 60px #e8c96a20;
+    transform: scale(1);
+  }
+  50% {
+    box-shadow: 0 0 35px #e8c96a70, 0 0 90px #e8c96a40, 0 0 140px #e8c96a20;
+    transform: scale(1.03);
+  }
+}
+
+@keyframes finale-btn-appear {
+  0% { opacity: 0; transform: translateY(20px) scale(0.8); }
+  60% { opacity: 1; transform: translateY(-4px) scale(1.05); }
+  100% { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+@keyframes finale-slide-in {
+  0% { opacity: 0; transform: translateX(40px); }
+  100% { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes finale-slide-out {
+  0% { opacity: 1; transform: translateX(0); }
+  100% { opacity: 0; transform: translateX(-40px); }
+}
+
+@keyframes finale-modal-enter {
+  0% { opacity: 0; transform: scale(0.7) translateY(30px); }
+  60% { transform: scale(1.02) translateY(-3px); }
+  100% { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+@keyframes finale-emoji-orbit {
+  0% { transform: rotate(0deg) translateX(var(--orbit-r, 100px)) rotate(0deg); }
+  100% { transform: rotate(360deg) translateX(var(--orbit-r, 100px)) rotate(-360deg); }
+}
+
+@keyframes finale-dot-active {
+  0%, 100% { box-shadow: 0 0 4px #e8c96a80; }
+  50% { box-shadow: 0 0 12px #e8c96aCC, 0 0 20px #e8c96a60; }
+}
+
 /* Doubt modal — grimoire divination */
 @keyframes doubt-orbit {
   from { transform: rotate(0deg); }
