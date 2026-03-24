@@ -714,6 +714,56 @@ body {
   100% { opacity: 1; transform: translateY(0) scale(1); }
 }
 
+@keyframes narrative-card-flip {
+  0% { transform: perspective(600px) rotateY(0deg); }
+  50% { transform: perspective(600px) rotateY(90deg); }
+  100% { transform: perspective(600px) rotateY(0deg); filter: brightness(1.8) saturate(1.5); }
+}
+
+@keyframes narrative-card-glow {
+  0% { box-shadow: 0 0 0 transparent; }
+  100% { box-shadow: 0 0 30px #e8c96a60, 0 0 60px #e8c96a30; }
+}
+
+@keyframes narrative-card-converge {
+  0% {
+    transform: translate(0, 0) scale(1);
+    opacity: 1;
+  }
+  70% {
+    transform: translate(var(--converge-x), var(--converge-y)) scale(0.3);
+    opacity: 0.8;
+  }
+  100% {
+    transform: translate(var(--converge-x), var(--converge-y)) scale(0);
+    opacity: 0;
+  }
+}
+
+@keyframes narrative-forge-glow {
+  0% { border-color: var(--color-solved-border); box-shadow: none; }
+  50% { border-color: #e8c96a; box-shadow: 0 0 30px #e8c96a50; }
+  100% { border-color: #e8c96a; box-shadow: 0 0 20px #e8c96a40, 0 0 60px #e8c96a20; }
+}
+
+@keyframes narrative-rune-reveal {
+  0% { opacity: 0; transform: scale(0.5); filter: blur(4px); }
+  100% { opacity: 1; transform: scale(1); filter: blur(0); }
+}
+
+@keyframes narrative-flash {
+  0% { opacity: 0; }
+  30% { opacity: 1; }
+  100% { opacity: 0; }
+}
+
+@keyframes narrative-text-fade {
+  0% { opacity: 0; transform: translateY(10px); }
+  20% { opacity: 1; transform: translateY(0); }
+  80% { opacity: 1; transform: translateY(0); }
+  100% { opacity: 0; transform: translateY(-10px); }
+}
+
 @keyframes finale-slide-in {
   0% { opacity: 0; transform: translateX(40px); }
   100% { opacity: 1; transform: translateX(0); }

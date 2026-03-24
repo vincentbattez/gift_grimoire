@@ -41,6 +41,7 @@ function ForgeSection({ forgeKey, title, children, isAdmin }: { forgeKey: string
   if (revealed && phase !== "revealing") {
     return (
       <div
+        data-forge-section={forgeKey}
         className="rounded-[18px] border overflow-hidden py-8 px-4 transition-colors duration-700"
         style={{
           borderColor: solved ? "var(--color-solved-border)" : "var(--color-locked-border)",
@@ -121,6 +122,7 @@ function ForgeSection({ forgeKey, title, children, isAdmin }: { forgeKey: string
   return (
     <div
       ref={containerRef}
+      data-forge-section={forgeKey}
       className="relative rounded-[18px] border border-locked-border overflow-hidden"
       style={{
         background: "linear-gradient(155deg, #130f26, #0b0917)",
@@ -224,21 +226,32 @@ function ForgeSection({ forgeKey, title, children, isAdmin }: { forgeKey: string
 
 function FinaleButton() {
   const enigmas = useStore((s) => s.enigmas);
-  const startFinale = useStore((s) => s.startFinale);
+  const startNarrative = useStore((s) => s.startNarrative);
   const finaleActive = useStore((s) => s.finaleActive);
+  const finaleNarrative = useStore((s) => s.finaleNarrative);
+  const finaleDone = useStore((s) => s.finaleDone);
   const allSolved = Object.values(enigmas).every((e) => e.solved);
 
-  if (!allSolved || finaleActive) return null;
+  if (!allSolved || finaleActive || finaleDone) return null;
+
+  const hidden = finaleNarrative;
 
   return (
-    <div className="mt-12 mb-6 flex justify-center" style={{ animation: "finale-btn-appear 0.8s ease-out both" }}>
+    <div
+      className="mt-12 mb-6 flex justify-center transition-opacity duration-500"
+      style={{
+        animation: hidden ? undefined : "finale-btn-appear 0.8s ease-out both",
+        opacity: hidden ? 0 : undefined,
+        pointerEvents: hidden ? "none" : undefined,
+      }}
+    >
       <button
-        onClick={startFinale}
+        onClick={startNarrative}
         className="relative px-8 py-4 rounded-[16px] cursor-pointer border-none"
         style={{
           background: "linear-gradient(135deg, #1a1430, #2a1840, #1a1430)",
           border: "1.5px solid #e8c96a50",
-          animation: "finale-btn-pulse 3s ease-in-out infinite",
+          animation: hidden ? undefined : "finale-btn-pulse 3s ease-in-out infinite",
           fontFamily: "var(--font-cinzel-decorative)",
         }}
       >
@@ -249,7 +262,7 @@ function FinaleButton() {
             textShadow: "0 0 20px #e8c96a40",
           }}
         >
-          ✦ Terminer le Grimoire ✦
+          ✦ Refermer le Grimoire ✦
         </span>
       </button>
     </div>

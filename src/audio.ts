@@ -549,6 +549,114 @@ export const sndGoldenSeal = () => {
   tone(330, "triangle", 0.06, 1.4, 0.08);
 };
 
+/** Soft typewriter key — quill on parchment */
+export const sndQuillTap = (pitch = 0) => {
+  const c = getCtx();
+  const t = c.currentTime;
+  const f = 3200 + pitch * 400;
+  // Soft click
+  const o = c.createOscillator();
+  const g = c.createGain();
+  o.type = "sine";
+  o.frequency.setValueAtTime(f, t);
+  o.frequency.exponentialRampToValueAtTime(f * 0.6, t + 0.04);
+  g.gain.setValueAtTime(0.03, t);
+  g.gain.exponentialRampToValueAtTime(0.0001, t + 0.06);
+  o.connect(g);
+  g.connect(c.destination);
+  o.start(t);
+  o.stop(t + 0.06);
+};
+
+/** Golden shimmer — special word emphasis */
+export const sndGoldenWord = () => {
+  tone(880, "sine", 0.06, 0.8);
+  tone(1320, "sine", 0.03, 0.6, 0.05);
+};
+
+/** Wax seal — continuous warm crackling while pressing (returns stop function) */
+export const sndWaxMelt = (): (() => void) => {
+  const c = getCtx();
+  const t = c.currentTime;
+
+  // Warm low crackle — wax melting under heat
+  const noise = c.createBufferSource();
+  const buf = c.createBuffer(1, c.sampleRate * 3, c.sampleRate);
+  const data = buf.getChannelData(0);
+  for (let i = 0; i < data.length; i++) {
+    data[i] = (Math.random() * 2 - 1) * (Math.random() > 0.92 ? 0.6 : 0.08);
+  }
+  noise.buffer = buf;
+  noise.loop = true;
+
+  const lp = c.createBiquadFilter();
+  lp.type = "lowpass";
+  lp.frequency.value = 400;
+  lp.Q.value = 1.2;
+
+  const g = c.createGain();
+  g.gain.setValueAtTime(0, t);
+  g.gain.linearRampToValueAtTime(0.12, t + 0.3);
+
+  noise.connect(lp);
+  lp.connect(g);
+  g.connect(c.destination);
+  noise.start(t);
+
+  // Soft warm hum — heat source
+  const hum = c.createOscillator();
+  const humG = c.createGain();
+  hum.type = "sine";
+  hum.frequency.value = 90;
+  humG.gain.setValueAtTime(0, t);
+  humG.gain.linearRampToValueAtTime(0.04, t + 0.5);
+  hum.connect(humG);
+  humG.connect(c.destination);
+  hum.start(t);
+
+  return () => {
+    const now = c.currentTime;
+    g.gain.cancelScheduledValues(now);
+    g.gain.setValueAtTime(g.gain.value, now);
+    g.gain.exponentialRampToValueAtTime(0.0001, now + 0.2);
+    humG.gain.cancelScheduledValues(now);
+    humG.gain.setValueAtTime(humG.gain.value, now);
+    humG.gain.exponentialRampToValueAtTime(0.0001, now + 0.2);
+    setTimeout(() => { noise.stop(); hum.stop(); }, 300);
+  };
+};
+
+/** Wax seal stamp — satisfying press impact */
+export const sndWaxStamp = () => {
+  const c = getCtx();
+  const t = c.currentTime;
+
+  // Deep thud — stamp pressing into wax
+  const o = c.createOscillator();
+  const g = c.createGain();
+  o.type = "sine";
+  o.frequency.setValueAtTime(180, t);
+  o.frequency.exponentialRampToValueAtTime(60, t + 0.15);
+  g.gain.setValueAtTime(0.2, t);
+  g.gain.exponentialRampToValueAtTime(0.0001, t + 0.4);
+  o.connect(g);
+  g.connect(c.destination);
+  o.start(t);
+  o.stop(t + 0.4);
+
+  // Metallic ring — seal embossing
+  tone(1200, "sine", 0.08, 1.5, 0.05);
+  tone(1800, "sine", 0.04, 1.2, 0.08);
+
+  // Warm golden bell cascade — triumphant seal
+  [523, 659, 784, 1047].forEach((f, i) => {
+    tone(f, "sine", 0.06, 1.8, 0.15 + i * 0.12);
+  });
+
+  // Sub resonance — weight
+  tone(110, "triangle", 0.05, 1.6, 0.05);
+};
+
 /** Forge seal break — arcane seal cracking + crystalline shatter + mystical resolve */
 export const sndForgeReveal = () => {
   const c = getCtx();
@@ -726,6 +834,43 @@ export const sndCrackle = (intensity = 1) => {
 };
 
 /** Epic finale — 7-second cinematic climax: rumble → ascending arpeggios → full chord → music-box resolution */
+/** Narrative card flip — mystical page turn with resonance */
+export const sndCardFlip = (index: number) => {
+  const baseFreq = 600 + index * 80;
+  tone(baseFreq, "sine", 0.06, 0.4);
+  tone(baseFreq * 1.5, "triangle", 0.03, 0.3, 0.05);
+  // Soft chime
+  tone(baseFreq * 2, "sine", 0.02, 0.6, 0.1);
+};
+
+/** Rising convergence — all energy pulling to center */
+export const sndConvergence = () => {
+  const c = getCtx();
+  const t = c.currentTime;
+
+  // Rising sweep
+  const sweep = c.createOscillator();
+  const sweepG = c.createGain();
+  sweep.type = "sine";
+  sweep.frequency.setValueAtTime(80, t);
+  sweep.frequency.exponentialRampToValueAtTime(800, t + 1.5);
+  sweepG.gain.setValueAtTime(0, t);
+  sweepG.gain.linearRampToValueAtTime(0.1, t + 0.8);
+  sweepG.gain.exponentialRampToValueAtTime(0.0001, t + 1.5);
+  sweep.connect(sweepG);
+  sweepG.connect(c.destination);
+  sweep.start(t);
+  sweep.stop(t + 1.5);
+
+  // Shimmering overtones
+  [440, 660, 880].forEach((f, i) => {
+    tone(f, "sine", 0.03, 1.2, 0.3 + i * 0.15);
+  });
+
+  // Sub bass build
+  tone(50, "triangle", 0.08, 1.5);
+};
+
 export const sndFinale = () => {
   const c = getCtx();
   const t = c.currentTime;

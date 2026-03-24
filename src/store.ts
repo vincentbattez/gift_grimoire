@@ -28,6 +28,8 @@ type GrimoireStore = {
   audioWarningAcknowledged: boolean;
   forgeRevealed: Record<string, boolean>;
   readLetters: Record<EnigmaId, boolean>;
+  finaleDone: boolean;
+  finaleNarrative: boolean;
   finaleActive: boolean;
   finaleModalOpen: boolean;
 
@@ -59,6 +61,7 @@ type GrimoireStore = {
   closeLoveLetter: () => void;
   acknowledgeAudioWarning: () => void;
   revealForge: (key: string) => void;
+  startNarrative: () => void;
   startFinale: () => void;
   openFinaleModal: () => void;
   closeFinaleModal: () => void;
@@ -93,6 +96,8 @@ export const useStore = create<GrimoireStore>()(
       audioWarningAcknowledged: false,
       forgeRevealed: {},
       readLetters: {},
+      finaleDone: false,
+      finaleNarrative: false,
       finaleActive: false,
       finaleModalOpen: false,
 
@@ -200,13 +205,14 @@ export const useStore = create<GrimoireStore>()(
         set((s) => ({
           forgeRevealed: { ...s.forgeRevealed, [key]: true },
         })),
+      startNarrative: () => set({ finaleNarrative: true }),
       startFinale: () => set({ finaleActive: true }),
-      openFinaleModal: () => set({ finaleModalOpen: true }),
-      closeFinaleModal: () => set({ finaleActive: false, finaleModalOpen: false }),
+      openFinaleModal: () => set({ finaleNarrative: false, finaleModalOpen: true }),
+      closeFinaleModal: () => set({ finaleActive: false, finaleModalOpen: false, finaleDone: true }),
     }),
     {
       name: "grimoire_v3",
-      partialize: (s) => ({ enigmas: s.enigmas, lastAttempt: s.lastAttempt, darkVadorPlayedAt: s.darkVadorPlayedAt, audioPlayCounts: s.audioPlayCounts, scrambleSolved: s.scrambleSolved, magnetSolved: s.magnetSolved, vibrationSolved: s.vibrationSolved, audioWarningAcknowledged: s.audioWarningAcknowledged, forgeRevealed: s.forgeRevealed, readLetters: s.readLetters }),
+      partialize: (s) => ({ enigmas: s.enigmas, lastAttempt: s.lastAttempt, darkVadorPlayedAt: s.darkVadorPlayedAt, audioPlayCounts: s.audioPlayCounts, scrambleSolved: s.scrambleSolved, magnetSolved: s.magnetSolved, vibrationSolved: s.vibrationSolved, audioWarningAcknowledged: s.audioWarningAcknowledged, forgeRevealed: s.forgeRevealed, readLetters: s.readLetters, finaleDone: s.finaleDone }),
     },
   ),
 );

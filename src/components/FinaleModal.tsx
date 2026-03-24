@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState, useCallback } from "react";
 import { useStore } from "../store";
 import { ENIGMAS } from "../config";
-import { sndFinale, sndHeartPop, sndPageTurn, sndGoldenSeal, sndCrackle, sndFireworkLaunch } from "../audio";
+import { sndFinale, sndHeartPop, sndPageTurn, sndGoldenSeal, sndCrackle, sndFireworkLaunch, sndWaxMelt, sndWaxStamp, sndQuillTap, sndGoldenWord, sndCardFlip, sndConvergence } from "../audio";
 import { spawnParticles, spawnCelebration } from "../particles";
 
 const CELEBRATION_DURATION = 9000;
@@ -74,7 +74,7 @@ function SlideContext() {
         className="text-[0.95rem] font-semibold mb-3 tracking-[0.06em]"
         style={{ fontFamily: "var(--font-cinzel-decorative)", color: "#8a6a20", textShadow: "0 0 20px #e8c96a30" }}
       >
-        Fin du Grimoire
+        Le Dernier Sortilège
       </h3>
 
       <div className="flex items-center justify-center gap-3 mb-4">
@@ -185,7 +185,86 @@ function SlideStats() {
   );
 }
 
+const LOVE_LINES = [
+  { text: "Chaque ligne de code de ce grimoire", pause: 1 },
+  { text: "a été écrite en pensant à toi.", pause: 1.4 },
+  { text: "", pause: 0.8 },
+  { text: "Tu es la raison pour laquelle", pause: 1 },
+  { text: "je crois encore à la magie.", pause: 1.2, golden: true },
+  { text: "Celle qui existe quand tu poses", pause: 1 },
+  { text: "ta tête sur mon épaule", pause: 1 },
+  { text: "et que le monde s'arrête.", pause: 1.4, golden: true },
+  { text: "", pause: 0.8 },
+  { text: "Je t'aime au-delà des mots,", pause: 1.2, golden: true },
+  { text: "au-delà des énigmes,", pause: 1 },
+  { text: "au-delà de tout ce que", pause: 1 },
+  { text: "ce grimoire pourra jamais contenir.", pause: 1.6 },
+];
+
+function TypewriterLine({ text, golden, delay, onDone }: {
+  text: string; golden?: boolean; delay: number; onDone?: () => void;
+}) {
+  const [visibleWords, setVisibleWords] = useState(0);
+  const words = text.split(" ");
+
+  useEffect(() => {
+    const timers: ReturnType<typeof setTimeout>[] = [];
+
+    const startTimer = setTimeout(() => {
+      words.forEach((_, i) => {
+        const wordDelay = i * (golden ? 140 : 100);
+        timers.push(setTimeout(() => {
+          setVisibleWords(i + 1);
+          sndQuillTap(Math.random() * 2 - 1);
+          if (i === words.length - 1) {
+            if (golden) sndGoldenWord();
+            onDone?.();
+          }
+        }, wordDelay));
+      });
+    }, delay);
+    timers.push(startTimer);
+
+    return () => timers.forEach(clearTimeout);
+  }, []);
+
+  if (!text) return <div style={{ height: "0.9em" }} />;
+
+  return (
+    <span style={{ color: golden ? "#8a6a20" : "#4a3a20" }}>
+      {words.map((word, i) => (
+        <span
+          key={i}
+          className="inline-block transition-all duration-300"
+          style={{
+            opacity: i < visibleWords ? 1 : 0,
+            transform: i < visibleWords ? "translateY(0)" : "translateY(4px)",
+            filter: i < visibleWords
+              ? golden ? "drop-shadow(0 0 6px #e8c96a50)" : undefined
+              : undefined,
+          }}
+        >
+          {word}{i < words.length - 1 ? "\u00A0" : ""}
+        </span>
+      ))}
+    </span>
+  );
+}
+
 function SlideLove() {
+  // Calculate cumulative delays for each line
+  const lineDelays: number[] = [];
+  let cumMs = 600; // initial delay before typing starts
+  for (const line of LOVE_LINES) {
+    lineDelays.push(cumMs);
+    const wordCount = line.text ? line.text.split(" ").length : 0;
+    const typingTime = wordCount * (line.golden ? 140 : 100);
+    cumMs += typingTime + line.pause * 400;
+  }
+
+  const [signatureVisible, setSignatureVisible] = useState(false);
+  const lastLineIdx = LOVE_LINES.length - 1;
+
   return (
     <div className="text-center">
       <div
@@ -207,42 +286,413 @@ function SlideLove() {
         <div className="h-px flex-1 bg-gradient-to-l from-transparent to-[#c9a03240]" />
       </div>
 
-      <p
-        className="text-[0.8rem] leading-[1.85] whitespace-pre-line mb-5"
-        style={{ fontFamily: "var(--font-cinzel)", color: "#4a3a20" }}
+      <div
+        className="text-[0.8rem] leading-[1.85] mb-5 min-h-[180px]"
+        style={{ fontFamily: "var(--font-cinzel)" }}
       >
-        {`Chaque ligne de code de ce grimoire
-a été écrite en pensant à toi.
-
-Tu es la raison pour laquelle je crois encore à la magie.
-Celle qui existe quand tu poses ta tête sur mon épaule et que le monde s'arrête.
-
-Je t'aime au-delà des mots,
-au-delà des énigmes,
-au-delà de tout ce que
-ce grimoire pourra jamais contenir.`}
-      </p>
-
-      <div className="flex items-center justify-center gap-3 mb-4">
-        <div className="h-px flex-1 bg-gradient-to-r from-transparent to-[#c9a03240]" />
-        <div className="w-1.5 h-1.5 rounded-full" style={{ background: "radial-gradient(circle, #e8c96a, #c9a032)" }} />
-        <div className="h-px flex-1 bg-gradient-to-l from-transparent to-[#c9a03240]" />
+        {LOVE_LINES.map((line, i) => (
+          <div key={i}>
+            <TypewriterLine
+              text={line.text}
+              golden={line.golden}
+              delay={lineDelays[i]}
+              onDone={i === lastLineIdx ? () => setTimeout(() => setSignatureVisible(true), 600) : undefined}
+            />
+          </div>
+        ))}
       </div>
 
-      <p
-        className="text-[0.76rem] italic tracking-wide"
-        style={{ fontFamily: "var(--font-cinzel)", color: "#8a6a20" }}
+      <div
+        className="transition-all duration-700"
+        style={{
+          opacity: signatureVisible ? 1 : 0,
+          transform: signatureVisible ? "translateY(0)" : "translateY(8px)",
+        }}
       >
-        — Pour toujours, ton Vincent —
-      </p>
-      <p className="text-[0.65rem] mt-2 tracking-[0.12em]" style={{ color: "#b09a60" }}>
-        Avec tout mon amour, infiniment ♡
-      </p>
+        <div className="flex items-center justify-center gap-3 mb-4">
+          <div className="h-px flex-1 bg-gradient-to-r from-transparent to-[#c9a03240]" />
+          <div className="w-1.5 h-1.5 rounded-full" style={{ background: "radial-gradient(circle, #e8c96a, #c9a032)" }} />
+          <div className="h-px flex-1 bg-gradient-to-l from-transparent to-[#c9a03240]" />
+        </div>
+
+        <p
+          className="text-[0.76rem] italic tracking-wide"
+          style={{ fontFamily: "var(--font-cinzel)", color: "#8a6a20" }}
+        >
+          — Pour toujours, ton Vincent —
+        </p>
+        <p className="text-[0.65rem] mt-2 tracking-[0.12em]" style={{ color: "#b09a60" }}>
+          Avec tout mon amour, infiniment ♡
+        </p>
+      </div>
+    </div>
+  );
+}
+
+const SEAL_HOLD_MS = 2000;
+
+function WaxSeal({ onComplete }: { onComplete: () => void }) {
+  const [progress, setProgress] = useState(0);
+  const [sealed, setSealed] = useState(false);
+  const pressing = useRef(false);
+  const startTime = useRef(0);
+  const rafId = useRef(0);
+  const stopMelt = useRef<(() => void) | null>(null);
+
+  const tick = useCallback(() => {
+    if (!pressing.current) return;
+    const elapsed = Date.now() - startTime.current;
+    const p = Math.min(elapsed / SEAL_HOLD_MS, 1);
+    setProgress(p);
+
+    if (p >= 1) {
+      pressing.current = false;
+      stopMelt.current?.();
+      stopMelt.current = null;
+      setSealed(true);
+      sndWaxStamp();
+      navigator.vibrate?.([60, 30, 100]);
+
+      // Particles burst from seal center
+      const el = document.getElementById("wax-seal");
+      if (el) {
+        const r = el.getBoundingClientRect();
+        spawnParticles(r.left + r.width / 2, r.top + r.height / 2, 40, "#e8c96a");
+        setTimeout(() => spawnParticles(r.left + r.width / 2, r.top + r.height / 2, 20, "#c9a032"), 200);
+      }
+
+      setTimeout(onComplete, 800);
+      return;
+    }
+
+    // Subtle vibration pulses during press
+    if (elapsed % 400 < 20) navigator.vibrate?.(15);
+
+    rafId.current = requestAnimationFrame(tick);
+  }, [onComplete]);
+
+  function handleStart() {
+    if (sealed) return;
+    pressing.current = true;
+    startTime.current = Date.now();
+    stopMelt.current = sndWaxMelt();
+    rafId.current = requestAnimationFrame(tick);
+  }
+
+  function handleEnd() {
+    if (!pressing.current) return;
+    pressing.current = false;
+    cancelAnimationFrame(rafId.current);
+    stopMelt.current?.();
+    stopMelt.current = null;
+    // Spring back
+    setProgress(0);
+  }
+
+  useEffect(() => {
+    return () => {
+      cancelAnimationFrame(rafId.current);
+      stopMelt.current?.();
+    };
+  }, []);
+
+  const circumference = 2 * Math.PI * 28;
+  const dashOffset = circumference * (1 - progress);
+
+  return (
+    <div className="flex flex-col items-center gap-2">
+      <div
+        id="wax-seal"
+        className="relative w-[68px] h-[68px] cursor-pointer select-none"
+        onPointerDown={handleStart}
+        onPointerUp={handleEnd}
+        onPointerLeave={handleEnd}
+        onPointerCancel={handleEnd}
+        style={{ touchAction: "none" }}
+      >
+        {/* Progress ring */}
+        <svg
+          className="absolute inset-0 w-full h-full -rotate-90"
+          viewBox="0 0 64 64"
+        >
+          {/* Track */}
+          <circle
+            cx="32" cy="32" r="28"
+            fill="none"
+            stroke="#c9a03225"
+            strokeWidth="3"
+          />
+          {/* Progress */}
+          <circle
+            cx="32" cy="32" r="28"
+            fill="none"
+            stroke={sealed ? "#e8c96a" : "#c9a032"}
+            strokeWidth="3"
+            strokeLinecap="round"
+            strokeDasharray={circumference}
+            strokeDashoffset={dashOffset}
+            style={{ transition: pressing.current ? undefined : "stroke-dashoffset 0.3s ease-out" }}
+          />
+        </svg>
+
+        {/* Wax seal body */}
+        <div
+          className="absolute inset-[6px] rounded-full flex items-center justify-center"
+          style={{
+            background: sealed
+              ? "radial-gradient(circle at 40% 35%, #e8c96a, #c9a032, #8a6a20)"
+              : `radial-gradient(circle at 40% 35%, ${
+                  progress > 0
+                    ? `hsl(${38 + progress * 5}, ${70 + progress * 20}%, ${50 + progress * 10}%)`
+                    : "#8a3030"
+                }, ${progress > 0 ? "#c96a3a" : "#6b1a1a"}, ${progress > 0 ? "#8a4a20" : "#4a0e0e"})`,
+            boxShadow: sealed
+              ? "0 0 20px #e8c96a80, inset 0 -2px 6px #00000040"
+              : progress > 0
+                ? `0 0 ${8 + progress * 20}px #e8c96a${Math.round(progress * 80).toString(16).padStart(2, "0")}, inset 0 -2px 6px #00000040`
+                : "inset 0 -2px 6px #00000050, 0 2px 8px #00000030",
+            transform: `scale(${sealed ? 0.92 : 1 - progress * 0.06})`,
+            transition: sealed ? "all 0.3s ease-out" : pressing.current ? undefined : "all 0.3s ease-out",
+          }}
+        >
+          {/* Seal emblem */}
+          <span
+            className="text-[1.2rem] leading-none select-none"
+            style={{
+              filter: sealed
+                ? "drop-shadow(0 0 8px #e8c96a80)"
+                : `drop-shadow(0 0 ${progress * 6}px #e8c96a${Math.round(progress * 60).toString(16).padStart(2, "0")})`,
+              opacity: sealed ? 1 : 0.7 + progress * 0.3,
+            }}
+          >
+            {sealed ? "♡" : "♡"}
+          </span>
+        </div>
+
+        {/* Melting wax drips — appear during press */}
+        {progress > 0.3 && !sealed && (
+          <>
+            {[0, 1, 2].map((i) => (
+              <div
+                key={i}
+                className="absolute rounded-full"
+                style={{
+                  width: 4 + i,
+                  height: 4 + Math.min((progress - 0.3) / 0.7, 1) * (8 + i * 3),
+                  background: `radial-gradient(circle, #c9603a, #8a3030)`,
+                  left: `${20 + i * 16}px`,
+                  top: `${52 + i * 2}px`,
+                  borderRadius: "0 0 50% 50%",
+                  opacity: 0.7,
+                  transition: "height 0.2s ease-out",
+                }}
+              />
+            ))}
+          </>
+        )}
+      </div>
+
+      <span
+        className="text-[0.5rem] tracking-[0.2em] uppercase"
+        style={{
+          fontFamily: "var(--font-cinzel)",
+          color: sealed ? "#8a6a20" : "#a08a50",
+          opacity: sealed ? 1 : 0.6 + progress * 0.4,
+        }}
+      >
+        {sealed ? "✦ Scellé ✦" : "Maintenir pour sceller"}
+      </span>
     </div>
   );
 }
 
 const SLIDES = [SlideContext, SlideStats, SlideLove];
+
+const NARRATIVE_TEXTS = [
+  "Le grimoire se referme…",
+  "Les mystères retournent au silence…",
+  "Mais la magie, elle, restera.",
+];
+
+/**
+ * Narrative pre-celebration: cards flip to reveal runes,
+ * forges glow, everything converges to center, then fireworks begin.
+ */
+function NarrativeSequence() {
+  const finaleNarrative = useStore((s) => s.finaleNarrative);
+  const startFinale = useStore((s) => s.startFinale);
+  const [phase, setPhase] = useState<"idle" | "text-intro" | "flipping" | "converging" | "glowing" | "done">("idle");
+  const [flipIndex, setFlipIndex] = useState(-1);
+  const [textIndex, setTextIndex] = useState(-1);
+  const timers = useRef<ReturnType<typeof setTimeout>[]>([]);
+  const started = useRef(false);
+
+  useEffect(() => {
+    if (!finaleNarrative || started.current) return;
+    started.current = true;
+
+    // ── Timeline ──
+    // Text 1 visible 5s, then cards flip, then converge right after, then text 2 visible 5s, flash, fireworks
+    const T = ENIGMAS.length * 400;    // flip time (2400ms)
+    const TEXT_MIN = 5000;             // minimum text display
+    const CONVERGE_DUR = 1400;
+
+    setPhase("text-intro");
+    setTextIndex(0);
+
+    // t=5600 — Overlay fades out, text fades out naturally (animation 5s)
+    const flipFadeStart = TEXT_MIN;
+    timers.current.push(setTimeout(() => {
+      setPhase("flipping");
+    }, flipFadeStart));
+
+    // t=6100-8500 — Cards flip one by one (start after overlay has faded ~500ms)
+    const flipStart = flipFadeStart + 500;
+    ENIGMAS.forEach((_, i) => {
+      timers.current.push(setTimeout(() => {
+        setFlipIndex(i);
+        sndCardFlip(i);
+        navigator.vibrate?.(20);
+
+        const el = document.querySelector(`[data-card-id="${ENIGMAS[i].id}"]`);
+        if (el) {
+          el.scrollIntoView({ behavior: "smooth", block: "center" });
+          setTimeout(() => {
+            const r = el.getBoundingClientRect();
+            spawnParticles(r.left + r.width / 2, r.top + r.height / 2, 12, "#e8c96a");
+          }, 100);
+        }
+      }, flipStart + i * 400));
+    });
+
+    // t=9200 — Converge right after last flip + small pause for glow
+    const convergeStart = flipStart + T + 600;
+    timers.current.push(setTimeout(() => {
+      setPhase("converging");
+      sndConvergence();
+      navigator.vibrate?.(60);
+
+      const cx = window.innerWidth / 2;
+      const cy = window.innerHeight / 2;
+
+      ENIGMAS.forEach((enigma) => {
+        const el = document.querySelector(`[data-card-id="${enigma.id}"]`) as HTMLElement | null;
+        if (!el) return;
+        const r = el.getBoundingClientRect();
+        const cardCx = r.left + r.width / 2;
+        const cardCy = r.top + r.height / 2;
+        el.style.setProperty("--converge-x", `${cx - cardCx}px`);
+        el.style.setProperty("--converge-y", `${cy - cardCy}px`);
+        el.style.animation = `narrative-card-converge ${CONVERGE_DUR}ms cubic-bezier(.4,0,.2,1) forwards`;
+      });
+    }, convergeStart));
+
+    // t=10900 — Overlay ON + Text 2 "Les mystères retournent au silence…"
+    const text2Start = convergeStart + CONVERGE_DUR + 300;
+    timers.current.push(setTimeout(() => {
+      setPhase("glowing");
+      setTextIndex(1);
+      sndGoldenSeal();
+      navigator.vibrate?.([30, 20, 30]);
+    }, text2Start));
+
+    // t=15900 — Text 3 "Mais la magie, elle, restera."
+    const text3Start = text2Start + TEXT_MIN;
+    timers.current.push(setTimeout(() => {
+      setTextIndex(2);
+    }, text3Start));
+
+    // t=20900 — Cleanup + launch fireworks directly
+    const finaleStart = text3Start + TEXT_MIN;
+    timers.current.push(setTimeout(() => {
+      setPhase("done");
+
+      ENIGMAS.forEach((enigma) => {
+        const el = document.querySelector(`[data-card-id="${enigma.id}"]`) as HTMLElement | null;
+        if (el) {
+          el.style.animation = "";
+          el.style.removeProperty("--converge-x");
+          el.style.removeProperty("--converge-y");
+          el.style.opacity = "";
+          el.style.transform = "";
+        }
+      });
+      document.querySelectorAll("[data-forge-section]").forEach((el) => {
+        (el as HTMLElement).style.animation = "";
+      });
+
+      startFinale();
+    }, finaleStart));
+
+    return () => timers.current.forEach(clearTimeout);
+  }, [finaleNarrative, startFinale]);
+
+  // Apply flip animations to cards in the DOM
+  useEffect(() => {
+    if (flipIndex < 0) return;
+    const enigma = ENIGMAS[flipIndex];
+    const el = document.querySelector(`[data-card-id="${enigma.id}"]`) as HTMLElement | null;
+    if (!el) return;
+
+    el.style.animation = "narrative-card-flip 0.6s ease-in-out forwards";
+    // Use timeout instead of animationend (which bubbles from child animations)
+    const t = setTimeout(() => {
+      el.style.animation = "narrative-card-glow 0.5s ease-out forwards";
+    }, 600);
+    return () => clearTimeout(t);
+  }, [flipIndex]);
+
+  if (!finaleNarrative) return null;
+
+  return (
+    <>
+      {/* Darkening overlay */}
+      <div
+        className="fixed inset-0 z-[190] pointer-events-none transition-all duration-700"
+        style={{
+          background: "#07060f",
+          opacity:
+            phase === "text-intro" ? 0.96
+            : phase === "flipping" ? 0
+            : phase === "converging" ? 0.5
+            : phase === "glowing" || phase === "done" ? 0.96
+            : 0,
+        }}
+      />
+
+      {/* Narrative text */}
+      {textIndex >= 0 && (
+        <div className="fixed inset-x-0 top-[12%] z-[195] flex flex-col items-center pointer-events-none px-6">
+          <div
+            key={textIndex}
+            className="rounded-2xl px-8 py-5 flex flex-col items-center"
+            style={{
+              background: "radial-gradient(ellipse at 50% 50%, #07060fE0, #07060fA0, transparent 80%)",
+              animation: "narrative-text-fade 5s ease-in-out both",
+            }}
+          >
+            <p
+              className="text-[1.1rem] tracking-[0.18em] text-center leading-relaxed"
+              style={{
+                fontFamily: "var(--font-cinzel-decorative)",
+                color: "#e8c96a",
+                textShadow: "0 0 40px #e8c96a80, 0 0 80px #e8c96a40, 0 0 120px #e8c96a20",
+              }}
+            >
+              {NARRATIVE_TEXTS[textIndex]}
+            </p>
+            <div className="mt-3 flex items-center gap-3">
+              <div className="h-px w-10 bg-gradient-to-r from-transparent to-[#e8c96a40]" />
+              <div className="w-1.5 h-1.5 rounded-full" style={{ background: "radial-gradient(circle, #e8c96a, #c9a032)" }} />
+              <div className="h-px w-10 bg-gradient-to-l from-transparent to-[#e8c96a40]" />
+            </div>
+          </div>
+        </div>
+      )}
+
+    </>
+  );
+}
 
 // ── Main Component ──
 
@@ -448,15 +898,18 @@ export function FinaleModal() {
 
   return (
     <>
+      {/* ── Narrative pre-celebration ── */}
+      <NarrativeSequence />
+
       {/* ── Celebration overlay ── */}
-      {finaleActive && !finaleModalOpen && (
-        <div
-          className="fixed inset-0 z-[200] pointer-events-none transition-opacity duration-700"
-          style={{
-            background: "radial-gradient(ellipse at 50% 50%, #07060fDD, #07060fF8)",
-            opacity: celebrationPhase === "done" ? 0 : 1,
-          }}
-        >
+      <div
+        className="fixed inset-0 z-[200] pointer-events-none transition-opacity duration-1000"
+        style={{
+          background: "radial-gradient(ellipse at 50% 50%, #07060fDD, #07060fF8)",
+          opacity: finaleActive && !finaleModalOpen && celebrationPhase !== "done" ? 1 : 0,
+        }}
+      >{finaleActive && !finaleModalOpen && (<>
+
           {/* Rocket projectiles */}
           {rockets.map((r) => (
             <div
@@ -603,8 +1056,8 @@ export function FinaleModal() {
               }}
             />
           </div>
-        </div>
-      )}
+      </>)}
+      </div>
 
       {/* ── Modal ── */}
       {(finaleModalOpen || closing) && (
@@ -718,7 +1171,7 @@ export function FinaleModal() {
                   ))}
                 </div>
 
-                {/* Next / Close */}
+                {/* Next */}
                 {slideIndex < SLIDES.length - 1 ? (
                   <button
                     onClick={nextSlide}
@@ -732,20 +1185,16 @@ export function FinaleModal() {
                     ›
                   </button>
                 ) : (
-                  <button
-                    onClick={handleClose}
-                    className="px-3 py-1.5 rounded-full text-[0.6rem] tracking-[0.12em] uppercase border transition-all duration-200 cursor-pointer"
-                    style={{
-                      borderColor: "#c9a03260",
-                      background: "linear-gradient(135deg, #f5e6c8, #ede0c0)",
-                      color: "#8a6a20",
-                      fontFamily: "var(--font-cinzel)",
-                    }}
-                  >
-                    Fermer ♡
-                  </button>
+                  <div className="w-[32px]" />
                 )}
               </div>
+
+              {/* Wax seal — only on last slide */}
+              {slideIndex === SLIDES.length - 1 && (
+                <div className="mt-6 flex justify-center" style={{ animation: "finale-slide-in 0.6s ease-out 0.3s both" }}>
+                  <WaxSeal onComplete={handleClose} />
+                </div>
+              )}
             </div>
           </div>
         </div>
