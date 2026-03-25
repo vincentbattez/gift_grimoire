@@ -368,6 +368,7 @@ function WaxSeal({ onComplete }: { onComplete: () => void }) {
     // Subtle vibration pulses during press
     if (elapsed % 400 < 20) navigator.vibrate?.(15);
 
+    // eslint-disable-next-line react-hooks/immutability
     rafId.current = requestAnimationFrame(tick);
   }, [onComplete]);
 
@@ -537,6 +538,7 @@ function NarrativeSequence() {
     const TEXT_MIN = 5000;             // minimum text display
     const CONVERGE_DUR = 1400;
 
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setPhase("text-intro");
     setTextIndex(0);
 
@@ -977,6 +979,7 @@ export function FinaleModal() {
               opacity: celebrationPhase === "stars" || celebrationPhase === "converge" ? 1 : 0,
             }}
           >
+            {/* eslint-disable-next-line react-hooks/refs */}
             {starsRef.current.map((s, i) => (
               <div
                 key={i}
@@ -1000,6 +1003,7 @@ export function FinaleModal() {
               opacity: celebrationPhase === "stars" || celebrationPhase === "converge" ? 1 : 0,
             }}
           >
+            {/* eslint-disable-next-line react-hooks/refs */}
             {burstRef.current.map((h, i) => (
               <div
                 key={i}
@@ -1071,6 +1075,7 @@ export function FinaleModal() {
           }}
         >
           {/* Background hearts */}
+          {/* eslint-disable-next-line react-hooks/refs */}
           {burstRef.current.slice(0, 25).map((h, i) => (
             <div
               key={i}

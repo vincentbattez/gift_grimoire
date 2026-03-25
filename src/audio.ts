@@ -413,7 +413,7 @@ export function sndDeepListen(): () => void {
       g.gain.exponentialRampToValueAtTime(0.0001, now + 0.4);
       o.stop(now + 0.45);
     }
-    try { breathLfo.stop(now + 0.45); } catch {}
+    try { breathLfo.stop(now + 0.45); } catch { /* AudioNode déjà arrêté */ }
   };
 }
 

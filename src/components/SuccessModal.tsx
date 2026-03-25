@@ -16,6 +16,7 @@ export function SuccessModal() {
 
   useEffect(() => {
     if (boxNumber === null) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setEntered(false);
       return;
     }

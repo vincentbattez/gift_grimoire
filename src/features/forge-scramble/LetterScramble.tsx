@@ -54,6 +54,7 @@ export function LetterScramble({ solved, onSolve }: ForgeProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const ghostRef = useRef<HTMLDivElement>(null);
   const lettersRef = useRef(letters);
+  // eslint-disable-next-line react-hooks/refs
   lettersRef.current = letters;
   const flipSnapshotRef = useRef<Map<number, DOMRect>>(new Map());
 

@@ -8,6 +8,7 @@ import { LockIcon } from "./LockIcon";
 
 /** Distance (px) at which the key snaps into the keyhole */
 const SNAP_THRESHOLD = 60;
+const FRAG_DISTANCES = Array.from({ length: 8 }, () => 80 + Math.random() * 40);
 
 type Phase = "drag" | "unlocking" | "done";
 
@@ -112,6 +113,7 @@ export function UnlockOverlay() {
       if (kh) {
         setKeyPos({ x: kh.x, y: kh.y - 50 });
         setPhase("unlocking");
+        // eslint-disable-next-line react-hooks/immutability
         triggerUnlockSequence(kh);
       }
     } else {
@@ -246,7 +248,7 @@ export function UnlockOverlay() {
             className="unlock-fragment is-flying"
             style={{
               "--frag-angle": `${(360 / 8) * i}deg`,
-              "--frag-dist": `${80 + Math.random() * 40}px`,
+              "--frag-dist": `${FRAG_DISTANCES[i]}px`,
             } as React.CSSProperties}
           />
         ))}

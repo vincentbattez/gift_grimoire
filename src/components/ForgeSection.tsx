@@ -9,6 +9,12 @@ type ForgePhase = "locked" | "shaking" | "shattering" | "revealing" | "done";
 
 const RUNE_GLYPHS = ["ᚠ", "ᚢ", "ᚦ", "ᚨ", "ᚱ", "ᚲ", "ᚷ", "ᚹ"];
 
+const RUNE_DATA = RUNE_GLYPHS.map((_, i) => ({
+  angle: (Math.PI * 2 / RUNE_GLYPHS.length) * i,
+  dist: 60 + Math.random() * 40,
+  rot: Math.random() * 360,
+}));
+
 const FORGE_SUCCESS_MESSAGES: Record<string, string> = {
   scramble: "Les lettres égarées ont retrouvé leur place… Une nouvelle clé se forge dans la lumière.",
   magnet: "Pascal changea les couleurs sombres du cœur de Dark Vador. Le seigneur des ténèbres posa enfin son sabre et sourit.",
@@ -139,8 +145,7 @@ export function ForgeSection({ forge, isAdmin }: ForgeSectionProps) {
       {phase === "shattering" && (
         <div className="absolute inset-0 pointer-events-none">
           {RUNE_GLYPHS.map((rune, i) => {
-            const angle = (Math.PI * 2 / RUNE_GLYPHS.length) * i;
-            const dist = 60 + Math.random() * 40;
+            const { angle, dist, rot } = RUNE_DATA[i];
             return (
               <span
                 key={i}
@@ -148,7 +153,7 @@ export function ForgeSection({ forge, isAdmin }: ForgeSectionProps) {
                 style={{
                   "--rune-tx": `${Math.cos(angle) * dist}px`,
                   "--rune-ty": `${Math.sin(angle) * dist}px`,
-                  "--rune-rot": `${Math.random() * 360}deg`,
+                  "--rune-rot": `${rot}deg`,
                   animation: "forge-rune-scatter 0.7s ease-out forwards",
                   animationDelay: `${i * 0.04}s`,
                 } as React.CSSProperties}
