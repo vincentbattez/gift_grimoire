@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 import { INK_CONFIG, buildLetterMap, getWordCells } from "./ink-config";
 import { useStore } from "../../store";
+import { useAdmin } from "../../useAdmin";
 import { EnigmaPicker } from "../../components/EnigmaPicker";
 import { spawnParticles } from "../../particles";
 import {
@@ -71,6 +72,7 @@ type MissType = "miss" | "miss-adjacent";
 
 // ── Component ─────────────────────────────────────────────────────────────
 export function InkRevealForge({ solved: propSolved, onSolve }: ForgeProps) {
+  const isAdmin = useAdmin();
   const storedGame = useStore((s) => s.inkGameState);
   const setInkGameState = useStore((s) => s.setInkGameState);
 
@@ -666,6 +668,33 @@ export function InkRevealForge({ solved: propSolved, onSolve }: ForgeProps) {
               </div>
             );
           })}
+        </div>
+      )}
+
+      {/* Admin reset */}
+      {isAdmin && (
+        <div className="mt-5 flex justify-center">
+          <button
+            onClick={() => {
+              setRevealedCells(new Set());
+              setWordStates(initWordStates());
+              setDropsLeft(INK_CONFIG.maxDrops);
+              setFirstDropUsed(false);
+              setMissedCells(new Map());
+              setInputValues({});
+              setInputErrors({});
+              setLocalSolved(false);
+              setShowSolvedModal(false);
+              setShowPicker(false);
+              setIsResetting(false);
+            }}
+            className="px-3 py-1 rounded-md text-[0.55rem] tracking-[0.15em] uppercase
+              border border-danger/30 text-danger/50 bg-danger/5
+              hover:border-danger/60 hover:text-danger/80 hover:bg-danger/10
+              transition-all duration-150 active:scale-95"
+          >
+            ↺ Reset jeu
+          </button>
         </div>
       )}
 
