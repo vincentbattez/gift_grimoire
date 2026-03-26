@@ -8,6 +8,7 @@ import { LockIcon } from "./LockIcon";
 
 /** Distance (px) at which the key snaps into the keyhole */
 const SNAP_THRESHOLD = 60;
+const FRAG_DISTANCES = Array.from({ length: 8 }, () => 80 + Math.random() * 40);
 
 type Phase = "drag" | "unlocking" | "done";
 
@@ -32,12 +33,13 @@ export function UnlockOverlay() {
   // Refs to avoid stale closures in setTimeout callbacks
   const unlockingIdRef = useRef(unlockingId);
   const unlockingTitleRef = useRef(unlockingTitle);
-  unlockingIdRef.current = unlockingId;
-  unlockingTitleRef.current = unlockingTitle;
 
-  // Reset state when a new unlock starts
+  // Reset state when a new unlock starts and sync refs
   useEffect(() => {
+    unlockingIdRef.current = unlockingId;
+    unlockingTitleRef.current = unlockingTitle;
     if (unlockingId && unlockingId !== prevIdRef.current) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setPhase("drag");
       setKeyPos(null);
       setDragging(false);
@@ -45,7 +47,7 @@ export function UnlockOverlay() {
       setSceneVisible(true);
     }
     prevIdRef.current = unlockingId;
-  }, [unlockingId]);
+  }, [unlockingId, unlockingTitle]);
 
   // Ambient drone while overlay is visible
   useEffect(() => {
@@ -97,63 +99,6 @@ export function UnlockOverlay() {
     setProximity(Math.max(0, Math.min(1, 1 - dist / 200)));
   }, [phase, getDistToKeyhole]);
 
-  const onDragEnd = useCallback((clientX: number, clientY: number) => {
-    if (phase !== "drag") return;
-    setDragging(false);
-
-    const dist = getDistToKeyhole(clientX - dragOffset.current.x, clientY - dragOffset.current.y);
-
-    if (dist < SNAP_THRESHOLD) {
-      // Snap to keyhole — offset so the teeth (bottom of key) align with the keyhole.
-      // Key SVG is 150px tall, teeth are at ~83%. With translate(-50%,-50%) the center
-      // is at 75px. Teeth offset from center = 150*0.83 - 75 = 50px.
-      // So we position the key 50px above the keyhole.
-      const kh = getKeyholeCenter();
-      if (kh) {
-        setKeyPos({ x: kh.x, y: kh.y - 50 });
-        setPhase("unlocking");
-        triggerUnlockSequence(kh);
-      }
-    } else {
-      // Spring back
-      setKeyPos(null);
-      setProximity(0);
-    }
-  }, [phase, getDistToKeyhole, getKeyholeCenter]);
-
-  // Mouse handlers
-  const onMouseDown = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
-    e.preventDefault();
-    const rect = e.currentTarget.getBoundingClientRect();
-    onDragStart(e.clientX, e.clientY, rect);
-
-    const onMove = (ev: MouseEvent) => onDragMove(ev.clientX, ev.clientY);
-    const onUp = (ev: MouseEvent) => {
-      onDragEnd(ev.clientX, ev.clientY);
-      window.removeEventListener("mousemove", onMove);
-      window.removeEventListener("mouseup", onUp);
-    };
-    window.addEventListener("mousemove", onMove);
-    window.addEventListener("mouseup", onUp);
-  }, [onDragStart, onDragMove, onDragEnd]);
-
-  // Touch handlers
-  const onTouchStart = useCallback((e: React.TouchEvent<HTMLDivElement>) => {
-    const t = e.touches[0];
-    const rect = e.currentTarget.getBoundingClientRect();
-    onDragStart(t.clientX, t.clientY, rect);
-  }, [onDragStart]);
-
-  const onTouchMove = useCallback((e: React.TouchEvent) => {
-    const t = e.touches[0];
-    onDragMove(t.clientX, t.clientY);
-  }, [onDragMove]);
-
-  const onTouchEnd = useCallback((e: React.TouchEvent) => {
-    const t = e.changedTouches[0];
-    onDragEnd(t.clientX, t.clientY);
-  }, [onDragEnd]);
-
   // ── Unlock sequence after snap ──
 
   const triggerUnlockSequence = useCallback((keyholeCenter: { x: number; y: number }) => {
@@ -196,6 +141,63 @@ export function UnlockOverlay() {
       clearTimeout(t2);
     };
   }, [clearUnlocking]);
+
+  const onDragEnd = useCallback((clientX: number, clientY: number) => {
+    if (phase !== "drag") return;
+    setDragging(false);
+
+    const dist = getDistToKeyhole(clientX - dragOffset.current.x, clientY - dragOffset.current.y);
+
+    if (dist < SNAP_THRESHOLD) {
+      // Snap to keyhole — offset so the teeth (bottom of key) align with the keyhole.
+      // Key SVG is 150px tall, teeth are at ~83%. With translate(-50%,-50%) the center
+      // is at 75px. Teeth offset from center = 150*0.83 - 75 = 50px.
+      // So we position the key 50px above the keyhole.
+      const kh = getKeyholeCenter();
+      if (kh) {
+        setKeyPos({ x: kh.x, y: kh.y - 50 });
+        setPhase("unlocking");
+        triggerUnlockSequence(kh);
+      }
+    } else {
+      // Spring back
+      setKeyPos(null);
+      setProximity(0);
+    }
+  }, [phase, getDistToKeyhole, getKeyholeCenter, triggerUnlockSequence]);
+
+  // Mouse handlers
+  const onMouseDown = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    const rect = e.currentTarget.getBoundingClientRect();
+    onDragStart(e.clientX, e.clientY, rect);
+
+    const onMove = (ev: MouseEvent) => onDragMove(ev.clientX, ev.clientY);
+    const onUp = (ev: MouseEvent) => {
+      onDragEnd(ev.clientX, ev.clientY);
+      window.removeEventListener("mousemove", onMove);
+      window.removeEventListener("mouseup", onUp);
+    };
+    window.addEventListener("mousemove", onMove);
+    window.addEventListener("mouseup", onUp);
+  }, [onDragStart, onDragMove, onDragEnd]);
+
+  // Touch handlers
+  const onTouchStart = useCallback((e: React.TouchEvent<HTMLDivElement>) => {
+    const t = e.touches[0];
+    const rect = e.currentTarget.getBoundingClientRect();
+    onDragStart(t.clientX, t.clientY, rect);
+  }, [onDragStart]);
+
+  const onTouchMove = useCallback((e: React.TouchEvent) => {
+    const t = e.touches[0];
+    onDragMove(t.clientX, t.clientY);
+  }, [onDragMove]);
+
+  const onTouchEnd = useCallback((e: React.TouchEvent) => {
+    const t = e.changedTouches[0];
+    onDragEnd(t.clientX, t.clientY);
+  }, [onDragEnd]);
 
   if (!unlockingId) return null;
 
@@ -246,7 +248,7 @@ export function UnlockOverlay() {
             className="unlock-fragment is-flying"
             style={{
               "--frag-angle": `${(360 / 8) * i}deg`,
-              "--frag-dist": `${80 + Math.random() * 40}px`,
+              "--frag-dist": `${FRAG_DISTANCES[i]}px`,
             } as React.CSSProperties}
           />
         ))}
@@ -261,7 +263,7 @@ export function UnlockOverlay() {
 
       {/* Enigma reveal after unlock */}
       {isDone && (() => {
-        const enigma = ENIGMAS.find((e) => e.id === unlockingIdRef.current);
+        const enigma = ENIGMAS.find((e) => e.id === unlockingId);
         return (
           <div className="unlock-reveal is-visible">
             <div className="unlock-reveal-label">

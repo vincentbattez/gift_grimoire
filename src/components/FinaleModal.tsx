@@ -201,9 +201,9 @@ const LOVE_LINES = [
   { text: "ce grimoire pourra jamais contenir.", pause: 1.6 },
 ];
 
-function TypewriterLine({ text, golden, delay, onDone }: {
+function TypewriterLine({ text, golden, delay, onDone }: Readonly<{
   text: string; golden?: boolean; delay: number; onDone?: () => void;
-}) {
+}>) {
   const [visibleWords, setVisibleWords] = useState(0);
   const words = text.split(" ");
 
@@ -368,6 +368,7 @@ function WaxSeal({ onComplete }: { onComplete: () => void }) {
     // Subtle vibration pulses during press
     if (elapsed % 400 < 20) navigator.vibrate?.(15);
 
+    // eslint-disable-next-line react-hooks/immutability
     rafId.current = requestAnimationFrame(tick);
   }, [onComplete]);
 
@@ -537,6 +538,7 @@ function NarrativeSequence() {
     const TEXT_MIN = 5000;             // minimum text display
     const CONVERGE_DUR = 1400;
 
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setPhase("text-intro");
     setTextIndex(0);
 
@@ -624,7 +626,8 @@ function NarrativeSequence() {
       startFinale();
     }, finaleStart));
 
-    return () => timers.current.forEach(clearTimeout);
+    const currentTimers = timers.current;
+    return () => currentTimers.forEach(clearTimeout);
   }, [finaleNarrative, startFinale]);
 
   // Apply flip animations to cards in the DOM
@@ -835,7 +838,8 @@ export function FinaleModal() {
       openFinaleModal();
     }, CELEBRATION_DURATION));
 
-    return () => celebTimers.current.forEach(clearTimeout);
+    const currentCelebTimers = celebTimers.current;
+    return () => currentCelebTimers.forEach(clearTimeout);
   }, [finaleActive, finaleModalOpen, openFinaleModal, launchRocket]);
 
   // Modal entrance
@@ -977,6 +981,7 @@ export function FinaleModal() {
               opacity: celebrationPhase === "stars" || celebrationPhase === "converge" ? 1 : 0,
             }}
           >
+            {/* eslint-disable-next-line react-hooks/refs */}
             {starsRef.current.map((s, i) => (
               <div
                 key={i}
@@ -1000,6 +1005,7 @@ export function FinaleModal() {
               opacity: celebrationPhase === "stars" || celebrationPhase === "converge" ? 1 : 0,
             }}
           >
+            {/* eslint-disable-next-line react-hooks/refs */}
             {burstRef.current.map((h, i) => (
               <div
                 key={i}
@@ -1071,6 +1077,7 @@ export function FinaleModal() {
           }}
         >
           {/* Background hearts */}
+          {/* eslint-disable-next-line react-hooks/refs */}
           {burstRef.current.slice(0, 25).map((h, i) => (
             <div
               key={i}

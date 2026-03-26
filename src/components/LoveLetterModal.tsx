@@ -67,7 +67,9 @@ export function LoveLetterModal() {
     };
   }, [enigmaId]);
 
+  // eslint-disable-next-line react-hooks/refs
   const displayId = enigmaId ?? (closing ? closingEnigmaRef.current : null);
+  // eslint-disable-next-line react-hooks/refs
   const enigma = displayId ? ENIGMAS.find((e) => e.id === displayId) : null;
   const isOpen = !!enigmaId && !closing;
 
@@ -94,6 +96,7 @@ export function LoveLetterModal() {
       onClick={handleClose}
     >
       {/* Heart burst */}
+      {/* eslint-disable-next-line react-hooks/refs */}
       {showHearts && burstRef.current.map((h, i) => (
         <div
           key={i}

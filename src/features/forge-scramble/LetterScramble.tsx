@@ -1,9 +1,8 @@
 import { useState, useRef, useCallback, useLayoutEffect, useEffect } from "react";
-import { sndLetterSwap, sndScrambleSolved } from "../audio";
-import { useStore } from "../store";
-import { EnigmaPicker } from "./EnigmaPicker";
+import { sndLetterSwap, sndScrambleSolved } from "../../audio";
+import { EnigmaPicker } from "../../components/EnigmaPicker";
+import type { ForgeProps } from "../../types/forge";
 
-/** ── Configuration ── */
 const SOLUTION = "HWHRESSKDS";
 
 interface Letter {
@@ -33,53 +32,46 @@ function shuffle<T>(arr: T[]): T[] {
   return a;
 }
 
-export function LetterScramble() {
-  const scrambleSolved = useStore((s) => s.scrambleSolved);
-  const solveScramble = useStore((s) => s.solveScramble);
+function makeShuffled(): Letter[] {
+  let shuffled = shuffle(INITIAL_LETTERS);
+  while (shuffled.map((l) => l.char).join("") === SOLUTION) {
+    shuffled = shuffle(INITIAL_LETTERS);
+  }
+  return shuffled;
+}
 
-  const [letters, setLetters] = useState<Letter[]>(() => {
-    if (useStore.getState().scrambleSolved) {
-      return SOLUTION.split("").map((char, i) => ({ id: i + 1, char }));
-    }
-    let shuffled = shuffle(INITIAL_LETTERS);
-    while (shuffled.map((l) => l.char).join("") === SOLUTION) {
-      shuffled = shuffle(INITIAL_LETTERS);
-    }
-    return shuffled;
-  });
-
+/** Forge : Le Maillon des Égarés — glisser-déposer de lettres pour reconstituer le mot */
+export function LetterScramble({ solved, onSolve }: ForgeProps) {
+  const [letters, setLetters] = useState<Letter[]>(() =>
+    solved ? SOLUTION.split("").map((char, i) => ({ id: i + 1, char })) : makeShuffled(),
+  );
   const [localSolved, setLocalSolved] = useState(false);
-  const solved = scrambleSolved || localSolved;
+  const isSolved = solved || localSolved;
   const [showPicker, setShowPicker] = useState(false);
-
-  useEffect(() => {
-    if (!scrambleSolved && localSolved) {
-      setLocalSolved(false);
-      setShowPicker(false);
-      setLetters(() => {
-        let shuffled = shuffle(INITIAL_LETTERS);
-        while (shuffled.map((l) => l.char).join("") === SOLUTION) {
-          shuffled = shuffle(INITIAL_LETTERS);
-        }
-        return shuffled;
-      });
-    }
-  }, [scrambleSolved]); // eslint-disable-line react-hooks/exhaustive-deps
   const [draggingId, setDraggingId] = useState<number | null>(null);
   const [targetIdx, setTargetIdx] = useState<number | null>(null);
 
   const containerRef = useRef<HTMLDivElement>(null);
   const ghostRef = useRef<HTMLDivElement>(null);
   const lettersRef = useRef(letters);
+  // eslint-disable-next-line react-hooks/refs
   lettersRef.current = letters;
   const flipSnapshotRef = useRef<Map<number, DOMRect>>(new Map());
 
-  // FLIP: après chaque changement de `letters`, animer les lettres vers leur nouvelle position
+  // Réinitialisation quand le store admin re-lock l'épreuve
+  useEffect(() => {
+    if (!solved && localSolved) {
+      setLocalSolved(false);
+      setShowPicker(false);
+      setLetters(makeShuffled());
+    }
+  }, [solved]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // FLIP animation
   useLayoutEffect(() => {
     const container = containerRef.current;
     const snapshot = flipSnapshotRef.current;
     if (!container || snapshot.size === 0) return;
-
     flipSnapshotRef.current = new Map();
 
     const cards = container.querySelectorAll<HTMLElement>("[data-lid]");
@@ -87,27 +79,18 @@ export function LetterScramble() {
       const id = Number(el.dataset.lid);
       const prev = snapshot.get(id);
       if (!prev) return;
-
       const curr = el.getBoundingClientRect();
       const dx = prev.left - curr.left;
       const dy = prev.top - curr.top;
       if (dx === 0 && dy === 0) return;
 
-      // Invert: replacer la lettre à son ancienne position
       el.style.transition = "none";
       el.style.transform = `translate(${dx}px, ${dy}px)`;
-
-      // Forcer le reflow pour que le navigateur prenne en compte la position initiale
       el.getBoundingClientRect();
-
-      // Play: animer vers la position naturelle
       el.style.transition = "transform 220ms cubic-bezier(0.25, 0.46, 0.45, 0.94)";
       el.style.transform = "";
 
-      const cleanup = () => {
-        el.style.transition = "";
-        el.removeEventListener("transitionend", cleanup);
-      };
+      const cleanup = () => { el.style.transition = ""; el.removeEventListener("transitionend", cleanup); };
       el.addEventListener("transitionend", cleanup);
     });
   }, [letters]);
@@ -115,8 +98,7 @@ export function LetterScramble() {
   const getCardRects = useCallback(() => {
     const container = containerRef.current;
     if (!container) return [];
-    const cards = container.querySelectorAll<HTMLElement>("[data-lid]");
-    return Array.from(cards).map((el) => ({
+    return Array.from(container.querySelectorAll<HTMLElement>("[data-lid]")).map((el) => ({
       idx: Number(el.dataset.lidx),
       rect: el.getBoundingClientRect(),
     }));
@@ -124,11 +106,10 @@ export function LetterScramble() {
 
   const handlePointerDown = useCallback(
     (e: React.PointerEvent, letter: Letter) => {
-      if (solved) return;
+      if (isSolved) return;
       e.preventDefault();
 
       setDraggingId(letter.id);
-
       const ghost = ghostRef.current;
       if (ghost) {
         ghost.textContent = letter.char;
@@ -142,34 +123,23 @@ export function LetterScramble() {
           ghost.style.left = `${ev.clientX}px`;
           ghost.style.top = `${ev.clientY}px`;
         }
-
         const rects = getCardRects();
         let closest = -1;
         let closestDist = Infinity;
-
         for (const { idx, rect } of rects) {
-          const cx = rect.left + rect.width / 2;
-          const cy = rect.top + rect.height / 2;
-          const dist = Math.hypot(ev.clientX - cx, ev.clientY - cy);
-          if (dist < closestDist) {
-            closest = idx;
-            closestDist = dist;
-          }
+          const dist = Math.hypot(ev.clientX - (rect.left + rect.width / 2), ev.clientY - (rect.top + rect.height / 2));
+          if (dist < closestDist) { closest = idx; closestDist = dist; }
         }
-
         setTargetIdx(closestDist < 55 ? closest : null);
       };
 
       const onUp = () => {
         document.removeEventListener("pointermove", onMove);
         document.removeEventListener("pointerup", onUp);
-
         if (ghost) ghost.style.display = "none";
-
         setDraggingId(null);
         setTargetIdx(null);
 
-        // First: capturer les positions actuelles avant le réordonnancement
         const container = containerRef.current;
         if (container) {
           const snapshot = new Map<number, DOMRect>();
@@ -181,41 +151,28 @@ export function LetterScramble() {
 
         setLetters((prev) => {
           const fromIdx = prev.findIndex((l) => l.id === letter.id);
-
           const rects = getCardRects();
-          if (ghost) {
-            const gx = parseFloat(ghost.style.left);
-            const gy = parseFloat(ghost.style.top);
-            let closest = -1;
-            let closestDist = Infinity;
-            for (const { idx, rect } of rects) {
-              const cx = rect.left + rect.width / 2;
-              const cy = rect.top + rect.height / 2;
-              const dist = Math.hypot(gx - cx, gy - cy);
-              if (dist < closestDist) {
-                closest = idx;
-                closestDist = dist;
-              }
-            }
-
-            if (closestDist < 55 && closest !== -1 && closest !== fromIdx) {
-              const arr = [...prev];
-              const [item] = arr.splice(fromIdx, 1);
-              arr.splice(closest, 0, item);
-
-              sndLetterSwap();
-
-              const word = arr.map((l) => l.char).join("");
-              if (word === SOLUTION) {
-                setLocalSolved(true);
-                sndScrambleSolved();
-                setShowPicker(true);
-              }
-
-              return arr;
-            }
+          if (!ghost) return prev;
+          const gx = parseFloat(ghost.style.left);
+          const gy = parseFloat(ghost.style.top);
+          let closest = -1;
+          let closestDist = Infinity;
+          for (const { idx, rect } of rects) {
+            const dist = Math.hypot(gx - (rect.left + rect.width / 2), gy - (rect.top + rect.height / 2));
+            if (dist < closestDist) { closest = idx; closestDist = dist; }
           }
-
+          if (closestDist < 55 && closest !== -1 && closest !== fromIdx) {
+            const arr = [...prev];
+            const [item] = arr.splice(fromIdx, 1);
+            arr.splice(closest, 0, item);
+            sndLetterSwap();
+            if (arr.map((l) => l.char).join("") === SOLUTION) {
+              setLocalSolved(true);
+              sndScrambleSolved();
+              setShowPicker(true);
+            }
+            return arr;
+          }
           return prev;
         });
       };
@@ -223,15 +180,12 @@ export function LetterScramble() {
       document.addEventListener("pointermove", onMove);
       document.addEventListener("pointerup", onUp);
     },
-    [solved, getCardRects],
+    [isSolved, getCardRects],
   );
 
   return (
     <div className="mt-6">
-      <div
-        ref={containerRef}
-        className="flex justify-center gap-1.5"
-      >
+      <div ref={containerRef} className="flex justify-center gap-1.5">
         {letters.map((l, i) => (
           <div
             key={l.id}
@@ -241,12 +195,10 @@ export function LetterScramble() {
             className={`
               w-8 h-10 flex items-center justify-center
               rounded-lg border text-sm font-cinzel font-bold
-              select-none touch-none cursor-grab
-              transition-all duration-150
+              select-none touch-none cursor-grab transition-all duration-150
               ${draggingId === l.id ? "opacity-25 scale-90" : ""}
               ${targetIdx === i && draggingId !== l.id ? "border-gold scale-110 shadow-[0_0_12px_#e8c96a40]" : "border-locked-border"}
-              ${solved ? "border-solved-border/50 shadow-[0_0_22px_#4ecca325]" : ""}
-              ${solved ? "bg-gradient-to-br from-[#0a1f1a] to-[#080f0c]" : "bg-gradient-to-br from-[#130f26] to-[#0b0917]"}
+              ${isSolved ? "border-solved-border/50 shadow-[0_0_22px_#4ecca325] bg-gradient-to-br from-[#0a1f1a] to-[#080f0c]" : "bg-gradient-to-br from-[#130f26] to-[#0b0917]"}
               text-text
             `}
           >
@@ -255,24 +207,13 @@ export function LetterScramble() {
         ))}
       </div>
 
-      {/* Picker — choose which enigma to unlock */}
       {showPicker && (
-        <EnigmaPicker
-          onClose={() => {
-            setShowPicker(false);
-            solveScramble();
-          }}
-        />
+        <EnigmaPicker onClose={() => { setShowPicker(false); onSolve(); }} />
       )}
 
-      {/* Ghost — follows pointer during drag */}
       <div
         ref={ghostRef}
-        className="fixed z-[1000] w-8 h-10 -translate-x-1/2 -translate-y-1/2
-          flex items-center justify-center
-          rounded-lg border border-gold text-sm font-cinzel font-bold
-          bg-gradient-to-br from-[#1c1438] to-[#130f26] text-gold
-          pointer-events-none shadow-[0_0_20px_#e8c96a40]"
+        className="fixed z-[1000] w-8 h-10 -translate-x-1/2 -translate-y-1/2 flex items-center justify-center rounded-lg border border-gold text-sm font-cinzel font-bold bg-gradient-to-br from-[#1c1438] to-[#130f26] text-gold pointer-events-none shadow-[0_0_20px_#e8c96a40]"
         style={{ display: "none" }}
       />
     </div>

@@ -18,9 +18,8 @@ type GrimoireStore = {
   celebrateCardId: EnigmaId | null;
   unlockingCardId: EnigmaId | null;
   unlockingTitle: string | null;
-  scrambleSolved: boolean;
-  magnetSolved: boolean;
-  vibrationSolved: boolean;
+  /** État de complétion des forges — clé = ForgeModule.key */
+  forges: Record<string, boolean>;
   successBoxNumber: number | null;
   successHaEvent: string | null;
   successEnigmaId: EnigmaId | null;
@@ -49,12 +48,8 @@ type GrimoireStore = {
   clearCelebrate: () => void;
   startUnlocking: (id: EnigmaId, title: string) => void;
   clearUnlocking: () => void;
-  solveScramble: () => void;
-  solveMagnet: () => void;
-  solveVibration: () => void;
-  resetScramble: () => void;
-  resetMagnet: () => void;
-  resetVibration: () => void;
+  solveForge: (key: string) => void;
+  resetForge: (key: string) => void;
   showSuccessBox: (boxNumber: number, haEvent: string, enigmaId: EnigmaId) => void;
   hideSuccessBox: () => void;
   openLoveLetter: (id: EnigmaId) => void;
@@ -86,9 +81,7 @@ export const useStore = create<GrimoireStore>()(
       celebrateCardId: null,
       unlockingCardId: null,
       unlockingTitle: null,
-      scrambleSolved: false,
-      magnetSolved: false,
-      vibrationSolved: false,
+      forges: {},
       successBoxNumber: null,
       successHaEvent: null,
       successEnigmaId: null,
@@ -107,20 +100,14 @@ export const useStore = create<GrimoireStore>()(
           const next = new Set(s.newlyUnlocked);
           next.add(id);
           return {
-            enigmas: {
-              ...s.enigmas,
-              [id]: { ...s.enigmas[id], unlocked: true },
-            },
+            enigmas: { ...s.enigmas, [id]: { ...s.enigmas[id], unlocked: true } },
             newlyUnlocked: next,
           };
         }),
 
       solve: (id) =>
         set((s) => ({
-          enigmas: {
-            ...s.enigmas,
-            [id]: { ...s.enigmas[id], solved: true },
-          },
+          enigmas: { ...s.enigmas, [id]: { ...s.enigmas[id], solved: true } },
         })),
 
       relock: (id) =>
@@ -128,10 +115,7 @@ export const useStore = create<GrimoireStore>()(
           const next = new Set(s.newlyUnlocked);
           next.delete(id);
           return {
-            enigmas: {
-              ...s.enigmas,
-              [id]: { unlocked: false, solved: false },
-            },
+            enigmas: { ...s.enigmas, [id]: { unlocked: false, solved: false } },
             newlyUnlocked: next,
           };
         }),
@@ -163,13 +147,14 @@ export const useStore = create<GrimoireStore>()(
       clearCelebrate: () => set({ celebrateCardId: null }),
       startUnlocking: (id, title) => set({ unlockingCardId: id, unlockingTitle: title }),
       clearUnlocking: () => set({ unlockingCardId: null, unlockingTitle: null }),
-      solveScramble: () => set({ scrambleSolved: true }),
-      solveMagnet: () => set({ magnetSolved: true }),
-      solveVibration: () => set({ vibrationSolved: true }),
-      resetScramble: () => set({ scrambleSolved: false }),
-      resetMagnet: () => set({ magnetSolved: false }),
-      resetVibration: () => set({ vibrationSolved: false }),
-      showSuccessBox: (boxNumber, haEvent, enigmaId) => set({ successBoxNumber: boxNumber, successHaEvent: haEvent, successEnigmaId: enigmaId }),
+
+      solveForge: (key) =>
+        set((s) => ({ forges: { ...s.forges, [key]: true } })),
+      resetForge: (key) =>
+        set((s) => ({ forges: { ...s.forges, [key]: false } })),
+
+      showSuccessBox: (boxNumber, haEvent, enigmaId) =>
+        set({ successBoxNumber: boxNumber, successHaEvent: haEvent, successEnigmaId: enigmaId }),
       hideSuccessBox: () => {
         const enigmaId = get().successEnigmaId;
         if (enigmaId) {
@@ -177,10 +162,7 @@ export const useStore = create<GrimoireStore>()(
             successBoxNumber: null,
             successHaEvent: null,
             successEnigmaId: null,
-            enigmas: {
-              ...s.enigmas,
-              [enigmaId]: { ...s.enigmas[enigmaId], solved: true },
-            },
+            enigmas: { ...s.enigmas, [enigmaId]: { ...s.enigmas[enigmaId], solved: true } },
           }));
         } else {
           set({ successBoxNumber: null, successHaEvent: null, successEnigmaId: null });
@@ -202,9 +184,7 @@ export const useStore = create<GrimoireStore>()(
       },
       acknowledgeAudioWarning: () => set({ audioWarningAcknowledged: true }),
       revealForge: (key) =>
-        set((s) => ({
-          forgeRevealed: { ...s.forgeRevealed, [key]: true },
-        })),
+        set((s) => ({ forgeRevealed: { ...s.forgeRevealed, [key]: true } })),
       startNarrative: () => set({ finaleNarrative: true }),
       startFinale: () => set({ finaleActive: true }),
       openFinaleModal: () => set({ finaleNarrative: false, finaleModalOpen: true }),
@@ -212,7 +192,17 @@ export const useStore = create<GrimoireStore>()(
     }),
     {
       name: "grimoire_v3",
-      partialize: (s) => ({ enigmas: s.enigmas, lastAttempt: s.lastAttempt, darkVadorPlayedAt: s.darkVadorPlayedAt, audioPlayCounts: s.audioPlayCounts, scrambleSolved: s.scrambleSolved, magnetSolved: s.magnetSolved, vibrationSolved: s.vibrationSolved, audioWarningAcknowledged: s.audioWarningAcknowledged, forgeRevealed: s.forgeRevealed, readLetters: s.readLetters, finaleDone: s.finaleDone }),
+      partialize: (s) => ({
+        enigmas: s.enigmas,
+        lastAttempt: s.lastAttempt,
+        darkVadorPlayedAt: s.darkVadorPlayedAt,
+        audioPlayCounts: s.audioPlayCounts,
+        forges: s.forges,
+        audioWarningAcknowledged: s.audioWarningAcknowledged,
+        forgeRevealed: s.forgeRevealed,
+        readLetters: s.readLetters,
+        finaleDone: s.finaleDone,
+      }),
     },
   ),
 );
