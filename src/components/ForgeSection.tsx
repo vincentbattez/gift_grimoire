@@ -15,19 +15,13 @@ const RUNE_DATA = RUNE_GLYPHS.map((_, i) => ({
   rot: Math.random() * 360,
 }));
 
-const FORGE_SUCCESS_MESSAGES: Record<string, string> = {
-  scramble: "Les lettres égarées ont retrouvé leur place… Une nouvelle clé se forge dans la lumière.",
-  magnet: "Pascal changea les couleurs sombres du cœur de Dark Vador. Le seigneur des ténèbres posa enfin son sabre et sourit.",
-  vibration: "Le murmure s'est tu… mais son secret résonne encore. Une clé naît du silence.",
-};
-
 interface ForgeSectionProps {
   forge: ForgeModule;
   isAdmin?: boolean;
 }
 
 export function ForgeSection({ forge, isAdmin }: ForgeSectionProps) {
-  const { key, title, component: ForgeComponent } = forge;
+  const { key, title, successMessage, component: ForgeComponent } = forge;
 
   const revealed = useStore((s) => s.forgeRevealed[key]);
   const revealForge = useStore((s) => s.revealForge);
@@ -60,7 +54,7 @@ export function ForgeSection({ forge, isAdmin }: ForgeSectionProps) {
               ✦ Épreuve accomplie ✦
             </div>
             <p className="text-[0.6rem] text-success/55 leading-relaxed italic max-w-[260px] mx-auto">
-              {FORGE_SUCCESS_MESSAGES[key]}
+              {successMessage}
             </p>
             {isAdmin && (
               <button

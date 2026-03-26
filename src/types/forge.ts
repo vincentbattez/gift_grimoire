@@ -8,5 +8,6 @@ export interface ForgeProps {
 export interface ForgeModule {
   key: string;
   title: string;
+  successMessage: string;
   component: React.ComponentType<ForgeProps>;
 }
