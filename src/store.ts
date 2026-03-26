@@ -191,7 +191,7 @@ export const useStore = create<GrimoireStore>()(
       closeFinaleModal: () => set({ finaleActive: false, finaleModalOpen: false, finaleDone: true }),
     }),
     {
-      name: "grimoire_v4",
+      name: "grimoire_v3",
       partialize: (s) => ({
         enigmas: s.enigmas,
         lastAttempt: s.lastAttempt,
