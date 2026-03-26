@@ -33,12 +33,13 @@ export function UnlockOverlay() {
   // Refs to avoid stale closures in setTimeout callbacks
   const unlockingIdRef = useRef(unlockingId);
   const unlockingTitleRef = useRef(unlockingTitle);
-  unlockingIdRef.current = unlockingId;
-  unlockingTitleRef.current = unlockingTitle;
 
-  // Reset state when a new unlock starts
+  // Reset state when a new unlock starts and sync refs
   useEffect(() => {
+    unlockingIdRef.current = unlockingId;
+    unlockingTitleRef.current = unlockingTitle;
     if (unlockingId && unlockingId !== prevIdRef.current) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setPhase("drag");
       setKeyPos(null);
       setDragging(false);
@@ -46,7 +47,7 @@ export function UnlockOverlay() {
       setSceneVisible(true);
     }
     prevIdRef.current = unlockingId;
-  }, [unlockingId]);
+  }, [unlockingId, unlockingTitle]);
 
   // Ambient drone while overlay is visible
   useEffect(() => {
@@ -98,7 +99,49 @@ export function UnlockOverlay() {
     setProximity(Math.max(0, Math.min(1, 1 - dist / 200)));
   }, [phase, getDistToKeyhole]);
 
-  // @ts-ignore
+  // ── Unlock sequence after snap ──
+
+  const triggerUnlockSequence = useCallback((keyholeCenter: { x: number; y: number }) => {
+    // 0ms — key insert click
+    sndKeyInsert();
+    navigator.vibrate?.(30);
+
+    // 600ms — key rotate (handled by CSS class)
+    // 1100ms — lock open sound
+    const t1 = setTimeout(() => {
+      sndLockOpen();
+      navigator.vibrate?.(50);
+    }, 1100);
+
+    // 1600ms — burst + unlock
+    const t2 = setTimeout(() => {
+      sndUnlock();
+      stopAmbientRef.current?.();
+      stopAmbientRef.current = null;
+      navigator.vibrate?.(200);
+
+      // Particles
+      spawnParticles(keyholeCenter.x, keyholeCenter.y, 50, "#9b6dff");
+      setTimeout(() => spawnParticles(keyholeCenter.x, keyholeCenter.y, 40, "#e8c96a"), 150);
+
+      // Read from refs to avoid stale closure
+      const id = unlockingIdRef.current;
+      if (id) {
+        triggerUnlockReveal(id);
+      }
+
+      setPhase("done");
+      // Hide lock/keyhole scene after a short dissolve, well before overlay fades
+      setTimeout(() => setSceneVisible(false), 500);
+      setTimeout(() => clearUnlocking(), 3000);
+    }, 1600);
+
+    return () => {
+      clearTimeout(t1);
+      clearTimeout(t2);
+    };
+  }, [clearUnlocking]);
+
   const onDragEnd = useCallback((clientX: number, clientY: number) => {
     if (phase !== "drag") return;
     setDragging(false);
@@ -155,49 +198,6 @@ export function UnlockOverlay() {
     const t = e.changedTouches[0];
     onDragEnd(t.clientX, t.clientY);
   }, [onDragEnd]);
-
-  // ── Unlock sequence after snap ──
-
-  const triggerUnlockSequence = useCallback((keyholeCenter: { x: number; y: number }) => {
-    // 0ms — key insert click
-    sndKeyInsert();
-    navigator.vibrate?.(30);
-
-    // 600ms — key rotate (handled by CSS class)
-    // 1100ms — lock open sound
-    const t1 = setTimeout(() => {
-      sndLockOpen();
-      navigator.vibrate?.(50);
-    }, 1100);
-
-    // 1600ms — burst + unlock
-    const t2 = setTimeout(() => {
-      sndUnlock();
-      stopAmbientRef.current?.();
-      stopAmbientRef.current = null;
-      navigator.vibrate?.(200);
-
-      // Particles
-      spawnParticles(keyholeCenter.x, keyholeCenter.y, 50, "#9b6dff");
-      setTimeout(() => spawnParticles(keyholeCenter.x, keyholeCenter.y, 40, "#e8c96a"), 150);
-
-      // Read from refs to avoid stale closure
-      const id = unlockingIdRef.current;
-      if (id) {
-        triggerUnlockReveal(id);
-      }
-
-      setPhase("done");
-      // Hide lock/keyhole scene after a short dissolve, well before overlay fades
-      setTimeout(() => setSceneVisible(false), 500);
-      setTimeout(() => clearUnlocking(), 3000);
-    }, 1600);
-
-    return () => {
-      clearTimeout(t1);
-      clearTimeout(t2);
-    };
-  }, [clearUnlocking]);
 
   if (!unlockingId) return null;
 
@@ -263,7 +263,7 @@ export function UnlockOverlay() {
 
       {/* Enigma reveal after unlock */}
       {isDone && (() => {
-        const enigma = ENIGMAS.find((e) => e.id === unlockingIdRef.current);
+        const enigma = ENIGMAS.find((e) => e.id === unlockingId);
         return (
           <div className="unlock-reveal is-visible">
             <div className="unlock-reveal-label">
