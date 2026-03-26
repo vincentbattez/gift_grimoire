@@ -2,6 +2,7 @@ import type { ForgeModule } from "../types/forge";
 import { DarkVadorForge } from "../features/forge-magnet/DarkVadorForge";
 import { LetterScramble } from "../features/forge-scramble/LetterScramble";
 import { VibrationForge } from "../features/forge-vibration/VibrationForge";
+import { InkRevealForge } from "../features/forge-ink/InkRevealForge";
 
 /**
  * Registre des forges pluggables.
@@ -25,5 +26,11 @@ export const FORGES: ForgeModule[] = [
     title: "Le Murmure Invisible",
     successMessage: "Le murmure s'est tu… mais son secret résonne encore. Une clé naît du silence.",
     component: VibrationForge,
+  },
+  {
+    key: "ink",
+    title: "L'Encre Révélatrice",
+    successMessage: "L'encre a tout révélé. Les mots tracés dans l'ombre brillent désormais dans ta mémoire.",
+    component: InkRevealForge,
   },
 ];

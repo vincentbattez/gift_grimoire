@@ -20,6 +20,13 @@ type GrimoireStore = {
   unlockingTitle: string | null;
   /** État de complétion des forges — clé = ForgeModule.key */
   forges: Record<string, boolean>;
+  /** État en cours de la forge encre (progression, non lié à solved) */
+  inkGameState: {
+    revealedCells: string[];
+    wordStates: Record<string, { solved: boolean; guessesLeft: number }>;
+    dropsLeft: number;
+    firstDropUsed: boolean;
+  } | null;
   successBoxNumber: number | null;
   successHaEvent: string | null;
   successEnigmaId: EnigmaId | null;
@@ -50,6 +57,12 @@ type GrimoireStore = {
   clearUnlocking: () => void;
   solveForge: (key: string) => void;
   resetForge: (key: string) => void;
+  setInkGameState: (state: {
+    revealedCells: string[];
+    wordStates: Record<string, { solved: boolean; guessesLeft: number }>;
+    dropsLeft: number;
+    firstDropUsed: boolean;
+  }) => void;
   showSuccessBox: (boxNumber: number, haEvent: string, enigmaId: EnigmaId) => void;
   hideSuccessBox: () => void;
   openLoveLetter: (id: EnigmaId) => void;
@@ -82,6 +95,7 @@ export const useStore = create<GrimoireStore>()(
       unlockingCardId: null,
       unlockingTitle: null,
       forges: {},
+      inkGameState: null,
       successBoxNumber: null,
       successHaEvent: null,
       successEnigmaId: null,
@@ -151,7 +165,11 @@ export const useStore = create<GrimoireStore>()(
       solveForge: (key) =>
         set((s) => ({ forges: { ...s.forges, [key]: true } })),
       resetForge: (key) =>
-        set((s) => ({ forges: { ...s.forges, [key]: false } })),
+        set((s) => ({
+          forges: { ...s.forges, [key]: false },
+          ...(key === "ink" ? { inkGameState: null } : {}),
+        })),
+      setInkGameState: (state) => set({ inkGameState: state }),
 
       showSuccessBox: (boxNumber, haEvent, enigmaId) =>
         set({ successBoxNumber: boxNumber, successHaEvent: haEvent, successEnigmaId: enigmaId }),
@@ -198,6 +216,7 @@ export const useStore = create<GrimoireStore>()(
         darkVadorPlayedAt: s.darkVadorPlayedAt,
         audioPlayCounts: s.audioPlayCounts,
         forges: s.forges,
+        inkGameState: s.inkGameState,
         audioWarningAcknowledged: s.audioWarningAcknowledged,
         forgeRevealed: s.forgeRevealed,
         readLetters: s.readLetters,
