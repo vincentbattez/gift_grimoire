@@ -1,73 +1,73 @@
-# React + TypeScript + Vite
+# Gift Grimoire
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+## Pourquoi ce projet existe
 
-Currently, two official plugins are available:
+Gift Grimoire est un cadeau personnel conçu pour une seule personne. C'est un jeu d'énigmes web où chaque puzzle est construit autour d'un personnage Disney/Pixar qui reflète une facette de sa personnalité — Mirabel, Raiponce, Wall-E, Bruno, Luisa, EVE. Chaque énigme résolue révèle une lettre d'amour écrite pour elle.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+Le projet n'a pas de public cible, pas de marché, pas d'utilisateurs. Il n'a qu'une héroïne.
 
-## React Compiler
+## Problèmes qu'il résout
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+- **L'éphémère des cadeaux classiques.** Un cadeau matériel se pose sur une étagère. Ici, le cadeau est un parcours qui s'étale sur plusieurs jours (un essai par jour) pour prolonger la magie.
 
-## Expanding the ESLint configuration
+- **Le fossé entre physique et numérique.** Le projet intègre Home Assistant pour connecter des objets physiques (aimant, capteur de vibration, cartes QR) à des mécaniques in-app. Les gestes du monde réel deviennent des clés qui débloquent le jeu.
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+- **L'absence de sensorialité dans les web apps.** Chaque interaction dispose de 4 états visuels et sonores (idle, doing, failing, successful). Particules, animations cinématiques, champ d'étoiles, feedback haptique — la barre de qualité visée est celle d'un jeu vidéo AAA.
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+## Comment il fonctionne
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+Le projet se compose de trois parties distinctes.
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+### Le Grimoire — fil conducteur (route `/`)
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+Le grimoire est l'application principale. Il présente une grille de 6 cartes d'énigmes, toutes verrouillées au départ. L'objectif final : résoudre chaque énigme pour obtenir **le numéro d'un cadeau physique à ouvrir** dans la vraie vie.
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+Flow pour chaque énigme :
+1. **Déverrouiller** la carte (via une Forge ou un QR code physique)
+2. **Résoudre** l'énigme — deviner le personnage Disney/Pixar décrit
+3. **Recevoir** le numéro de boîte cadeau à ouvrir + une lettre d'amour personnalisée
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+Contrainte : un seul essai par jour. Un compteur indique le temps restant avant la prochaine tentative. Quand toutes les énigmes sont résolues, une séquence de finale se déclenche.
+
+### Les Forges — créatrices de clés
+
+Les Forges sont des mini-puzzles indépendants dont le seul but est de **forger une clé**. Cette clé permet ensuite de déverrouiller une énigme au choix dans le grimoire.
+
+Résoudre une forge → un picker apparaît → la joueuse choisit quelle énigme déverrouiller → animation cinématique (clé dorée glissée dans une serrure) → la carte se révèle.
+
+Trois forges, chacune avec une mécanique différente :
+
+| Forge | Mécanique | Capteur |
+|---|---|---|
+| Le Maillon des Égarés | Anagramme drag-and-drop | In-app |
+| La Chaleur de l'Arc-en-ciel | Aimant physique près d'un prop Dark Vador | Home Assistant (`input_boolean`) |
+| Le Murmure Invisible | Capteur de vibration | Home Assistant (`binary_sensor`) |
+
+### Les QR codes physiques
+
+Des cartes QR sont imprimées et dispersées dans la vraie vie. Scanner un QR code **déverrouille directement une énigme** dans le grimoire, sans passer par une forge. L'URL `?unlock=<id>` déclenche automatiquement la séquence de déverrouillage cinématique.
+
+### La Chasse au Trésor — side project (route `/tresor`)
+
+Un module séparé qui génère des **cartes de tarot imprimables** (95mm × 145mm) pour une chasse au trésor physique. Chaque carte contient une énigme en vers, un indice et un symbole arcane. Les énigmes forment un parcours où chaque destination mène à la suivante (Disneyland → Kpop Demon Hunter → SNK → Sardaigne → Encanto → …).
+
+Ce module est purement destiné à l'impression — pas d'interactivité web.
+
+## Objectifs d'expérience utilisateur
+
+- **Immersion totale.** Aucun élément ne doit "faire web app". Le ton est poétique, chaque texte visible porte un poids narratif. L'interface est un grimoire, pas un dashboard.
+- **Pont physique-digital.** Les objets réels (cartes QR, aimant, capteur) sont le point d'entrée de chaque moment magique. L'écran n'est que le miroir de ce qui se passe dans le monde physique.
+- **Rythme contrôlé.** Un essai par jour force la patience, étire le plaisir sur plusieurs jours, et transforme chaque tentative en événement.
+- **Récompense émotionnelle.** Chaque énigme résolue donne un numéro de cadeau physique à ouvrir et une lettre d'amour unique, lue dans une ambiance cinématique. Le jeu est un prétexte ; le vrai contenu, ce sont les mots.
+
+## Stack technique
+
+React 19 · TypeScript · Zustand · Tailwind CSS 4 · Vite 8 · Zod · Home Assistant REST API
+
+## Démarrage
+
+```bash
+cp .env.example .env  # configurer VITE_HA_URL et VITE_HA_TOKEN
+npm install
+npm run dev
 ```
