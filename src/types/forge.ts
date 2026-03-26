@@ -1,3 +1,5 @@
+import type { ComponentType } from "react";
+
 export interface ForgeProps {
   /** L'épreuve est-elle déjà résolue (state persisté) */
   solved: boolean;
@@ -9,5 +11,5 @@ export interface ForgeModule {
   key: string;
   title: string;
   successMessage: string;
-  component: React.ComponentType<ForgeProps>;
+  component: ComponentType<ForgeProps>;
 }

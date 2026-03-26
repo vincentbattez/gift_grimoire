@@ -89,7 +89,6 @@ function ModalBody({
   }
 
   function startSuspenseTimer(offsetMs = 0) {
-    // eslint-disable-next-line react-hooks/purity
     const start = Date.now() - offsetMs;
     const interval = setInterval(() => setSuspenseProgress(Math.min((Date.now() - start) / SUSPENSE_MS, 1)), 50);
     const timeout = setTimeout(() => {
@@ -111,7 +110,6 @@ function ModalBody({
   function submit() {
     if (isSolved || attemptUsed || feedback === "suspense") return;
     const isCorrect = normalize(value) === normalize(enigma.answer);
-    // eslint-disable-next-line react-hooks/purity
     const willDoubt = Math.random() < (isCorrect ? 0.4 : 0.6);
 
     setFeedback("suspense");
@@ -121,7 +119,6 @@ function ModalBody({
     startSuspenseTimer();
 
     if (willDoubt) {
-      // eslint-disable-next-line react-hooks/purity
       const doubtAt = SUSPENSE_MS * (0.6 + Math.random() * 0.3);
       setTimeout(() => {
         pauseSuspense();

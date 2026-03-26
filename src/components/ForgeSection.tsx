@@ -113,7 +113,7 @@ export function ForgeSection({ forge, isAdmin }: ForgeSectionProps) {
         }),
       }}
     >
-      {/* Contenu flouté avant révélation */}
+      {/* Contenu : placeholder flouté avant révélation, vrai composant après */}
       <div
         className="pointer-events-none select-none py-8 px-4"
         style={{
@@ -123,7 +123,11 @@ export function ForgeSection({ forge, isAdmin }: ForgeSectionProps) {
         }}
       >
         <div className="text-center text-[0.5rem] tracking-[0.25em] text-muted/50 mb-2 uppercase">{title}</div>
-        <ForgeComponent solved={solved} onSolve={() => solveForge(key)} />
+        {phase === "revealing" ? (
+          <ForgeComponent solved={solved} onSolve={() => solveForge(key)} />
+        ) : (
+          <div className="h-24" />
+        )}
       </div>
 
       {/* Anneau de pulse au shattering */}
