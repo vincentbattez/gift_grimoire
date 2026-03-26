@@ -201,9 +201,9 @@ const LOVE_LINES = [
   { text: "ce grimoire pourra jamais contenir.", pause: 1.6 },
 ];
 
-function TypewriterLine({ text, golden, delay, onDone }: {
+function TypewriterLine({ text, golden, delay, onDone }: Readonly<{
   text: string; golden?: boolean; delay: number; onDone?: () => void;
-}) {
+}>) {
   const [visibleWords, setVisibleWords] = useState(0);
   const words = text.split(" ");
 
@@ -626,7 +626,8 @@ function NarrativeSequence() {
       startFinale();
     }, finaleStart));
 
-    return () => timers.current.forEach(clearTimeout);
+    const currentTimers = timers.current;
+    return () => currentTimers.forEach(clearTimeout);
   }, [finaleNarrative, startFinale]);
 
   // Apply flip animations to cards in the DOM
@@ -837,7 +838,8 @@ export function FinaleModal() {
       openFinaleModal();
     }, CELEBRATION_DURATION));
 
-    return () => celebTimers.current.forEach(clearTimeout);
+    const currentCelebTimers = celebTimers.current;
+    return () => currentCelebTimers.forEach(clearTimeout);
   }, [finaleActive, finaleModalOpen, openFinaleModal, launchRocket]);
 
   // Modal entrance

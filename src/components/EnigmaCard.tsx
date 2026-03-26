@@ -44,7 +44,7 @@ export function EnigmaCard({ enigma, isAdmin }: { enigma: Enigma; isAdmin: boole
       const timer = setTimeout(() => playUnlockCardEffect(enigma.id, enigma.title), 150);
       return () => clearTimeout(timer);
     }
-  }, [unlockingId, enigma.id]);
+  }, [unlockingId, enigma.id, enigma.title]);
 
   useEffect(() => {
     if (!isCelebrating || !ref.current) return;
@@ -86,7 +86,7 @@ export function EnigmaCard({ enigma, isAdmin }: { enigma: Enigma; isAdmin: boole
       clearTimeout(timer);
       clearTimeout(clearTimer);
     };
-  }, [isCelebrating, clearCelebrate]);
+  }, [isCelebrating, clearCelebrate, showSuccessBox, enigma.boxNumber, enigma.haEvent, enigma.id]);
 
   function handleClick() {
     if (isLocked) {

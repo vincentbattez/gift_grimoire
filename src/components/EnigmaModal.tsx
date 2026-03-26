@@ -88,8 +88,8 @@ function ModalBody({
     window.addEventListener("mouseup", onUp);
   }
 
-  function startSuspenseTimer(offsetMs = 0) {
-    const start = Date.now() - offsetMs;
+  function startSuspenseTimer(offsetMs: number, startTime: number) {
+    const start = startTime - offsetMs;
     const interval = setInterval(() => setSuspenseProgress(Math.min((Date.now() - start) / SUSPENSE_MS, 1)), 50);
     const timeout = setTimeout(() => {
       clearInterval(interval);
@@ -107,19 +107,19 @@ function ModalBody({
     suspenseRef.current.elapsed = Date.now() - suspenseRef.current.startTime;
   }
 
-  function submit() {
+  function submit(startTime: number, rand1: number, rand2: number) {
     if (isSolved || attemptUsed || feedback === "suspense") return;
     const isCorrect = normalize(value) === normalize(enigma.answer);
-    const willDoubt = Math.random() < (isCorrect ? 0.4 : 0.6);
+    const willDoubt = rand1 < (isCorrect ? 0.4 : 0.6);
 
     setFeedback("suspense");
     setFeedbackMsg("Le grimoire analyse ta réponse…");
     setSuspenseProgress(0);
     stopAnalysisRef.current = sndAnalysis();
-    startSuspenseTimer();
+    startSuspenseTimer(0, startTime);
 
     if (willDoubt) {
-      const doubtAt = SUSPENSE_MS * (0.6 + Math.random() * 0.3);
+      const doubtAt = SUSPENSE_MS * (0.6 + rand2 * 0.3);
       setTimeout(() => {
         pauseSuspense();
         stopAnalysisRef.current?.();
@@ -131,13 +131,13 @@ function ModalBody({
     }
   }
 
-  function confirmDoubt() {
+  function confirmDoubt(startTime: number) {
     sndClick();
     setShowDoubt(false);
     setFeedbackMsg("Le grimoire reprend son analyse…");
     const elapsed = suspenseRef.current?.elapsed ?? SUSPENSE_MS / 2;
     stopAnalysisRef.current = sndAnalysis(elapsed / 1000);
-    startSuspenseTimer(elapsed);
+    startSuspenseTimer(elapsed, startTime);
   }
 
   function cancelDoubt() {
@@ -224,7 +224,7 @@ function ModalBody({
             value={value}
             disabled={isSuspense}
             onChange={(e) => setValue(e.target.value)}
-            onKeyDown={(e) => e.key === "Enter" && submit()}
+            onKeyDown={(e) => e.key === "Enter" && submit(Date.now(), Math.random(), Math.random())}
             className={`w-full bg-[#0d0a1a] border-[1.5px] rounded-[14px] py-3.5 px-4 text-base text-text font-[var(--font-cinzel)] text-center outline-none transition-all duration-300 tracking-[0.1em] ${inputBorder}`}
           />
 
@@ -296,7 +296,7 @@ function ModalBody({
         </>
       ) : (
         <button
-          onClick={submit}
+          onClick={() => submit(Date.now(), Math.random(), Math.random())}
           disabled={attemptUsed || isSuspense}
           className={`w-full mt-3 py-4 border-none rounded-[14px] text-white font-[var(--font-cinzel)] text-[0.85rem] font-semibold tracking-[0.12em] uppercase cursor-pointer transition-all duration-200 active:scale-[0.97] ${attemptUsed || isSuspense ? "bg-gradient-to-br from-[#3a3a4a] to-[#2a2a3a] opacity-50 cursor-not-allowed" : "bg-gradient-to-br from-[#6b4a97] to-accent shadow-[0_4px_22px_#9b6dff28]"}`}
         >
@@ -304,7 +304,7 @@ function ModalBody({
         </button>
       )}
 
-      <DoubtOverlay visible={showDoubt} onConfirm={confirmDoubt} onCancel={cancelDoubt} />
+      <DoubtOverlay visible={showDoubt} onConfirm={() => confirmDoubt(Date.now())} onCancel={cancelDoubt} />
     </div>
   );
 }
