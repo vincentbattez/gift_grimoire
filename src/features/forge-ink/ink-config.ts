@@ -5,24 +5,37 @@ export interface WordConfig {
 }
 
 export interface InkForgeConfig {
-  gridSize: number;
+  gridCols: number;
+  gridRows: number;
   maxDrops: number;
   maxGuessesPerWord: number;
   words: WordConfig[];
 }
 
-// Grille 9×9
-// Ligne 2 : R E S O N A N C E  (RESONANCE horizontal)
-//                ↑       ↑
-//              ECRAN   VOILE (tous deux verticaux, partagent E en (2,1) et O en (2,3))
+// Grille 7 colonnes × 9 lignes (mobile-safe)
+// Col 3 : RESONANCE verticale
+// Ligne 0 : ECRAN horizontal — partage R avec RESONANCE en (0,3)
+// Ligne 3 : VOILE horizontal — partage O avec RESONANCE en (3,3)
+//
+//  col:  0 1 2 3 4 5 6
+//  row0:   E C R A N
+//  row1:       E
+//  row2:       S
+//  row3:   V O I L E  ← VOILE (partage O en (3,3) car RESONANCE[3]=O)
+//  row4:       N
+//  row5:       A
+//  row6:       N
+//  row7:       C
+//  row8:       E
 export const INK_CONFIG: InkForgeConfig = {
-  gridSize: 9,
+  gridCols: 7,
+  gridRows: 9,
   maxDrops: 40,
   maxGuessesPerWord: 3,
   words: [
-    { text: "RESONANCE", start: [2, 0], direction: "H" },
-    { text: "ECRAN",     start: [2, 1], direction: "V" },
-    { text: "VOILE",     start: [1, 3], direction: "V" },
+    { text: "RESONANCE", start: [0, 3], direction: "V" },
+    { text: "ECRAN",     start: [0, 1], direction: "H" },
+    { text: "VOILE",     start: [3, 2], direction: "H" },
   ],
 };
 

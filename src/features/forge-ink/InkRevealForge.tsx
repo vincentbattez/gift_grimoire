@@ -19,8 +19,8 @@ const LETTER_MAP = buildLetterMap(INK_CONFIG);
 /** Pré-calcul chaud/froid : distance de chaque case vide à la lettre la plus proche */
 function computeProximityMap(): Map<string, "hot" | "warm"> {
   const map = new Map<string, "hot" | "warm">();
-  for (let r = 0; r < INK_CONFIG.gridSize; r++) {
-    for (let c = 0; c < INK_CONFIG.gridSize; c++) {
+  for (let r = 0; r < INK_CONFIG.gridRows; r++) {
+    for (let c = 0; c < INK_CONFIG.gridCols; c++) {
       const key = `${r},${c}`;
       if (LETTER_MAP.has(key)) continue;
       let minDist = Infinity;
@@ -432,14 +432,14 @@ export function InkRevealForge({ solved: propSolved, onSolve }: ForgeProps) {
         ref={gridRef}
         className="grid gap-[3px] mx-auto"
         style={{
-          gridTemplateColumns: `repeat(${INK_CONFIG.gridSize}, 1fr)`,
+          gridTemplateColumns: `repeat(${INK_CONFIG.gridCols}, 1fr)`,
           maxWidth: "min(100%, 358px)",
           touchAction: "manipulation",
         }}
       >
-        {Array.from({ length: INK_CONFIG.gridSize * INK_CONFIG.gridSize }, (_, idx) => {
-          const row = Math.floor(idx / INK_CONFIG.gridSize);
-          const col = idx % INK_CONFIG.gridSize;
+        {Array.from({ length: INK_CONFIG.gridCols * INK_CONFIG.gridRows }, (_, idx) => {
+          const row = Math.floor(idx / INK_CONFIG.gridCols);
+          const col = idx % INK_CONFIG.gridCols;
           const key = `${row},${col}`;
           const letterEntry = LETTER_MAP.get(key);
           const isRevealed = revealedCells.has(key);
