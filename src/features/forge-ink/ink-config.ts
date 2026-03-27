@@ -13,7 +13,7 @@ export interface InkForgeConfig {
 
 export const INK_CONFIG: InkForgeConfig = {
   gridSize: 7,
-  maxDrops: 4,
+  maxDrops: 40,
   maxGuessesPerWord: 3,
   words: [
     { text: "PLUME", start: [1, 1], direction: "H" }, // @todo: a remplacer par RESONANCE

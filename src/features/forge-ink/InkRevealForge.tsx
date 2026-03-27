@@ -227,7 +227,8 @@ export function InkRevealForge({ solved: propSolved, onSolve }: ForgeProps) {
 
         if (result === "hit") {
           sndInkHit();
-          setRevealedCells((prev) => new Set([...prev, key]));
+          const newRevealed = new Set([...revealedCells, key]);
+          setRevealedCells(newRevealed);
           setNewlyRevealedCells((prev) => new Set([...prev, key]));
           setTimeout(() => {
             setNewlyRevealedCells((prev) => {
@@ -244,6 +245,34 @@ export function InkRevealForge({ solved: propSolved, onSolve }: ForgeProps) {
               spawnParticles(rect.left + rect.width / 2, rect.top + rect.height / 2, 15, "#e8c96a");
             }
           }
+
+          // Auto-valider les mots dont toutes les cases sont maintenant révélées
+          const autoSolved = INK_CONFIG.words.filter((word) => {
+            if (wordStates[word.text]?.solved) return false;
+            return getWordCells(word).every(([r, c]) => newRevealed.has(`${r},${c}`));
+          });
+          if (autoSolved.length > 0) {
+            setWordStates((prev) => {
+              const next = { ...prev };
+              for (const word of autoSolved) {
+                next[word.text] = { ...next[word.text], solved: true };
+              }
+              return next;
+            });
+            autoSolved.forEach((word) => {
+              sndInkWordSolved();
+              const cells = getWordCells(word);
+              cells.forEach(([r, c], idx) => {
+                setTimeout(() => {
+                  const el = gridRef.current?.querySelector<HTMLElement>(`[data-cell="${r},${c}"]`);
+                  if (el) {
+                    const rect = el.getBoundingClientRect();
+                    spawnParticles(rect.left + rect.width / 2, rect.top + rect.height / 2, 10, "#e8c96a");
+                  }
+                }, idx * 70);
+              });
+            });
+          }
         } else {
           setMissedCells((prev) => new Set([...prev, key]));
           setAnimatingMissCells((prev) => new Set([...prev, key]));
@@ -257,7 +286,7 @@ export function InkRevealForge({ solved: propSolved, onSolve }: ForgeProps) {
         }
       }, 420);
     },
-    [revealedCells, missedCells, animating, dropsLeft, showMessage],
+    [revealedCells, missedCells, animating, dropsLeft, wordStates, showMessage],
   );
 
   // ── Word guess handler ────────────────────────────────────────────────
