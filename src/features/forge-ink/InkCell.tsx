@@ -38,15 +38,14 @@ export function InkCell({
   return (
     <button
       data-cell={cellKey}
-      onPointerDown={(e) => {
-        e.preventDefault();
+      onClick={() => {
         if (!disabled) onTap(row, col);
       }}
       className={[
         "relative flex items-center justify-center",
         "aspect-square min-h-[44px] rounded-[5px]",
         "text-xs font-cinzel font-bold",
-        "select-none touch-none outline-none",
+        "select-none outline-none",
         "transition-all duration-300",
         isRevealed
           ? wordSolved
