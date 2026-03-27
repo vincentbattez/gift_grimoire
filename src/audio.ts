@@ -1077,6 +1077,14 @@ export const sndInkGuessError = () => {
   tone(233, "triangle", 0.05, 0.18, 0.01);
 };
 
+/** Crystalline ping — one per letter during word reveal cascade */
+export const sndInkLetterReveal = (index: number) => {
+  const scale = [587, 659, 784, 880, 988, 1175, 1319, 1568, 1760];
+  const freq = scale[index % scale.length];
+  tone(freq, "sine", 0.07, 0.32);
+  tone(freq * 2, "triangle", 0.025, 0.22, 0.01);
+};
+
 export function sndAmbientTension(): () => void {
   const c = getCtx();
   const t = c.currentTime;

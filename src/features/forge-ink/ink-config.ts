@@ -67,3 +67,32 @@ export function getWordCells(word: WordConfig): [number, number][] {
     word.direction === "H" ? word.start[1] + i : word.start[1],
   ] as [number, number]);
 }
+
+// ── Derived constants ─────────────────────────────────────────────────────
+
+export type WordState = { solved: boolean; guessesLeft: number };
+
+/** Map "row,col" → { letter, wordTexts[] } — pre-computed at module load */
+export const LETTER_MAP = buildLetterMap(INK_CONFIG);
+
+function computeProximityMap(): Map<string, "hot" | "warm"> {
+  const map = new Map<string, "hot" | "warm">();
+  for (let r = 0; r < INK_CONFIG.gridRows; r++) {
+    for (let c = 0; c < INK_CONFIG.gridCols; c++) {
+      const key = `${r},${c}`;
+      if (LETTER_MAP.has(key)) continue;
+      let minDist = Infinity;
+      for (const lk of LETTER_MAP.keys()) {
+        const [lr, lc] = lk.split(",").map(Number);
+        const dist = Math.abs(r - lr) + Math.abs(c - lc);
+        if (dist < minDist) minDist = dist;
+      }
+      if (minDist === 1) map.set(key, "hot");
+      else if (minDist === 2) map.set(key, "warm");
+    }
+  }
+  return map;
+}
+
+/** Distance de chaque case vide à la lettre la plus proche */
+export const PROXIMITY_MAP = computeProximityMap();
