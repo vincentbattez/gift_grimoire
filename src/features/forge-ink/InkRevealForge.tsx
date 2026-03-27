@@ -525,8 +525,8 @@ export function InkRevealForge({ solved: propSolved, onSolve }: ForgeProps) {
                 </span>
               )}
 
-              {/* Scintillement — case directement adjacente à un miss */}
-              {proximity === "hot" && (
+              {/* Scintillement — case adjacente qui contient une lettre */}
+              {proximity === "hot" && letterEntry && (
                 <span
                   key={proximityCenter}
                   className="absolute inset-0 pointer-events-none overflow-hidden rounded-[4px] z-[8]"
