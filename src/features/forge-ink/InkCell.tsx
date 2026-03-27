@@ -76,7 +76,6 @@ export function InkCell({
                 : proximity === "warm"
                   ? "linear-gradient(135deg, #171200, #0e0c00)"
                   : "linear-gradient(135deg, #130f26, #0b0917)",
-        boxShadow: undefined,
       }}
     >
       {/* Revealed letter */}

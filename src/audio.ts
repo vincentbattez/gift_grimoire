@@ -985,7 +985,6 @@ export const sndFinale = () => {
   tone(1760, "sine", 0.03, 1.5, 6.3);
 };
 
-/** Ambient tension drone — crescendo over ~3s, returns stop function */
 /** Ink drop falling — water plip. ratio 0→1 : encrier vide→plein */
 export const sndInkDrop = (ratio = 1) => {
   const c = getCtx();
@@ -1085,6 +1084,7 @@ export const sndInkLetterReveal = (index: number) => {
   tone(freq * 2, "triangle", 0.025, 0.22, 0.01);
 };
 
+/** Ambient tension drone — crescendo over ~3s, returns stop function */
 export function sndAmbientTension(): () => void {
   const c = getCtx();
   const t = c.currentTime;

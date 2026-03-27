@@ -134,7 +134,7 @@ export function InkRevealForge({ solved: propSolved, onSolve }: ForgeProps) {
       {engine.activeWords.length > 0 && (
         <div className="mt-5 flex flex-col gap-3">
           <div className="text-center text-[0.45rem] tracking-[0.25em] text-muted/40 uppercase">
-            — Mots a reveler —
+            — Mots à révéler —
           </div>
           {engine.activeWords.map((wordText) => {
             const state = engine.wordStates[wordText];

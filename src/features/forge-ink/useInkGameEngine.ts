@@ -159,7 +159,6 @@ export function useInkGameEngine(
       missedCells: Array.from(missedCells),
       wordStates,
       dropsLeft,
-      firstDropUsed: false,
       dayStamp: todayStamp(),
     });
   }, [revealedCells, missedCells, wordStates, dropsLeft, setInkGameState]);
@@ -216,9 +215,10 @@ export function useInkGameEngine(
       setWordStates((prev) => {
         const next = { ...prev };
         for (const word of INK_CONFIG.words) {
-          if (!next[word.text].solved) {
+          const current = next[word.text];
+          if (!current || !current.solved) {
             next[word.text] = {
-              ...next[word.text],
+              ...(current ?? { solved: false }),
               guessesLeft: INK_CONFIG.maxGuessesPerWord,
             };
           }

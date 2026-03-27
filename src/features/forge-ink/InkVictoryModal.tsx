@@ -22,7 +22,7 @@ export function InkVictoryModal({ onContinue }: InkVictoryModalProps) {
         }}
       >
         <div className="text-[0.45rem] tracking-[0.4em] text-gold/40 uppercase">
-          ✦ L'Encre Revelatrice ✦
+          ✦ L'Encre Révélatrice ✦
         </div>
 
         <p
@@ -33,7 +33,7 @@ export function InkVictoryModal({ onContinue }: InkVictoryModalProps) {
             textShadow: "0 0 20px rgba(232,201,106,0.15)",
           }}
         >
-          "maintenant, tu sais ce qu'il te reste a faire..."
+          "maintenant, tu sais ce qu'il te reste à faire..."
         </p>
 
         <div className="flex gap-2 text-gold/25 text-base">

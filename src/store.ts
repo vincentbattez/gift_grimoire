@@ -26,7 +26,6 @@ type GrimoireStore = {
     missedCells: string[];
     wordStates: Record<string, { solved: boolean; guessesLeft: number }>;
     dropsLeft: number;
-    firstDropUsed: boolean;
     /** Date du jour (YYYY-MM-DD) où l'état a été sauvegardé — sert au reset quotidien */
     dayStamp: string;
   } | null;
@@ -65,7 +64,6 @@ type GrimoireStore = {
     missedCells: string[];
     wordStates: Record<string, { solved: boolean; guessesLeft: number }>;
     dropsLeft: number;
-    firstDropUsed: boolean;
     dayStamp: string;
   }) => void;
   showSuccessBox: (boxNumber: number, haEvent: string, enigmaId: EnigmaId) => void;
