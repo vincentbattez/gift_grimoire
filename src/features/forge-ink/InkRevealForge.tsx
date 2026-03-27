@@ -92,7 +92,7 @@ export function InkRevealForge({ solved: propSolved, onSolve }: ForgeProps) {
   const [tapMessage, setTapMessage] = useState<string | null>(null);
   const [animating, setAnimating] = useState<{
     key: string;
-    result: "hit" | MissType;
+    result: "hit" | "miss";
   } | null>(null);
   const [inputValues, setInputValues] = useState<Record<string, string>>({});
   const [inputErrors, setInputErrors] = useState<Record<string, boolean>>({});
@@ -177,7 +177,7 @@ export function InkRevealForge({ solved: propSolved, onSolve }: ForgeProps) {
       );
       setTimeout(() => {
         setDropsLeft(INK_CONFIG.maxDrops);
-        setMissedCells(new Map());
+        setAnimatingMissCells(new Set());
         setProximityCenter(null);
         setWordStates((prev) => {
           const next = { ...prev };
@@ -245,10 +245,11 @@ export function InkRevealForge({ solved: propSolved, onSolve }: ForgeProps) {
             }
           }
         } else {
-          setMissedCells((prev) => new Map([...prev, [key, "miss"]]));
+          setMissedCells((prev) => new Set([...prev, key]));
+          setAnimatingMissCells((prev) => new Set([...prev, key]));
           setTimeout(() => {
-            setMissedCells((prev) => {
-              const next = new Map(prev);
+            setAnimatingMissCells((prev) => {
+              const next = new Set(prev);
               next.delete(key);
               return next;
             });
@@ -420,6 +421,7 @@ export function InkRevealForge({ solved: propSolved, onSolve }: ForgeProps) {
             (wt) => wordStates[wt]?.solved,
           );
           const isNewlyRevealed = newlyRevealedCells.has(key);
+          const isAnimatingMiss = animatingMissCells.has(key);
           const proximity = (() => {
             if (!proximityCenter || isRevealed || isMissed || isAnimating) return undefined;
             const [cr, cc] = proximityCenter.split(",").map(Number);
@@ -531,9 +533,9 @@ export function InkRevealForge({ solved: propSolved, onSolve }: ForgeProps) {
                 </span>
               )}
 
-              {/* Miss stain — splash organique multi-couches */}
-              {isMissed && (
-                <span className="absolute inset-0 flex items-center justify-center pointer-events-none">
+              {/* Miss — splash animé (éphémère) */}
+              {isAnimatingMiss && (
+                <span className="absolute inset-0 flex items-center justify-center pointer-events-none z-[12]">
                   <span
                     className="absolute rounded-full"
                     style={{
@@ -556,9 +558,25 @@ export function InkRevealForge({ solved: propSolved, onSolve }: ForgeProps) {
                       animation: "ink-miss-blob 1.5s ease-out 0.06s both",
                     }}
                   />
+                </span>
+              )}
+
+              {/* Miss — tache d'encre séchée (permanente) */}
+              {isMissed && !isAnimatingMiss && (
+                <span className="absolute inset-0 flex items-center justify-center pointer-events-none">
                   <span
-                    className="absolute text-muted/20 z-10"
-                    style={{ fontSize: "0.38rem" }}
+                    className="absolute rounded-full"
+                    style={{
+                      width: "42%",
+                      height: "42%",
+                      background:
+                        "radial-gradient(ellipse, #16122a 0%, #0d0920 65%, transparent 90%)",
+                      opacity: 0.6,
+                    }}
+                  />
+                  <span
+                    className="absolute text-muted/18 z-10"
+                    style={{ fontSize: "0.32rem" }}
                   >
                     ✕
                   </span>
@@ -721,7 +739,8 @@ export function InkRevealForge({ solved: propSolved, onSolve }: ForgeProps) {
               setRevealedCells(new Set());
               setWordStates(initWordStates());
               setDropsLeft(INK_CONFIG.maxDrops);
-              setMissedCells(new Map());
+              setMissedCells(new Set());
+              setAnimatingMissCells(new Set());
               setProximityCenter(null);
               setInputValues({});
               setInputErrors({});
