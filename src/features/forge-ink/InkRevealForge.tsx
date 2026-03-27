@@ -525,6 +525,63 @@ export function InkRevealForge({ solved: propSolved, onSolve }: ForgeProps) {
                 </span>
               )}
 
+              {/* Scintillement — case directement adjacente à un miss */}
+              {proximity === "hot" && (
+                <span
+                  key={proximityCenter}
+                  className="absolute inset-0 pointer-events-none overflow-hidden rounded-[4px] z-[8]"
+                >
+                  {/* Sweep ambré diagonal */}
+                  <span
+                    className="absolute"
+                    style={{
+                      width: "55%",
+                      height: "130%",
+                      top: "-15%",
+                      left: 0,
+                      background:
+                        "linear-gradient(90deg, transparent, #f59e0b90, #fde68a55, transparent)",
+                      animation: "proximity-sparkle-sweep 0.65s ease-out 0.08s both",
+                    }}
+                  />
+                  {/* Flash central */}
+                  <span
+                    className="absolute inset-0"
+                    style={{
+                      background:
+                        "radial-gradient(circle, #f59e0b30 0%, transparent 65%)",
+                      animation: "proximity-sparkle-flash 0.45s ease-out both",
+                    }}
+                  />
+                  {/* Point scintillant haut-gauche */}
+                  <span
+                    className="absolute rounded-full"
+                    style={{
+                      width: 3,
+                      height: 3,
+                      top: "22%",
+                      left: "28%",
+                      background: "#fde68a",
+                      boxShadow: "0 0 4px #f59e0b",
+                      animation: "proximity-sparkle-dot 0.6s ease-out 0.1s both",
+                    }}
+                  />
+                  {/* Point scintillant bas-droite */}
+                  <span
+                    className="absolute rounded-full"
+                    style={{
+                      width: 2,
+                      height: 2,
+                      bottom: "25%",
+                      right: "30%",
+                      background: "#fde68a",
+                      boxShadow: "0 0 3px #f59e0b",
+                      animation: "proximity-sparkle-dot 0.55s ease-out 0.18s both",
+                    }}
+                  />
+                </span>
+              )}
+
               {/* Drop animation */}
               {isAnimating && (
                 <span

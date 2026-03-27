@@ -948,3 +948,23 @@ body {
 .ink-drop-active {
   animation: drop-active-glow 2.1s ease-in-out infinite;
 }
+
+/* Scintillement sur case directement adjacente à un miss */
+@keyframes proximity-sparkle-sweep {
+  0%   { transform: translateX(-115%) skewX(-22deg); opacity: 0; }
+  12%  { opacity: 1; }
+  88%  { opacity: 0.65; }
+  100% { transform: translateX(230%) skewX(-22deg); opacity: 0; }
+}
+
+@keyframes proximity-sparkle-flash {
+  0%   { opacity: 0; transform: scale(0.6); }
+  28%  { opacity: 0.85; transform: scale(1); }
+  100% { opacity: 0; transform: scale(1.2); }
+}
+
+@keyframes proximity-sparkle-dot {
+  0%   { opacity: 0; transform: scale(0) translateY(0); }
+  30%  { opacity: 1; transform: scale(1) translateY(-3px); }
+  100% { opacity: 0; transform: scale(0.5) translateY(-9px); }
+}
