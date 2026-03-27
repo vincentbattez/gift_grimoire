@@ -1071,6 +1071,12 @@ export const sndInkWordSolved = () => {
   );
 };
 
+/** Brief dissonant tone — wrong word guess */
+export const sndInkGuessError = () => {
+  tone(220, "triangle", 0.06, 0.2);
+  tone(233, "triangle", 0.05, 0.18, 0.01);
+};
+
 export function sndAmbientTension(): () => void {
   const c = getCtx();
   const t = c.currentTime;

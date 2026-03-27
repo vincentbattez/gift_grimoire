@@ -10,6 +10,7 @@ import {
   sndInkMiss,
   sndInkMissAdjacent,
   sndInkWordSolved,
+  sndInkGuessError,
   sndScrambleSolved,
 } from "../../audio";
 import type { ForgeProps } from "../../types/forge";
@@ -63,6 +64,9 @@ function getActiveWordTexts(revealedCells: Set<string>): string[] {
     .map((w) => w.text);
 }
 
+/** Strip diacritics: "écran" → "ecran", "résonance" → "resonance" */
+const normalize = (s: string) => s.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+
 function todayStamp(): string {
   const d = new Date();
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
@@ -111,6 +115,7 @@ export function InkRevealForge({ solved: propSolved, onSolve }: ForgeProps) {
   const [newlyRevealedCells, setNewlyRevealedCells] = useState<Set<string>>(new Set());
   const gridRef = useRef<HTMLDivElement>(null);
   const prevPropSolvedRef = useRef(propSolved);
+  const lastTapRef = useRef(0);
 
   const solved = propSolved || localSolved;
 
@@ -167,6 +172,20 @@ export function InkRevealForge({ solved: propSolved, onSolve }: ForgeProps) {
         }
         sndScrambleSolved();
         navigator.vibrate?.([50, 30, 50, 30, 100]);
+
+        // Shimmer wave diagonal sur toute la grille
+        if (gridRef.current) {
+          const cells = gridRef.current.querySelectorAll<HTMLElement>("[data-cell]");
+          cells.forEach((el) => {
+            const [r, c] = (el.dataset.cell ?? "0,0").split(",").map(Number);
+            const delay = (r + c) * 50;
+            setTimeout(() => {
+              el.style.animation = "ink-victory-shimmer 0.6s ease-out both";
+              setTimeout(() => { el.style.animation = ""; }, 700);
+            }, delay);
+          });
+        }
+
         setTimeout(() => setShowSolvedModal(true), 800);
       }, 300);
     }
@@ -207,6 +226,10 @@ export function InkRevealForge({ solved: propSolved, onSolve }: ForgeProps) {
   // ── Cell tap handler ──────────────────────────────────────────────────
   const handleCellTap = useCallback(
     (row: number, col: number) => {
+      const now = Date.now();
+      if (now - lastTapRef.current < 500) return;
+      lastTapRef.current = now;
+
       const key = `${row},${col}`;
       if (
         revealedCells.has(key) ||
@@ -306,11 +329,11 @@ export function InkRevealForge({ solved: propSolved, onSolve }: ForgeProps) {
   // ── Word guess handler ────────────────────────────────────────────────
   const handleWordGuess = useCallback(
     (wordText: string) => {
-      const val = (inputValues[wordText] ?? "").trim().toUpperCase();
+      const val = normalize((inputValues[wordText] ?? "").trim().toUpperCase());
       const state = wordStates[wordText];
       if (!val || !state || state.guessesLeft === 0 || state.solved) return;
 
-      if (val === wordText) {
+      if (val === normalize(wordText)) {
         sndInkWordSolved();
         navigator.vibrate?.([30, 20, 50]);
         const word = INK_CONFIG.words.find((w) => w.text === wordText)!;
@@ -345,10 +368,11 @@ export function InkRevealForge({ solved: propSolved, onSolve }: ForgeProps) {
           });
         }
       } else {
+        sndInkGuessError();
         setInputErrors((prev) => ({ ...prev, [wordText]: true }));
         setTimeout(
           () => setInputErrors((prev) => ({ ...prev, [wordText]: false })),
-          2000,
+          4000,
         );
         setWordStates((prev) => ({
           ...prev,
@@ -366,15 +390,67 @@ export function InkRevealForge({ solved: propSolved, onSolve }: ForgeProps) {
   const activeWords = getActiveWordTexts(revealedCells);
 
   // ── Render ────────────────────────────────────────────────────────────
+
+  // Vue read-only quand la forge est terminée
+  if (propSolved && !showSolvedModal) {
+    return (
+      <div className="mt-4">
+        <div
+          className="grid gap-[2px] mx-auto"
+          style={{
+            gridTemplateColumns: `repeat(${INK_CONFIG.gridCols}, 1fr)`,
+            maxWidth: "min(100%, 280px)",
+          }}
+        >
+          {Array.from({ length: INK_CONFIG.gridCols * INK_CONFIG.gridRows }, (_, idx) => {
+            const row = Math.floor(idx / INK_CONFIG.gridCols);
+            const col = idx % INK_CONFIG.gridCols;
+            const entry = LETTER_MAP.get(`${row},${col}`);
+            return (
+              <div
+                key={idx}
+                className="flex items-center justify-center aspect-square rounded-[3px]"
+                style={{
+                  background: entry ? "linear-gradient(135deg, #1c1a0a, #0f0e07)" : "transparent",
+                  border: entry ? "1px solid rgba(232,201,106,0.3)" : "none",
+                  boxShadow: entry ? "0 0 6px #e8c96a15" : "none",
+                }}
+              >
+                {entry && (
+                  <span
+                    className="text-gold leading-none"
+                    style={{
+                      fontSize: "0.55rem",
+                      fontFamily: "var(--font-cinzel)",
+                      fontWeight: 700,
+                      textShadow: "0 0 8px #e8c96a60",
+                      animation: "gold-letter-shimmer 2.5s ease-in-out infinite",
+                      animationDelay: `${(row + col) * 0.12}s`,
+                    }}
+                  >
+                    {entry.letter}
+                  </span>
+                )}
+              </div>
+            );
+          })}
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="mt-4">
       {/* Drops indicator */}
+      <div className="text-center text-[0.4rem] tracking-[0.2em] text-muted/30 uppercase mb-2">
+        Gouttes restantes
+      </div>
       <div className="flex justify-center gap-3 mb-5">
         {Array.from({ length: INK_CONFIG.maxDrops }, (_, i) => (
           <div
             key={i}
             className={`relative overflow-hidden transition-all duration-500 ${
-              i < dropsLeft ? "ink-drop-active" : ""
+              i < dropsLeft ? (dropsLeft === 1 ? "ink-drop-last" : "ink-drop-active") : ""
             }`}
             style={{
               width: 16,
@@ -609,20 +685,26 @@ export function InkRevealForge({ solved: propSolved, onSolve }: ForgeProps) {
                 </span>
               )}
 
-              {/* Hit ripple — encre dorée se répand */}
+              {/* Hit ripple — ink bleed organique multi-blob */}
               {isAnimatingHit && (
-                <span
-                  className="absolute inset-0 flex items-center justify-center pointer-events-none z-[15]"
-                  style={{ animation: "ink-spread-ripple 0.42s ease-out both" }}
-                >
+                <span className="absolute inset-0 pointer-events-none z-[15]">
                   <span
-                    className="rounded-full"
-                    style={{
-                      width: "88%",
-                      height: "88%",
-                      background:
-                        "radial-gradient(circle, #e8c96a42 0%, #9b6dff22 55%, transparent 82%)",
-                    }}
+                    className="absolute inset-0 flex items-center justify-center"
+                    style={{ animation: "ink-spread-ripple 0.42s ease-out both" }}
+                  >
+                    <span className="rounded-full" style={{ width: "88%", height: "88%", background: "radial-gradient(circle, #e8c96a42 0%, #9b6dff22 55%, transparent 82%)" }} />
+                  </span>
+                  <span
+                    className="absolute rounded-full"
+                    style={{ width: "70%", height: "65%", top: "12%", left: "18%", background: "radial-gradient(ellipse, #e8c96a30 0%, transparent 70%)", animation: "ink-bleed-a 0.5s ease-out both" }}
+                  />
+                  <span
+                    className="absolute rounded-full"
+                    style={{ width: "55%", height: "72%", top: "22%", left: "8%", background: "radial-gradient(ellipse, #9b6dff25 0%, transparent 65%)", animation: "ink-bleed-b 0.48s ease-out 0.03s both" }}
+                  />
+                  <span
+                    className="absolute rounded-full"
+                    style={{ width: "60%", height: "58%", top: "6%", left: "28%", background: "radial-gradient(ellipse, #e8c96a20 0%, transparent 68%)", animation: "ink-bleed-c 0.52s ease-out 0.05s both" }}
                   />
                 </span>
               )}
@@ -692,6 +774,7 @@ export function InkRevealForge({ solved: propSolved, onSolve }: ForgeProps) {
             const state = wordStates[wordText];
             if (!state) return null;
             const pattern = getWordPattern(wordText, revealedCells);
+            const wordDir = INK_CONFIG.words.find((w) => w.text === wordText)?.direction;
             const isLocked = state.guessesLeft === 0 && !state.solved;
             const hasError = inputErrors[wordText];
 
@@ -717,8 +800,12 @@ export function InkRevealForge({ solved: propSolved, onSolve }: ForgeProps) {
                   opacity: isLocked ? 0.55 : 1,
                 }}
               >
-                {/* Pattern + guess indicators */}
+                {/* Pattern + direction + guess indicators */}
                 <div className="flex items-center justify-between mb-2.5">
+                  <div className="flex items-center gap-1.5">
+                    <span className="text-[0.5rem] text-muted/30" title={wordDir === "H" ? "horizontal" : "vertical"}>
+                      {wordDir === "H" ? "→" : "↓"}
+                    </span>
                   <div className="flex gap-1">
                     {pattern.map((ch, i) => (
                       <span
@@ -741,6 +828,7 @@ export function InkRevealForge({ solved: propSolved, onSolve }: ForgeProps) {
                         {ch !== "_" ? ch : ""}
                       </span>
                     ))}
+                  </div>
                   </div>
 
                   {!state.solved && (

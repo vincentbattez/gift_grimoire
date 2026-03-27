@@ -862,6 +862,22 @@ body {
   100% { transform: scale(3.4); opacity: 0; }
 }
 
+@keyframes ink-bleed-a {
+  0%   { transform: scale(0.1) rotate(0deg); opacity: 0.7; }
+  50%  { opacity: 0.3; }
+  100% { transform: scale(2.8) rotate(12deg); opacity: 0; }
+}
+@keyframes ink-bleed-b {
+  0%   { transform: scale(0.15) rotate(-8deg); opacity: 0.5; }
+  60%  { opacity: 0.2; }
+  100% { transform: scale(2.2) rotate(6deg); opacity: 0; }
+}
+@keyframes ink-bleed-c {
+  0%   { transform: scale(0.08) rotate(15deg); opacity: 0.6; }
+  40%  { opacity: 0.35; }
+  100% { transform: scale(3.0) rotate(-5deg); opacity: 0; }
+}
+
 @keyframes cell-reveal-bloom {
   0%   { box-shadow: inset 0 0 0px transparent, 0 0 0 transparent; }
   22%  { box-shadow: inset 0 0 22px #e8c96a55, 0 0 18px #e8c96a25; }
@@ -931,6 +947,12 @@ body {
   100% { opacity: 1; transform: scale(1); filter: blur(0px) saturate(1); }
 }
 
+@keyframes ink-victory-shimmer {
+  0%   { box-shadow: inset 0 0 0 0 transparent, 0 0 0 0 transparent; border-color: rgba(34,26,53,0.5); }
+  40%  { box-shadow: inset 0 0 12px #e8c96a40, 0 0 14px #e8c96a35; border-color: rgba(232,201,106,0.5); }
+  100% { box-shadow: inset 0 0 0 0 transparent, 0 0 0 0 transparent; border-color: rgba(34,26,53,0.5); }
+}
+
 @keyframes ink-word-ripple {
   0%   { box-shadow: inset 0 0 0 0 transparent, 0 0 0 0 transparent; }
   30%  { box-shadow: inset 0 0 10px #e8c96a50, 0 0 12px #e8c96a40; }
@@ -953,6 +975,11 @@ body {
 
 .ink-drop-active {
   animation: drop-active-glow 2.1s ease-in-out infinite;
+}
+
+.ink-drop-last {
+  animation: drop-active-glow 0.9s ease-in-out infinite;
+  filter: hue-rotate(-40deg) saturate(1.4);
 }
 
 /* Scintillement sur case directement adjacente à un miss */
