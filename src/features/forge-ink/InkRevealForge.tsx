@@ -8,7 +8,6 @@ import {
   sndInkDrop,
   sndInkHit,
   sndInkMiss,
-  sndInkMissAdjacent,
   sndInkWordSolved,
   sndScrambleSolved,
 } from "../../audio";
@@ -17,37 +16,33 @@ import type { ForgeProps } from "../../types/forge";
 // ── Derived constants ─────────────────────────────────────────────────────
 const LETTER_MAP = buildLetterMap(INK_CONFIG);
 
+/** Pré-calcul chaud/froid : distance de chaque case vide à la lettre la plus proche */
+function computeProximityMap(): Map<string, "hot" | "warm"> {
+  const map = new Map<string, "hot" | "warm">();
+  for (let r = 0; r < INK_CONFIG.gridSize; r++) {
+    for (let c = 0; c < INK_CONFIG.gridSize; c++) {
+      const key = `${r},${c}`;
+      if (LETTER_MAP.has(key)) continue;
+      let minDist = Infinity;
+      for (const lk of LETTER_MAP.keys()) {
+        const [lr, lc] = lk.split(",").map(Number);
+        const dist = Math.abs(r - lr) + Math.abs(c - lc);
+        if (dist < minDist) minDist = dist;
+      }
+      if (minDist === 1) map.set(key, "hot");
+      else if (minDist === 2) map.set(key, "warm");
+    }
+  }
+  return map;
+}
+const PROXIMITY_MAP = computeProximityMap();
+
 function initWordStates(): Record<string, { solved: boolean; guessesLeft: number }> {
   const states: Record<string, { solved: boolean; guessesLeft: number }> = {};
   for (const word of INK_CONFIG.words) {
     states[word.text] = { solved: false, guessesLeft: INK_CONFIG.maxGuessesPerWord };
   }
   return states;
-}
-
-function isAdjacentToLetter(row: number, col: number): boolean {
-  return (
-    [
-      [row - 1, col],
-      [row + 1, col],
-      [row, col - 1],
-      [row, col + 1],
-    ] as [number, number][]
-  ).some(([r, c]) => LETTER_MAP.has(`${r},${c}`));
-}
-
-function findNearestLetterKey(row: number, col: number): string {
-  let nearest = "";
-  let minDist = Infinity;
-  for (const key of LETTER_MAP.keys()) {
-    const [r, c] = key.split(",").map(Number);
-    const dist = Math.abs(r - row) + Math.abs(c - col);
-    if (dist < minDist) {
-      minDist = dist;
-      nearest = key;
-    }
-  }
-  return nearest;
 }
 
 function getWordPattern(wordText: string, revealedCells: Set<string>): string[] {
@@ -68,7 +63,7 @@ function getActiveWordTexts(revealedCells: Set<string>): string[] {
 }
 
 // ── Types ─────────────────────────────────────────────────────────────────
-type MissType = "miss" | "miss-adjacent";
+type MissType = "miss";
 
 // ── Component ─────────────────────────────────────────────────────────────
 export function InkRevealForge({ solved: propSolved, onSolve }: ForgeProps) {
@@ -86,12 +81,10 @@ export function InkRevealForge({ solved: propSolved, onSolve }: ForgeProps) {
   const [dropsLeft, setDropsLeft] = useState(
     () => storedGame?.dropsLeft ?? INK_CONFIG.maxDrops,
   );
-  const [firstDropUsed, setFirstDropUsed] = useState(
-    () => storedGame?.firstDropUsed ?? false,
-  );
 
   // ── Ephemeral state ──
   const [missedCells, setMissedCells] = useState<Map<string, MissType>>(new Map());
+  const [showProximity, setShowProximity] = useState(false);
   const [tapMessage, setTapMessage] = useState<string | null>(null);
   const [animating, setAnimating] = useState<{
     key: string;
@@ -115,9 +108,9 @@ export function InkRevealForge({ solved: propSolved, onSolve }: ForgeProps) {
       revealedCells: Array.from(revealedCells),
       wordStates,
       dropsLeft,
-      firstDropUsed,
+      firstDropUsed: false,
     });
-  }, [revealedCells, wordStates, dropsLeft, firstDropUsed, setInkGameState]);
+  }, [revealedCells, wordStates, dropsLeft, setInkGameState]);
 
   // Admin re-lock detection (propSolved transitioned from true → false)
   useEffect(() => {
@@ -128,8 +121,8 @@ export function InkRevealForge({ solved: propSolved, onSolve }: ForgeProps) {
       setRevealedCells(new Set());
       setWordStates(initWordStates());
       setDropsLeft(INK_CONFIG.maxDrops);
-      setFirstDropUsed(false);
       setMissedCells(new Map());
+      setShowProximity(false);
       setInputValues({});
       setInputErrors({});
     }
@@ -178,6 +171,7 @@ export function InkRevealForge({ solved: propSolved, onSolve }: ForgeProps) {
       setTimeout(() => {
         setDropsLeft(INK_CONFIG.maxDrops);
         setMissedCells(new Map());
+        setShowProximity(false);
         setWordStates((prev) => {
           const next = { ...prev };
           for (const word of INK_CONFIG.words) {
@@ -208,62 +202,47 @@ export function InkRevealForge({ solved: propSolved, onSolve }: ForgeProps) {
         return;
 
       const letterEntry = LETTER_MAP.get(key);
-      let targetKey = key;
-      let result: "hit" | MissType;
+      const result: "hit" | "miss" = letterEntry ? "hit" : "miss";
 
-      if (letterEntry) {
-        result = "hit";
+      if (result === "hit") {
         sndInkDrop();
-      } else if (!firstDropUsed) {
-        // Guided first drop → glide to nearest letter
-        targetKey = findNearestLetterKey(row, col);
-        result = "hit";
-        showMessage("Le grimoire guide ta première goutte…");
-        sndInkDrop();
-      } else if (isAdjacentToLetter(row, col)) {
-        result = "miss-adjacent";
-        showMessage("L'encre frémit…");
-        sndInkMissAdjacent();
       } else {
-        result = "miss";
         sndInkMiss();
+        // Afficher le halo chaud/froid autour des lettres
+        setShowProximity(true);
+        setTimeout(() => setShowProximity(false), 2800);
       }
 
-      setFirstDropUsed(true);
       setDropsLeft((prev) => Math.max(0, prev - 1));
-      setAnimating({ key: targetKey, result });
+      setAnimating({ key, result });
 
       setTimeout(() => {
         setAnimating(null);
 
         if (result === "hit") {
           sndInkHit();
-          setRevealedCells((prev) => new Set([...prev, targetKey]));
+          setRevealedCells((prev) => new Set([...prev, key]));
 
-          // Spawn particles on hit cell
           if (gridRef.current) {
-            const el = gridRef.current.querySelector<HTMLElement>(
-              `[data-cell="${targetKey}"]`,
-            );
+            const el = gridRef.current.querySelector<HTMLElement>(`[data-cell="${key}"]`);
             if (el) {
               const rect = el.getBoundingClientRect();
               spawnParticles(rect.left + rect.width / 2, rect.top + rect.height / 2, 15, "#e8c96a");
             }
           }
         } else {
-          setMissedCells((prev) => new Map([...prev, [targetKey, result as MissType]]));
-          const removeDelay = result === "miss-adjacent" ? 2500 : 1500;
+          setMissedCells((prev) => new Map([...prev, [key, "miss"]]));
           setTimeout(() => {
             setMissedCells((prev) => {
               const next = new Map(prev);
-              next.delete(targetKey);
+              next.delete(key);
               return next;
             });
-          }, removeDelay);
+          }, 1500);
         }
       }, 420);
     },
-    [revealedCells, missedCells, animating, dropsLeft, firstDropUsed, showMessage],
+    [revealedCells, missedCells, animating, dropsLeft, showMessage],
   );
 
   // ── Word guess handler ────────────────────────────────────────────────
@@ -404,11 +383,14 @@ export function InkRevealForge({ solved: propSolved, onSolve }: ForgeProps) {
           const key = `${row},${col}`;
           const letterEntry = LETTER_MAP.get(key);
           const isRevealed = revealedCells.has(key);
-          const missType = missedCells.get(key);
+          const isMissed = missedCells.has(key);
           const isAnimating = animating?.key === key;
           const wordSolved = isRevealed && letterEntry?.wordTexts.some(
             (wt) => wordStates[wt]?.solved,
           );
+          const proximity = !isRevealed && !isMissed && !isAnimating && showProximity
+            ? PROXIMITY_MAP.get(key)
+            : undefined;
 
           return (
             <button
@@ -423,17 +405,19 @@ export function InkRevealForge({ solved: propSolved, onSolve }: ForgeProps) {
                 "aspect-square min-h-[44px] rounded-[5px]",
                 "text-xs font-cinzel font-bold",
                 "select-none touch-none outline-none",
-                "transition-all duration-200",
+                "transition-all duration-300",
                 isRevealed
                   ? wordSolved
                     ? "border border-gold/50 shadow-[0_0_10px_#e8c96a25]"
                     : "border border-gold/25"
                   : isAnimating
                   ? "border border-accent/50"
-                  : missType === "miss-adjacent"
-                  ? "border border-gold/15"
-                  : missType === "miss"
+                  : isMissed
                   ? "border border-muted/20"
+                  : proximity === "hot"
+                  ? "border border-amber-400/50"
+                  : proximity === "warm"
+                  ? "border border-amber-400/20"
                   : "border border-locked-border/50 active:border-accent/40 active:scale-[0.93]",
               ].join(" ")}
               style={{
@@ -443,11 +427,18 @@ export function InkRevealForge({ solved: propSolved, onSolve }: ForgeProps) {
                     : "linear-gradient(135deg, #181508, #0c0b05)"
                   : isAnimating
                   ? "linear-gradient(135deg, #1a1030, #0d0920)"
-                  : missType === "miss-adjacent"
-                  ? "linear-gradient(135deg, #1a1200, #0d0900)"
-                  : missType === "miss"
+                  : isMissed
                   ? "linear-gradient(135deg, #0d0a1a, #07060f)"
+                  : proximity === "hot"
+                  ? "linear-gradient(135deg, #1e1400, #130e00)"
+                  : proximity === "warm"
+                  ? "linear-gradient(135deg, #171200, #0e0c00)"
                   : "linear-gradient(135deg, #130f26, #0b0917)",
+                boxShadow: proximity === "hot"
+                  ? "inset 0 0 10px #f59e0b30"
+                  : proximity === "warm"
+                  ? "inset 0 0 6px #f59e0b12"
+                  : undefined,
               }}
             >
               {/* Revealed letter */}
@@ -488,7 +479,7 @@ export function InkRevealForge({ solved: propSolved, onSolve }: ForgeProps) {
               )}
 
               {/* Miss stain */}
-              {!isRevealed && missType === "miss" && (
+              {isMissed && (
                 <span
                   className="absolute inset-0 flex items-center justify-center pointer-events-none"
                   style={{ animation: "ink-miss-evaporate 1.5s ease-out both" }}
@@ -501,26 +492,10 @@ export function InkRevealForge({ solved: propSolved, onSolve }: ForgeProps) {
                       background: "radial-gradient(circle, #1a1240, #0d0920)",
                     }}
                   />
-                  <span
-                    className="absolute text-muted/30"
-                    style={{ fontSize: "0.45rem" }}
-                  >
+                  <span className="absolute text-muted/30" style={{ fontSize: "0.45rem" }}>
                     ×
                   </span>
                 </span>
-              )}
-
-              {/* Miss adjacent amber stain */}
-              {!isRevealed && missType === "miss-adjacent" && (
-                <span
-                  className="absolute inset-0 rounded-[5px] pointer-events-none"
-                  style={{
-                    background:
-                      "radial-gradient(circle, #e8c96a22, #e8c96a08 60%, transparent 80%)",
-                    boxShadow: "inset 0 0 8px #e8c96a18",
-                    animation: "ink-miss-adjacent-fade 2.5s ease-out both",
-                  }}
-                />
               )}
             </button>
           );
@@ -679,8 +654,8 @@ export function InkRevealForge({ solved: propSolved, onSolve }: ForgeProps) {
               setRevealedCells(new Set());
               setWordStates(initWordStates());
               setDropsLeft(INK_CONFIG.maxDrops);
-              setFirstDropUsed(false);
               setMissedCells(new Map());
+              setShowProximity(false);
               setInputValues({});
               setInputErrors({});
               setLocalSolved(false);
