@@ -97,6 +97,7 @@ export function InkRevealForge({ solved: propSolved, onSolve }: ForgeProps) {
   const [introCollapsed, setIntroCollapsed] = useState(true);
   const [localSolved, setLocalSolved] = useState(false);
   const [isResetting, setIsResetting] = useState(false);
+  const [newlyRevealedCells, setNewlyRevealedCells] = useState<Set<string>>(new Set());
   const gridRef = useRef<HTMLDivElement>(null);
   const prevPropSolvedRef = useRef(propSolved);
 
@@ -221,6 +222,14 @@ export function InkRevealForge({ solved: propSolved, onSolve }: ForgeProps) {
         if (result === "hit") {
           sndInkHit();
           setRevealedCells((prev) => new Set([...prev, key]));
+          setNewlyRevealedCells((prev) => new Set([...prev, key]));
+          setTimeout(() => {
+            setNewlyRevealedCells((prev) => {
+              const next = new Set(prev);
+              next.delete(key);
+              return next;
+            });
+          }, 1100);
 
           if (gridRef.current) {
             const el = gridRef.current.querySelector<HTMLElement>(`[data-cell="${key}"]`);
@@ -340,18 +349,34 @@ export function InkRevealForge({ solved: propSolved, onSolve }: ForgeProps) {
         {Array.from({ length: INK_CONFIG.maxDrops }, (_, i) => (
           <div
             key={i}
-            className="transition-all duration-500"
+            className={`relative overflow-hidden transition-all duration-500 ${
+              i < dropsLeft ? "ink-drop-active" : ""
+            }`}
             style={{
-              width: 14,
-              height: 20,
+              width: 16,
+              height: 23,
               borderRadius: "50% 50% 50% 50% / 30% 30% 70% 70%",
               background:
                 i < dropsLeft
-                  ? "linear-gradient(160deg, #b08dff, #9b6dff)"
-                  : "#221a35",
-              boxShadow: i < dropsLeft ? "0 0 8px #9b6dff50" : "none",
+                  ? "linear-gradient(160deg, #caaeff 0%, #9b6dff 45%, #6e38cc 100%)"
+                  : "linear-gradient(160deg, #1a1230, #0e0b1c)",
             }}
-          />
+          >
+            {i < dropsLeft && (
+              <span
+                className="absolute rounded-full"
+                style={{
+                  width: "32%",
+                  height: "18%",
+                  top: "16%",
+                  left: "22%",
+                  background: "rgba(255,255,255,0.3)",
+                  transform: "rotate(-30deg)",
+                  borderRadius: "50%",
+                }}
+              />
+            )}
+          </div>
         ))}
       </div>
 
@@ -384,9 +409,11 @@ export function InkRevealForge({ solved: propSolved, onSolve }: ForgeProps) {
           const isRevealed = revealedCells.has(key);
           const isMissed = missedCells.has(key);
           const isAnimating = animating?.key === key;
+          const isAnimatingHit = animating?.key === key && animating.result === "hit";
           const wordSolved = isRevealed && letterEntry?.wordTexts.some(
             (wt) => wordStates[wt]?.solved,
           );
+          const isNewlyRevealed = newlyRevealedCells.has(key);
           const proximity = (() => {
             if (!proximityCenter || isRevealed || isMissed || isAnimating) return undefined;
             const [cr, cc] = proximityCenter.split(",").map(Number);
@@ -413,15 +440,15 @@ export function InkRevealForge({ solved: propSolved, onSolve }: ForgeProps) {
                 isRevealed
                   ? wordSolved
                     ? "border border-gold/50 shadow-[0_0_10px_#e8c96a25]"
-                    : "border border-gold/25"
+                    : `border border-gold/25 ${isNewlyRevealed ? "ink-cell-revealing" : ""}`
                   : isAnimating
                   ? "border border-accent/50"
                   : isMissed
                   ? "border border-muted/20"
                   : proximity === "hot"
-                  ? "border border-amber-400/50"
+                  ? "ink-proximity-hot border"
                   : proximity === "warm"
-                  ? "border border-amber-400/20"
+                  ? "ink-proximity-warm border"
                   : "border border-locked-border/50 active:border-accent/40 active:scale-[0.93]",
               ].join(" ")}
               style={{
@@ -438,11 +465,7 @@ export function InkRevealForge({ solved: propSolved, onSolve }: ForgeProps) {
                   : proximity === "warm"
                   ? "linear-gradient(135deg, #171200, #0e0c00)"
                   : "linear-gradient(135deg, #130f26, #0b0917)",
-                boxShadow: proximity === "hot"
-                  ? "inset 0 0 10px #f59e0b30"
-                  : proximity === "warm"
-                  ? "inset 0 0 6px #f59e0b12"
-                  : undefined,
+                boxShadow: undefined,
               }}
             >
               {/* Revealed letter */}
@@ -454,8 +477,10 @@ export function InkRevealForge({ solved: propSolved, onSolve }: ForgeProps) {
                       ? "0 0 12px #e8c96a90"
                       : "0 0 6px #e8c96a50",
                     fontSize: "0.7rem",
-                    animation: wordSolved
-                      ? "golden-ball-glow 2s ease-in-out infinite"
+                    animation: isNewlyRevealed
+                      ? "ink-letter-crystallize 0.85s ease-out both"
+                      : wordSolved
+                      ? "gold-letter-shimmer 2.5s ease-in-out infinite"
                       : undefined,
                   }}
                 >
@@ -482,22 +507,54 @@ export function InkRevealForge({ solved: propSolved, onSolve }: ForgeProps) {
                 </span>
               )}
 
-              {/* Miss stain */}
-              {isMissed && (
+              {/* Hit ripple — encre dorée se répand */}
+              {isAnimatingHit && (
                 <span
-                  className="absolute inset-0 flex items-center justify-center pointer-events-none"
-                  style={{ animation: "ink-miss-evaporate 1.5s ease-out both" }}
+                  className="absolute inset-0 flex items-center justify-center pointer-events-none z-[15]"
+                  style={{ animation: "ink-spread-ripple 0.42s ease-out both" }}
                 >
                   <span
-                    className="rounded-full opacity-60"
+                    className="rounded-full"
                     style={{
-                      width: "60%",
-                      height: "60%",
-                      background: "radial-gradient(circle, #1a1240, #0d0920)",
+                      width: "88%",
+                      height: "88%",
+                      background:
+                        "radial-gradient(circle, #e8c96a42 0%, #9b6dff22 55%, transparent 82%)",
                     }}
                   />
-                  <span className="absolute text-muted/30" style={{ fontSize: "0.45rem" }}>
-                    ×
+                </span>
+              )}
+
+              {/* Miss stain — splash organique multi-couches */}
+              {isMissed && (
+                <span className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                  <span
+                    className="absolute rounded-full"
+                    style={{
+                      width: "66%",
+                      height: "66%",
+                      background:
+                        "radial-gradient(ellipse, #1a1240 0%, #0d0920 55%, transparent 82%)",
+                      animation: "ink-miss-splash 1.5s ease-out both",
+                    }}
+                  />
+                  <span
+                    className="absolute rounded-full"
+                    style={{
+                      width: "40%",
+                      height: "44%",
+                      top: "12%",
+                      left: "16%",
+                      background:
+                        "radial-gradient(ellipse, #130f26 0%, #09071a 68%, transparent)",
+                      animation: "ink-miss-blob 1.5s ease-out 0.06s both",
+                    }}
+                  />
+                  <span
+                    className="absolute text-muted/20 z-10"
+                    style={{ fontSize: "0.38rem" }}
+                  >
+                    ✕
                   </span>
                 </span>
               )}
@@ -693,7 +750,7 @@ export function InkRevealForge({ solved: propSolved, onSolve }: ForgeProps) {
               background: "linear-gradient(155deg, #1a1430, #0d0920)",
               boxShadow:
                 "0 0 60px rgba(232,201,106,0.15), 0 0 120px rgba(232,201,106,0.07)",
-              animation: "love-letter-enter 0.4s ease-out both",
+              animation: "ink-modal-reveal 0.55s ease-out both",
             }}
           >
             {/* Glyphs décoratifs */}
