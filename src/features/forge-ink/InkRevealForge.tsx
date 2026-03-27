@@ -84,7 +84,7 @@ export function InkRevealForge({ solved: propSolved, onSolve }: ForgeProps) {
 
   // ── Ephemeral state ──
   const [missedCells, setMissedCells] = useState<Map<string, MissType>>(new Map());
-  const [showProximity, setShowProximity] = useState(false);
+  const [proximityCenter, setProximityCenter] = useState<string | null>(null);
   const [tapMessage, setTapMessage] = useState<string | null>(null);
   const [animating, setAnimating] = useState<{
     key: string;
@@ -122,7 +122,7 @@ export function InkRevealForge({ solved: propSolved, onSolve }: ForgeProps) {
       setWordStates(initWordStates());
       setDropsLeft(INK_CONFIG.maxDrops);
       setMissedCells(new Map());
-      setShowProximity(false);
+      setProximityCenter(null);
       setInputValues({});
       setInputErrors({});
     }
@@ -171,7 +171,7 @@ export function InkRevealForge({ solved: propSolved, onSolve }: ForgeProps) {
       setTimeout(() => {
         setDropsLeft(INK_CONFIG.maxDrops);
         setMissedCells(new Map());
-        setShowProximity(false);
+        setProximityCenter(null);
         setWordStates((prev) => {
           const next = { ...prev };
           for (const word of INK_CONFIG.words) {
@@ -208,9 +208,8 @@ export function InkRevealForge({ solved: propSolved, onSolve }: ForgeProps) {
         sndInkDrop();
       } else {
         sndInkMiss();
-        // Afficher le halo chaud/froid autour des lettres
-        setShowProximity(true);
-        setTimeout(() => setShowProximity(false), 2800);
+        setProximityCenter(key);
+        setTimeout(() => setProximityCenter(null), 2800);
       }
 
       setDropsLeft((prev) => Math.max(0, prev - 1));
@@ -388,9 +387,14 @@ export function InkRevealForge({ solved: propSolved, onSolve }: ForgeProps) {
           const wordSolved = isRevealed && letterEntry?.wordTexts.some(
             (wt) => wordStates[wt]?.solved,
           );
-          const proximity = !isRevealed && !isMissed && !isAnimating && showProximity
-            ? PROXIMITY_MAP.get(key)
-            : undefined;
+          const proximity = (() => {
+            if (!proximityCenter || isRevealed || isMissed || isAnimating) return undefined;
+            const [cr, cc] = proximityCenter.split(",").map(Number);
+            const isAdjacentToMiss =
+              (Math.abs(row - cr) === 1 && col === cc) ||
+              (row === cr && Math.abs(col - cc) === 1);
+            return isAdjacentToMiss ? PROXIMITY_MAP.get(key) : undefined;
+          })();
 
           return (
             <button
@@ -655,7 +659,7 @@ export function InkRevealForge({ solved: propSolved, onSolve }: ForgeProps) {
               setWordStates(initWordStates());
               setDropsLeft(INK_CONFIG.maxDrops);
               setMissedCells(new Map());
-              setShowProximity(false);
+              setProximityCenter(null);
               setInputValues({});
               setInputErrors({});
               setLocalSolved(false);
