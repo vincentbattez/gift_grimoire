@@ -23,6 +23,7 @@ type GrimoireStore = {
   /** État en cours de la forge encre (progression, non lié à solved) */
   inkGameState: {
     revealedCells: string[];
+    missedCells: string[];
     wordStates: Record<string, { solved: boolean; guessesLeft: number }>;
     dropsLeft: number;
     firstDropUsed: boolean;
@@ -59,6 +60,7 @@ type GrimoireStore = {
   resetForge: (key: string) => void;
   setInkGameState: (state: {
     revealedCells: string[];
+    missedCells: string[];
     wordStates: Record<string, { solved: boolean; guessesLeft: number }>;
     dropsLeft: number;
     firstDropUsed: boolean;

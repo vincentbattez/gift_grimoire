@@ -63,7 +63,6 @@ function getActiveWordTexts(revealedCells: Set<string>): string[] {
 }
 
 // ── Types ─────────────────────────────────────────────────────────────────
-type MissType = "miss";
 
 // ── Component ─────────────────────────────────────────────────────────────
 export function InkRevealForge({ solved: propSolved, onSolve }: ForgeProps) {
@@ -82,8 +81,13 @@ export function InkRevealForge({ solved: propSolved, onSolve }: ForgeProps) {
     () => storedGame?.dropsLeft ?? INK_CONFIG.maxDrops,
   );
 
+  // ── Persisted game state (continued) ──
+  const [missedCells, setMissedCells] = useState<Set<string>>(
+    () => new Set(storedGame?.missedCells ?? []),
+  );
+
   // ── Ephemeral state ──
-  const [missedCells, setMissedCells] = useState<Map<string, MissType>>(new Map());
+  const [animatingMissCells, setAnimatingMissCells] = useState<Set<string>>(new Set());
   const [proximityCenter, setProximityCenter] = useState<string | null>(null);
   const [tapMessage, setTapMessage] = useState<string | null>(null);
   const [animating, setAnimating] = useState<{
@@ -107,11 +111,12 @@ export function InkRevealForge({ solved: propSolved, onSolve }: ForgeProps) {
   useEffect(() => {
     setInkGameState({
       revealedCells: Array.from(revealedCells),
+      missedCells: Array.from(missedCells),
       wordStates,
       dropsLeft,
       firstDropUsed: false,
     });
-  }, [revealedCells, wordStates, dropsLeft, setInkGameState]);
+  }, [revealedCells, missedCells, wordStates, dropsLeft, setInkGameState]);
 
   // Admin re-lock detection (propSolved transitioned from true → false)
   useEffect(() => {
@@ -122,7 +127,8 @@ export function InkRevealForge({ solved: propSolved, onSolve }: ForgeProps) {
       setRevealedCells(new Set());
       setWordStates(initWordStates());
       setDropsLeft(INK_CONFIG.maxDrops);
-      setMissedCells(new Map());
+      setMissedCells(new Set());
+      setAnimatingMissCells(new Set());
       setProximityCenter(null);
       setInputValues({});
       setInputErrors({});
