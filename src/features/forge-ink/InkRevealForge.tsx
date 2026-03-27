@@ -2,12 +2,13 @@ import { useState, useEffect, useCallback, useRef } from "react";
 import { INK_CONFIG, buildLetterMap, getWordCells } from "./ink-config";
 import { useStore } from "../../store";
 import { useAdmin } from "../../useAdmin";
-import { EnigmaPicker } from "../../components/EnigmaPicker";
 import { spawnParticles } from "../../particles";
+import { useCountdown } from "../../hooks/useCountdown";
 import {
   sndInkDrop,
   sndInkHit,
   sndInkMiss,
+  sndInkMissAdjacent,
   sndInkWordSolved,
   sndScrambleSolved,
 } from "../../audio";
@@ -62,28 +63,36 @@ function getActiveWordTexts(revealedCells: Set<string>): string[] {
     .map((w) => w.text);
 }
 
-// ── Types ─────────────────────────────────────────────────────────────────
+function todayStamp(): string {
+  const d = new Date();
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+}
 
 // ── Component ─────────────────────────────────────────────────────────────
 export function InkRevealForge({ solved: propSolved, onSolve }: ForgeProps) {
   const isAdmin = useAdmin();
   const storedGame = useStore((s) => s.inkGameState);
   const setInkGameState = useStore((s) => s.setInkGameState);
+  const countdown = useCountdown();
+
+  // ── Reset quotidien — si le jour stocké ≠ aujourd'hui, on repart à zéro ──
+  const isStale = storedGame != null && storedGame.dayStamp !== todayStamp();
+  const freshGame = isStale ? null : storedGame;
 
   // ── Persisted game state ──
   const [revealedCells, setRevealedCells] = useState<Set<string>>(
-    () => new Set(storedGame?.revealedCells ?? []),
+    () => new Set(freshGame?.revealedCells ?? []),
   );
   const [wordStates, setWordStates] = useState<
     Record<string, { solved: boolean; guessesLeft: number }>
-  >(() => storedGame?.wordStates ?? initWordStates());
+  >(() => freshGame?.wordStates ?? initWordStates());
   const [dropsLeft, setDropsLeft] = useState(
-    () => storedGame?.dropsLeft ?? INK_CONFIG.maxDrops,
+    () => freshGame?.dropsLeft ?? INK_CONFIG.maxDrops,
   );
 
   // ── Persisted game state (continued) ──
   const [missedCells, setMissedCells] = useState<Set<string>>(
-    () => new Set(storedGame?.missedCells ?? []),
+    () => new Set(freshGame?.missedCells ?? []),
   );
 
   // ── Ephemeral state ──
@@ -97,8 +106,6 @@ export function InkRevealForge({ solved: propSolved, onSolve }: ForgeProps) {
   const [inputValues, setInputValues] = useState<Record<string, string>>({});
   const [inputErrors, setInputErrors] = useState<Record<string, boolean>>({});
   const [showSolvedModal, setShowSolvedModal] = useState(false);
-  const [showPicker, setShowPicker] = useState(false);
-  const [introCollapsed, setIntroCollapsed] = useState(true);
   const [localSolved, setLocalSolved] = useState(false);
   const [isResetting, setIsResetting] = useState(false);
   const [newlyRevealedCells, setNewlyRevealedCells] = useState<Set<string>>(new Set());
@@ -115,6 +122,7 @@ export function InkRevealForge({ solved: propSolved, onSolve }: ForgeProps) {
       wordStates,
       dropsLeft,
       firstDropUsed: false,
+      dayStamp: todayStamp(),
     });
   }, [revealedCells, missedCells, wordStates, dropsLeft, setInkGameState]);
 
@@ -122,7 +130,6 @@ export function InkRevealForge({ solved: propSolved, onSolve }: ForgeProps) {
   useEffect(() => {
     if (!propSolved && prevPropSolvedRef.current) {
       setLocalSolved(false);
-      setShowPicker(false);
       setShowSolvedModal(false);
       setRevealedCells(new Set());
       setWordStates(initWordStates());
@@ -159,6 +166,7 @@ export function InkRevealForge({ solved: propSolved, onSolve }: ForgeProps) {
           }
         }
         sndScrambleSolved();
+        navigator.vibrate?.([50, 30, 50, 30, 100]);
         setTimeout(() => setShowSolvedModal(true), 800);
       }, 300);
     }
@@ -212,9 +220,12 @@ export function InkRevealForge({ solved: propSolved, onSolve }: ForgeProps) {
       const result: "hit" | "miss" = letterEntry ? "hit" : "miss";
 
       if (result === "hit") {
-        sndInkDrop();
+        sndInkDrop(dropsLeft / INK_CONFIG.maxDrops);
+        navigator.vibrate?.(30);
       } else {
-        sndInkMiss();
+        const isHot = PROXIMITY_MAP.get(key) === "hot";
+        if (isHot) sndInkMissAdjacent(); else sndInkMiss();
+        navigator.vibrate?.([15, 10, 15]);
         setProximityCenter(key);
         setTimeout(() => setProximityCenter(null), 2800);
       }
@@ -261,15 +272,18 @@ export function InkRevealForge({ solved: propSolved, onSolve }: ForgeProps) {
             });
             autoSolved.forEach((word) => {
               sndInkWordSolved();
+              navigator.vibrate?.([30, 20, 50]);
               const cells = getWordCells(word);
               cells.forEach(([r, c], idx) => {
                 setTimeout(() => {
                   const el = gridRef.current?.querySelector<HTMLElement>(`[data-cell="${r},${c}"]`);
                   if (el) {
+                    el.style.animation = "ink-word-ripple 0.5s ease-out both";
+                    setTimeout(() => { el.style.animation = ""; }, 600);
                     const rect = el.getBoundingClientRect();
                     spawnParticles(rect.left + rect.width / 2, rect.top + rect.height / 2, 10, "#e8c96a");
                   }
-                }, idx * 70);
+                }, idx * 60);
               });
             });
           }
@@ -298,6 +312,7 @@ export function InkRevealForge({ solved: propSolved, onSolve }: ForgeProps) {
 
       if (val === wordText) {
         sndInkWordSolved();
+        navigator.vibrate?.([30, 20, 50]);
         const word = INK_CONFIG.words.find((w) => w.text === wordText)!;
         const cells = getWordCells(word);
 
@@ -313,7 +328,7 @@ export function InkRevealForge({ solved: propSolved, onSolve }: ForgeProps) {
         setInputValues((prev) => ({ ...prev, [wordText]: "" }));
         setInputErrors((prev) => ({ ...prev, [wordText]: false }));
 
-        // Cascade particles
+        // Cascade particles + ripple
         if (gridRef.current) {
           cells.forEach(([r, c], idx) => {
             setTimeout(() => {
@@ -321,23 +336,19 @@ export function InkRevealForge({ solved: propSolved, onSolve }: ForgeProps) {
                 `[data-cell="${r},${c}"]`,
               );
               if (el) {
+                el.style.animation = "ink-word-ripple 0.5s ease-out both";
+                setTimeout(() => { el.style.animation = ""; }, 600);
                 const rect = el.getBoundingClientRect();
-                spawnParticles(
-                  rect.left + rect.width / 2,
-                  rect.top + rect.height / 2,
-                  10,
-                  "#e8c96a",
-                );
+                spawnParticles(rect.left + rect.width / 2, rect.top + rect.height / 2, 10, "#e8c96a");
               }
-            }, idx * 70);
+            }, idx * 60);
           });
         }
       } else {
         setInputErrors((prev) => ({ ...prev, [wordText]: true }));
-        showMessage("L'encre refuse ce mot…");
         setTimeout(
           () => setInputErrors((prev) => ({ ...prev, [wordText]: false })),
-          900,
+          2000,
         );
         setWordStates((prev) => ({
           ...prev,
@@ -357,29 +368,6 @@ export function InkRevealForge({ solved: propSolved, onSolve }: ForgeProps) {
   // ── Render ────────────────────────────────────────────────────────────
   return (
     <div className="mt-4">
-      {/* Intro collapsible */}
-      <button
-        onClick={() => setIntroCollapsed((v) => !v)}
-        className="w-full text-left mb-4 px-3 py-2 rounded-lg border border-locked-border/40
-          text-[0.5rem] text-muted/50 tracking-wide leading-relaxed
-          hover:border-locked-border hover:text-muted/70 transition-colors cursor-pointer"
-      >
-        <span className="flex items-center gap-2">
-          <span className="text-muted/30">{introCollapsed ? "↓" : "↑"}</span>
-          <span className="italic">
-            {introCollapsed ? "Lire l'introduction…" : "Réduire"}
-          </span>
-        </span>
-        {!introCollapsed && (
-          <p className="mt-2 text-[0.5rem] text-muted/45 italic leading-relaxed">
-            Cette page du grimoire semble vide… mais tes doigts sentent les sillons
-            d'une plume ancienne. Des mots y furent tracés à l'encre des secrets — une
-            encre que seul un regard patient peut révéler. Verse tes gouttes avec
-            discernement : l'encre révélatrice n'est pas inépuisable.
-          </p>
-        )}
-      </button>
-
       {/* Drops indicator */}
       <div className="flex justify-center gap-3 mb-5">
         {Array.from({ length: INK_CONFIG.maxDrops }, (_, i) => (
@@ -416,6 +404,13 @@ export function InkRevealForge({ solved: propSolved, onSolve }: ForgeProps) {
         ))}
       </div>
 
+      {/* Timer reset quotidien */}
+      {countdown && (
+        <div className="text-center text-[0.45rem] tracking-[0.15em] text-muted/30 font-mono mb-4">
+          Reset dans {countdown}
+        </div>
+      )}
+
       {/* Message flash */}
       {tapMessage && (
         <div
@@ -427,7 +422,14 @@ export function InkRevealForge({ solved: propSolved, onSolve }: ForgeProps) {
         </div>
       )}
 
-      {/* Grid 7×7 */}
+      {/* Hint premier clic */}
+      {revealedCells.size === 0 && missedCells.size === 0 && !solved && (
+        <div className="text-center text-[0.45rem] text-muted/40 italic tracking-wide mb-3">
+          Touche une case pour y verser de l'encre
+        </div>
+      )}
+
+      {/* Grid */}
       <div
         ref={gridRef}
         className="grid gap-[3px] mx-auto"
@@ -803,6 +805,12 @@ export function InkRevealForge({ solved: propSolved, onSolve }: ForgeProps) {
                   </div>
                 )}
 
+                {hasError && (
+                  <p className="mt-1.5 text-[0.5rem] text-danger/55 italic tracking-wide">
+                    L'encre refuse ce mot…
+                  </p>
+                )}
+
                 {isLocked && (
                   <p className="text-[0.5rem] text-danger/45 italic tracking-wide">
                     L'encre a séché sur ce mot…
@@ -838,8 +846,7 @@ export function InkRevealForge({ solved: propSolved, onSolve }: ForgeProps) {
               setInputErrors({});
               setLocalSolved(false);
               setShowSolvedModal(false);
-              setShowPicker(false);
-              setIsResetting(false);
+                      setIsResetting(false);
             }}
             className="px-3 py-1 rounded-md text-[0.55rem] tracking-[0.15em] uppercase
               border border-danger/30 text-danger/50 bg-danger/5
@@ -897,7 +904,7 @@ export function InkRevealForge({ solved: propSolved, onSolve }: ForgeProps) {
             <button
               onClick={() => {
                 setShowSolvedModal(false);
-                setShowPicker(true);
+                onSolve();
               }}
               className="px-6 py-2.5 rounded-xl text-[0.6rem] tracking-[0.2em] uppercase
                 transition-all duration-200 active:scale-95"
@@ -913,15 +920,6 @@ export function InkRevealForge({ solved: propSolved, onSolve }: ForgeProps) {
         </div>
       )}
 
-      {/* Enigma picker */}
-      {showPicker && (
-        <EnigmaPicker
-          onClose={() => {
-            setShowPicker(false);
-            onSolve();
-          }}
-        />
-      )}
     </div>
   );
 }

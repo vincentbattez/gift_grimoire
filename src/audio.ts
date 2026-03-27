@@ -986,18 +986,21 @@ export const sndFinale = () => {
 };
 
 /** Ambient tension drone — crescendo over ~3s, returns stop function */
-/** Ink drop falling — water plip */
-export const sndInkDrop = () => {
+/** Ink drop falling — water plip. ratio 0→1 : encrier vide→plein */
+export const sndInkDrop = (ratio = 1) => {
   const c = getCtx();
   const t = c.currentTime;
+
+  const startFreq = 600 + ratio * 500;
+  const endFreq = 200 + ratio * 200;
 
   const o = c.createOscillator();
   const g = c.createGain();
   o.connect(g);
   g.connect(c.destination);
   o.type = "sine";
-  o.frequency.setValueAtTime(900, t);
-  o.frequency.exponentialRampToValueAtTime(300, t + 0.12);
+  o.frequency.setValueAtTime(startFreq, t);
+  o.frequency.exponentialRampToValueAtTime(endFreq, t + 0.12);
   g.gain.setValueAtTime(0, t);
   g.gain.linearRampToValueAtTime(0.1, t + 0.01);
   g.gain.exponentialRampToValueAtTime(0.0001, t + 0.18);

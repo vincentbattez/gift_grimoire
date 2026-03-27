@@ -31,6 +31,8 @@ export const FORGES: ForgeModule[] = [
     key: "ink",
     title: "L'Encre Révélatrice",
     successMessage: "L'encre a tout révélé. Les mots tracés dans l'ombre brillent désormais dans ta mémoire.",
+    introText:
+      "Cette page du grimoire semble vide… mais tes doigts sentent les sillons d'une plume ancienne. Des mots y furent tracés à l'encre des secrets — une encre que seul un regard patient peut révéler. Verse tes gouttes avec discernement : l'encre révélatrice n'est pas inépuisable.",
     component: InkRevealForge,
   },
 ];

@@ -30,7 +30,7 @@ export interface InkForgeConfig {
 export const INK_CONFIG: InkForgeConfig = {
   gridCols: 7,
   gridRows: 9,
-  maxDrops: 40,
+  maxDrops: 6,
   maxGuessesPerWord: 3,
   words: [
     { text: "RESONANCE", start: [0, 3], direction: "V" },

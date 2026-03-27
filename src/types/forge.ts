@@ -11,5 +11,7 @@ export interface ForgeModule {
   key: string;
   title: string;
   successMessage: string;
+  /** Texte narratif affiché dans une modal au moment du déblocage */
+  introText?: string;
   component: ComponentType<ForgeProps>;
 }

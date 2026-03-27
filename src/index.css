@@ -931,6 +931,12 @@ body {
   100% { opacity: 1; transform: scale(1); filter: blur(0px) saturate(1); }
 }
 
+@keyframes ink-word-ripple {
+  0%   { box-shadow: inset 0 0 0 0 transparent, 0 0 0 0 transparent; }
+  30%  { box-shadow: inset 0 0 10px #e8c96a50, 0 0 12px #e8c96a40; }
+  100% { box-shadow: inset 0 0 0 0 transparent, 0 0 0 0 transparent; }
+}
+
 .ink-proximity-hot {
   animation: proximity-hot-pulse 1.25s ease-in-out infinite !important;
   background: linear-gradient(135deg, #1e1400, #130e00) !important;
