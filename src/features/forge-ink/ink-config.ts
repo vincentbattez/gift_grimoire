@@ -11,14 +11,18 @@ export interface InkForgeConfig {
   words: WordConfig[];
 }
 
+// Grille 9×9
+// Ligne 2 : R E S O N A N C E  (RESONANCE horizontal)
+//                ↑       ↑
+//              ECRAN   VOILE (tous deux verticaux, partagent E en (2,1) et O en (2,3))
 export const INK_CONFIG: InkForgeConfig = {
-  gridSize: 7,
+  gridSize: 9,
   maxDrops: 40,
   maxGuessesPerWord: 3,
   words: [
-    { text: "PLUME", start: [1, 1], direction: "H" }, // @todo: a remplacer par RESONANCE
-    { text: "LUEUR", start: [1, 2], direction: "V" }, // @todo: a remplacer par ECRAN
-    { text: "ENCRE", start: [1, 5], direction: "V" }, // @todo: a remplacer par VOILE
+    { text: "RESONANCE", start: [2, 0], direction: "H" },
+    { text: "ECRAN",     start: [2, 1], direction: "V" },
+    { text: "VOILE",     start: [1, 3], direction: "V" },
   ],
 };
 
