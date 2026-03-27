@@ -451,6 +451,12 @@ export function InkRevealForge({ solved: propSolved, onSolve }: ForgeProps) {
           );
           const isNewlyRevealed = newlyRevealedCells.has(key);
           const isAnimatingMiss = animatingMissCells.has(key);
+          // Case lettre non-révélée directement adjacente au dernier miss
+          const isHotLetter = !!letterEntry && !isRevealed && !!proximityCenter && (() => {
+            const [cr, cc] = proximityCenter.split(",").map(Number);
+            return (Math.abs(row - cr) === 1 && col === cc) ||
+                   (row === cr && Math.abs(col - cc) === 1);
+          })();
           const proximity = (() => {
             if (!proximityCenter || isRevealed || isMissed || isAnimating) return undefined;
             const [cr, cc] = proximityCenter.split(",").map(Number);
@@ -525,8 +531,8 @@ export function InkRevealForge({ solved: propSolved, onSolve }: ForgeProps) {
                 </span>
               )}
 
-              {/* Scintillement — case adjacente qui contient une lettre */}
-              {proximity === "hot" && letterEntry && (
+              {/* Scintillement — case lettre directement adjacente au miss */}
+              {isHotLetter && (
                 <span
                   key={proximityCenter}
                   className="absolute inset-0 pointer-events-none overflow-hidden rounded-[4px] z-[8]"
