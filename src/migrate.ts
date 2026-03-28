@@ -37,16 +37,26 @@ function migrateFromV3() {
     }
 
     // Distribute per-forge solved/revealed to individual forge stores
+    // Merge with existing state to avoid losing v3 data when the key already exists
     const forges: Record<string, boolean> = state.forges ?? {};
     const forgeRevealed: Record<string, boolean> = state.forgeRevealed ?? {};
     for (const key of ["magnet", "scramble", "vibration", "ink"]) {
       const storeKey = `grimoire_forge_${key}`;
-      if (!localStorage.getItem(storeKey)) {
+      const v3Fields = {
+        solved: forges[key] ?? false,
+        revealed: forgeRevealed[key] ?? false,
+      };
+      const existing = localStorage.getItem(storeKey);
+      if (existing) {
+        try {
+          const parsed = JSON.parse(existing);
+          const merged = { ...v3Fields, ...parsed.state };
+          parsed.state = merged;
+          localStorage.setItem(storeKey, JSON.stringify(parsed));
+        } catch { /* malformed JSON — overwrite below */ }
+      } else {
         localStorage.setItem(storeKey, JSON.stringify({
-          state: {
-            solved: forges[key] ?? false,
-            revealed: forgeRevealed[key] ?? false,
-          },
+          state: v3Fields,
           version: 0,
         }));
       }
