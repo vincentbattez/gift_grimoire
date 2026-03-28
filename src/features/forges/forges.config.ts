@@ -38,5 +38,12 @@ export const FORGES: ForgeModule[] = [
       "Cette page du grimoire semble vide… mais tes doigts sentent les sillons d'une plume ancienne. Des mots y furent tracés à l'encre des secrets — une encre que seul un regard patient peut révéler. Verse tes gouttes avec discernement : l'encre révélatrice n'est pas inépuisable.",
     component: InkRevealForge,
     onReset: () => useInkStore.getState().resetInkGame(),
+    adminActions: [
+      {
+        label: "reset ink drops",
+        onClick: () => useInkStore.getState().resetInkDrops(),
+        color: "sky-400",
+      },
+    ],
   },
 ];

@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect } from "react";
 import type { CooldownState } from "./types";
 
 function formatMs(ms: number): string {
@@ -25,50 +25,43 @@ function isSameDay(a: number, b: number): boolean {
   );
 }
 
+function computeRemaining(lastTriggeredAt: number | null, durationMs: number | null): number {
+  if (lastTriggeredAt == null) return 0;
+
+  if (durationMs == null) {
+    if (!isSameDay(lastTriggeredAt, Date.now())) return 0;
+    return msUntilMidnight();
+  }
+
+  const elapsed = Date.now() - lastTriggeredAt;
+  return Math.max(0, durationMs - elapsed);
+}
+
 /**
  * Hook réutilisable de cooldown.
  *
  * @param lastTriggeredAt - Timestamp (ms) du dernier déclenchement, ou null si jamais déclenché
  * @param durationMs      - Durée du cooldown en ms. Si null, le cooldown expire à minuit.
- *
- * @returns CooldownState avec active, remainingMs, label
  */
 export function useCooldown(
   lastTriggeredAt: number | null,
   durationMs: number | null = null,
 ): CooldownState {
-  const computeRemaining = useCallback((): number => {
-    if (lastTriggeredAt == null) return 0;
+  // Tick force un re-render chaque seconde pour recalculer remaining
+  const [, tick] = useState(0);
 
-    if (durationMs == null) {
-      // Cooldown daily : actif si même jour
-      if (!isSameDay(lastTriggeredAt, Date.now())) return 0;
-      return msUntilMidnight();
-    }
-
-    // Cooldown fixe
-    const elapsed = Date.now() - lastTriggeredAt;
-    return Math.max(0, durationMs - elapsed);
-  }, [lastTriggeredAt, durationMs]);
-
-  const [remaining, setRemaining] = useState(computeRemaining);
+  const remaining = computeRemaining(lastTriggeredAt, durationMs);
+  const isActive = remaining > 0;
 
   useEffect(() => {
-    setRemaining(computeRemaining());
-    if (computeRemaining() <= 0) return;
-
-    const id = setInterval(() => {
-      const r = computeRemaining();
-      setRemaining(r);
-      if (r <= 0) clearInterval(id);
-    }, 1_000);
-
+    if (!isActive) return;
+    const id = setInterval(() => tick((n) => n + 1), 1_000);
     return () => clearInterval(id);
-  }, [computeRemaining]);
+  }, [isActive]);
 
   return {
-    active: remaining > 0,
+    active: isActive,
     remainingMs: remaining,
-    label: remaining > 0 ? formatMs(remaining) : "00:00:00",
+    label: isActive ? formatMs(remaining) : "00:00:00",
   };
 }

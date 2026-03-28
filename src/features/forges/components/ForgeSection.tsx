@@ -1,6 +1,5 @@
 import { useState, useRef, useEffect } from "react";
 import { useForgeStore } from "../store";
-import { useInkStore } from "../forge-ink/store";
 import { sndForgeReveal, sndClick } from "../../../audio";
 import { spawnParticles } from "../../../particles";
 import { LockIcon } from "../../../components/LockIcon";
@@ -158,14 +157,18 @@ export function ForgeSection({ forge, isAdmin }: ForgeSectionProps) {
             >
               ✦ unlock
             </button>
-            {key === "ink" && (
-              <button
-                onClick={() => useInkStore.getState().resetInkDrops()}
-                className="px-3 py-1 rounded-md text-[0.55rem] tracking-[0.15em] uppercase border border-sky-400/30 text-sky-400/50 bg-sky-400/5 hover:border-sky-400/60 hover:text-sky-400/80 hover:bg-sky-400/10 transition-all duration-150 active:scale-95"
-              >
-                ↺ reset ink drops
-              </button>
-            )}
+            {forge.adminActions?.map((action) => {
+              const c = action.color ?? "sky-400";
+              return (
+                <button
+                  key={action.label}
+                  onClick={action.onClick}
+                  className={`px-3 py-1 rounded-md text-[0.55rem] tracking-[0.15em] uppercase border border-${c}/30 text-${c}/50 bg-${c}/5 hover:border-${c}/60 hover:text-${c}/80 hover:bg-${c}/10 transition-all duration-150 active:scale-95`}
+                >
+                  ↺ {action.label}
+                </button>
+              );
+            })}
           </div>
         )}
         {solved && (

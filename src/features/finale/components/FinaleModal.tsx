@@ -227,6 +227,7 @@ function TypewriterLine({ text, golden, delay, onDone }: Readonly<{
     timers.push(startTimer);
 
     return () => timers.forEach(clearTimeout);
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- animation one-shot au mount, deps stables
   }, []);
 
   if (!text) return <div style={{ height: "0.9em" }} />;

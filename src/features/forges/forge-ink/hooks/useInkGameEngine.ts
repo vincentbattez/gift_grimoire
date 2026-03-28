@@ -109,8 +109,9 @@ export function useInkGameEngine(
   const setInkGameState = useInkStore((s) => s.setInkGameState);
   const dropResetCounter = useInkStore((s) => s.dropResetCounter);
   // Cooldown daily : les drops se reset à minuit.
-  // On utilise Date.now() pour forcer un cooldown "toujours actif" qui affiche le countdown.
-  const dailyCooldown = useCooldown(Date.now());
+  // Timestamp stable du début de session pour forcer le cooldown actif.
+  const [sessionStart] = useState(() => Date.now());
+  const dailyCooldown = useCooldown(sessionStart);
 
   const isStale = storedGame != null && storedGame.dayStamp !== todayStamp();
   const freshGame = isStale ? null : storedGame;
@@ -170,7 +171,7 @@ export function useInkGameEngine(
   // ── Admin re-lock (propSolved true → false) ──
   useEffect(() => {
     if (!propSolved && prevPropSolvedRef.current) {
-      setLocalSolved(false);
+      setLocalSolved(false); // eslint-disable-line react-hooks/set-state-in-effect -- admin reset
       setShowSolvedModal(false);
       setRevealedCells(new Set());
       setWordStates(initWordStates());
@@ -186,7 +187,7 @@ export function useInkGameEngine(
   useEffect(() => {
     if (dropResetCounter === dropResetRef.current) return;
     dropResetRef.current = dropResetCounter;
-    setDropsLeft(INK_CONFIG.maxDrops);
+    setDropsLeft(INK_CONFIG.maxDrops); // eslint-disable-line react-hooks/set-state-in-effect -- admin reset signal
     setAnimatingMissCells(new Set());
     setProximityCenter(null);
     setWordStates((prev) => {
@@ -208,7 +209,7 @@ export function useInkGameEngine(
     );
     if (!allWordsSolved) return;
 
-    setLocalSolved(true);
+    setLocalSolved(true); // eslint-disable-line react-hooks/set-state-in-effect -- game completion transition
     setTimeout(() => {
       playCelebration(gridRef, LETTER_MAP.keys());
       sndScrambleSolved();
@@ -226,7 +227,7 @@ export function useInkGameEngine(
     );
     if (!allLocked) return;
 
-    setIsResetting(true);
+    setIsResetting(true); // eslint-disable-line react-hooks/set-state-in-effect -- game deadlock recovery
     showMessage(
       "L'encre s'est tarie… mais les mots déjà révélés ne s'effaceront pas. Le grimoire te laissera réessayer.",
     );

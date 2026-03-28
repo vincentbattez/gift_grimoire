@@ -19,8 +19,7 @@ export function useEnigmaOrchestrator(): EnigmaLifecycleEvents {
   const closeModal = useEnigmaStore((s) => s.closeModal);
 
   const onTry = useCallback(
-    (_enigmaId: string, _answer: string) => {
-      // Le parent enregistre la tentative pour déclencher le cooldown
+    () => {
       recordAttempt();
     },
     [recordAttempt],
@@ -28,34 +27,11 @@ export function useEnigmaOrchestrator(): EnigmaLifecycleEvents {
 
   const onSuccess = useCallback(
     (enigmaId: string) => {
-      // Fermer la modale et lancer la célébration
       closeModal();
       celebrate(enigmaId);
     },
     [closeModal, celebrate],
   );
 
-  const onFail = useCallback(
-    (_enigmaId: string) => {
-      // Le parent enregistre aussi l'échec (même cooldown)
-      // L'affichage du feedback erreur reste local à l'enfant
-    },
-    [],
-  );
-
-  const onUnlock = useCallback(
-    (_enigmaId: string) => {
-      // Géré par triggerUnlockEffect / UnlockOverlay
-    },
-    [],
-  );
-
-  const onLetterRead = useCallback(
-    (_enigmaId: string) => {
-      // Géré par closeLoveLetter dans le store
-    },
-    [],
-  );
-
-  return { onTry, onSuccess, onFail, onUnlock, onLetterRead };
+  return { onTry, onSuccess };
 }
