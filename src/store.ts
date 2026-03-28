@@ -1,7 +1,8 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
-import { ENIGMAS } from "./config";
+import { ENIGMAS } from "./features/enigma/config";
 import { MODAL_CLOSE_MS } from "./timings";
+import type { EnigmaPersistedStatus } from "./features/enigma/types";
 
 type EnigmaId = string;
 type EnigmaState = { unlocked: boolean; solved: boolean };
@@ -46,6 +47,8 @@ type GrimoireStore = {
   clearCelebrate: () => void;
   startUnlocking: (id: EnigmaId, title: string) => void;
   clearUnlocking: () => void;
+  /** Admin: force l'état persisté d'une énigme */
+  setEnigmaStatus: (id: EnigmaId, status: EnigmaPersistedStatus) => void;
   solveForge: (key: string) => void;
   resetForge: (key: string) => void;
   showSuccessBox: (boxNumber: number, haEvent: string, enigmaId: EnigmaId) => void;
@@ -143,6 +146,31 @@ export const useStore = create<GrimoireStore>()(
       clearCelebrate: () => set({ celebrateCardId: null }),
       startUnlocking: (id, title) => set({ unlockingCardId: id, unlockingTitle: title }),
       clearUnlocking: () => set({ unlockingCardId: null, unlockingTitle: null }),
+
+      setEnigmaStatus: (id, status) =>
+        set((s) => {
+          switch (status) {
+            case "locked":
+              return {
+                enigmas: { ...s.enigmas, [id]: { unlocked: false, solved: false } },
+                readLetters: { ...s.readLetters, [id]: false },
+              };
+            case "unlocked":
+              return {
+                enigmas: { ...s.enigmas, [id]: { unlocked: true, solved: false } },
+                readLetters: { ...s.readLetters, [id]: false },
+              };
+            case "solved":
+              return {
+                enigmas: { ...s.enigmas, [id]: { unlocked: true, solved: true } },
+              };
+            case "completed":
+              return {
+                enigmas: { ...s.enigmas, [id]: { unlocked: true, solved: true } },
+                readLetters: { ...s.readLetters, [id]: true },
+              };
+          }
+        }),
 
       solveForge: (key) =>
         set((s) => ({ forges: { ...s.forges, [key]: true } })),

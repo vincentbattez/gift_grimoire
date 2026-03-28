@@ -1,5 +1,5 @@
 import {useStore} from "../store";
-import {ENIGMAS} from "../config";
+import {ENIGMAS} from "../features/enigma/config";
 import {ProgressBar} from "./ProgressBar.tsx";
 
 export function Header() {
