@@ -1,7 +1,7 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 import { ENIGMAS } from "./config";
-import { MODAL_CLOSE_MS } from "../../timings";
+import { MODAL_CLOSE_MS } from "./timings";
 import type { EnigmaPersistedStatus } from "./types";
 
 type EnigmaId = string;

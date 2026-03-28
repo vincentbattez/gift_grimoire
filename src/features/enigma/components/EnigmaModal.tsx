@@ -3,7 +3,7 @@ import { useEnigmaStore } from "../store";
 import { useCooldownStore, isAttemptUsedToday } from "../../cooldown/store";
 import { ENIGMAS, type Enigma } from "../config";
 import { sndOk, sndBad, sndClick, sndLoveReveal, sndAnalysis, sndDoubt } from "../../../audio";
-import { SOLVE_FEEDBACK_MS, INPUT_FOCUS_DELAY_MS, ERROR_FEEDBACK_MS, SUSPENSE_MS } from "../../../timings";
+import { SOLVE_FEEDBACK_MS, INPUT_FOCUS_DELAY_MS, ERROR_FEEDBACK_MS, SUSPENSE_MS } from "../timings";
 import { useCooldown } from "../../cooldown/useCooldown";
 import { useEnigmaOrchestrator } from "../hooks/useEnigmaOrchestrator";
 import type { EnigmaLifecycleEvents } from "../types";

@@ -3,7 +3,7 @@ import type { Enigma } from "../config";
 import { useEnigmaStore } from "../store";
 import { sndClick, sndVictory, sndGoldenSeal } from "../../../audio";
 import { spawnCelebration } from "../../../particles";
-import { CELEBRATION_SCROLL_SETTLE_MS, CELEBRATION_DURATION_MS } from "../../../timings";
+import { CELEBRATION_SCROLL_SETTLE_MS, CELEBRATION_DURATION_MS } from "../timings";
 import { triggerUnlockEffect, playUnlockCardEffect } from "../unlock";
 import { LockIcon } from "../../../components/LockIcon";
 import { LockedModal } from "./LockedModal";
