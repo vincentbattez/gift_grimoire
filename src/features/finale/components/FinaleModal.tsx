@@ -4,6 +4,7 @@ import { useFinaleStore } from "../store";
 import { ENIGMAS } from "../../enigma/config";
 import { sndFinale, sndHeartPop, sndPageTurn, sndGoldenSeal, sndCrackle, sndFireworkLaunch, sndWaxMelt, sndWaxStamp, sndQuillTap, sndGoldenWord, sndCardFlip, sndConvergence } from "../../../audio";
 import { spawnParticles, spawnCelebration } from "../../../particles";
+import { OrnamentDivider } from "../../../components/ui/OrnamentDivider";
 
 const CELEBRATION_DURATION = 9000;
 const STAR_COUNT = 35;
@@ -78,11 +79,7 @@ function SlideContext() {
         Le Dernier Sortilège
       </h3>
 
-      <div className="flex items-center justify-center gap-3 mb-4">
-        <div className="h-px flex-1 bg-gradient-to-r from-transparent to-[#c9a03240]" />
-        <div className="w-1.5 h-1.5 rounded-full" style={{ background: "radial-gradient(circle, #e8c96a, #c9a032)" }} />
-        <div className="h-px flex-1 bg-gradient-to-l from-transparent to-[#c9a03240]" />
-      </div>
+      <OrnamentDivider className="mb-4" />
 
       <p
         className="text-[0.8rem] leading-[1.8] whitespace-pre-line mb-4"
@@ -136,11 +133,7 @@ function SlideStats() {
         Ton aventure
       </h3>
 
-      <div className="flex items-center justify-center gap-3 mb-5">
-        <div className="h-px flex-1 bg-gradient-to-r from-transparent to-[#c9a03240]" />
-        <div className="w-1.5 h-1.5 rounded-full" style={{ background: "radial-gradient(circle, #e8c96a, #c9a032)" }} />
-        <div className="h-px flex-1 bg-gradient-to-l from-transparent to-[#c9a03240]" />
-      </div>
+      <OrnamentDivider className="mb-5" />
 
       <div className="grid grid-cols-2 gap-3 mb-5">
         {stats.map((s) => (
@@ -282,11 +275,7 @@ function SlideLove() {
         Mon Léamour
       </h3>
 
-      <div className="flex items-center justify-center gap-3 mb-4">
-        <div className="h-px flex-1 bg-gradient-to-r from-transparent to-[#c9a03240]" />
-        <div className="w-1.5 h-1.5 rounded-full" style={{ background: "radial-gradient(circle, #e8c96a, #c9a032)" }} />
-        <div className="h-px flex-1 bg-gradient-to-l from-transparent to-[#c9a03240]" />
-      </div>
+      <OrnamentDivider className="mb-4" />
 
       <div
         className="text-[0.8rem] leading-[1.85] mb-5 min-h-[180px]"
@@ -311,11 +300,7 @@ function SlideLove() {
           transform: signatureVisible ? "translateY(0)" : "translateY(8px)",
         }}
       >
-        <div className="flex items-center justify-center gap-3 mb-4">
-          <div className="h-px flex-1 bg-gradient-to-r from-transparent to-[#c9a03240]" />
-          <div className="w-1.5 h-1.5 rounded-full" style={{ background: "radial-gradient(circle, #e8c96a, #c9a032)" }} />
-          <div className="h-px flex-1 bg-gradient-to-l from-transparent to-[#c9a03240]" />
-        </div>
+        <OrnamentDivider className="mb-4" />
 
         <p
           className="text-[0.76rem] italic tracking-wide"
@@ -686,11 +671,7 @@ function NarrativeSequence() {
             >
               {NARRATIVE_TEXTS[textIndex]}
             </p>
-            <div className="mt-3 flex items-center gap-3">
-              <div className="h-px w-10 bg-gradient-to-r from-transparent to-[#e8c96a40]" />
-              <div className="w-1.5 h-1.5 rounded-full" style={{ background: "radial-gradient(circle, #e8c96a, #c9a032)" }} />
-              <div className="h-px w-10 bg-gradient-to-l from-transparent to-[#e8c96a40]" />
-            </div>
+            <OrnamentDivider className="mt-3" lineWidth="fixed" />
           </div>
         </div>
       )}

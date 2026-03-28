@@ -7,6 +7,7 @@ import { MAX_PLAYS, type VoiceHint } from "./constants";
 import { PlayCountDot } from "../PlayCountDot";
 import { AudioWarningModal } from "../AudioWarningModal";
 import { LastAttemptModal } from "../LastAttemptModal";
+import { CornerOrnaments } from "../ui/CornerOrnaments";
 
 export function VoiceButton({ hint }: { hint: VoiceHint }) {
   const count = useCooldownStore((s) => s.audioPlayCounts[hint.key] ?? 0);
@@ -97,14 +98,7 @@ export function VoiceButton({ hint }: { hint: VoiceHint }) {
         />
 
         {/* corner decorations */}
-        {!exhausted && (
-          <>
-            <div className={`absolute top-[6px] left-[6px] w-2 h-2 border-t border-l opacity-35 ${cornerBorder}`} />
-            <div className={`absolute top-[6px] right-[6px] w-2 h-2 border-t border-r opacity-35 ${cornerBorder}`} />
-            <div className={`absolute bottom-[6px] left-[6px] w-2 h-2 border-b border-l opacity-35 ${cornerBorder}`} />
-            <div className={`absolute bottom-[6px] right-[6px] w-2 h-2 border-b border-r opacity-35 ${cornerBorder}`} />
-          </>
-        )}
+        {!exhausted && <CornerOrnaments color={cornerBorder} />}
 
         {/* success badge */}
         {success && (
@@ -125,8 +119,8 @@ export function VoiceButton({ hint }: { hint: VoiceHint }) {
         <PlayCountDot total={MAX_PLAYS} remaining={remaining} solved={success} />
       </button>
 
-      {showWarning && <AudioWarningModal onConfirm={() => { setShowWarning(false); confirmAndPlay(); }} />}
-      {showLastAttempt && <LastAttemptModal onConfirm={() => { setShowLastAttempt(false); playAudio(); }} />}
+      <AudioWarningModal isOpen={showWarning} onConfirm={() => { setShowWarning(false); confirmAndPlay(); }} />
+      <LastAttemptModal isOpen={showLastAttempt} onConfirm={() => { setShowLastAttempt(false); playAudio(); }} />
     </>
   );
 }

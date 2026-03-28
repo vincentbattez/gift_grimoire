@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from "react";
+import { Button } from "../../../components/ui/Button";
 import { sndForgeReveal, sndClick } from "../../../audio";
 import { spawnParticles } from "../../../particles";
 import { LockIcon } from "../../../components/LockIcon";
@@ -147,12 +148,7 @@ export function ForgeSection({ forge, isAdmin }: ForgeSectionProps) {
           <ForgeComponent solved={solved} onSolve={() => forge.solve()} />
         {!solved && isAdmin && (
           <div className="mt-4 flex gap-2 justify-center flex-wrap">
-            <button
-              onClick={() => { forge.reveal(); forge.solve(); }}
-              className="px-3 py-1 rounded-md text-[0.55rem] tracking-[0.15em] uppercase border border-success/30 text-success/50 bg-success/5 hover:border-success/60 hover:text-success/80 hover:bg-success/10 transition-all duration-150 active:scale-95"
-            >
-              ✦ unlock
-            </button>
+            <Button variant="admin" color="success" onClick={() => { forge.reveal(); forge.solve(); }}>✦ unlock</Button>
             {forge.adminActions?.map((action) => {
               const c = action.color ?? "sky-400";
               return (
@@ -176,12 +172,7 @@ export function ForgeSection({ forge, isAdmin }: ForgeSectionProps) {
               {successMessage}
             </p>
             {isAdmin && (
-              <button
-                onClick={() => forge.reset()}
-                className="mt-3 px-3 py-1 rounded-md text-[0.55rem] tracking-[0.15em] uppercase border border-danger/30 text-danger/50 bg-danger/5 hover:border-danger/60 hover:text-danger/80 hover:bg-danger/10 transition-all duration-150 active:scale-95"
-              >
-                ↺ Re-lock
-              </button>
+              <Button variant="admin" color="danger" className="mt-3" onClick={() => forge.reset()}>↺ Re-lock</Button>
             )}
           </div>
         )}
@@ -298,16 +289,7 @@ export function ForgeSection({ forge, isAdmin }: ForgeSectionProps) {
           <LockIcon />
           <span className="text-[0.55rem] tracking-[0.25em] text-muted uppercase">{title}</span>
           {isAdmin && (
-            <button
-              onClick={(e) => {
-                e.stopPropagation();
-                forge.reveal();
-                forge.solve();
-              }}
-              className="mt-2 px-3 py-1 rounded-md text-[0.55rem] tracking-[0.15em] uppercase border border-success/30 text-success/50 bg-success/5 hover:border-success/60 hover:text-success/80 hover:bg-success/10 transition-all duration-150 active:scale-95 z-10"
-            >
-              ✦ unlock
-            </button>
+            <Button variant="admin" color="success" className="mt-2 z-10" onClick={(e) => { e.stopPropagation(); forge.reveal(); forge.solve(); }}>✦ unlock</Button>
           )}
         </div>
       )}

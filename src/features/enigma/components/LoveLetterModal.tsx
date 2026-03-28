@@ -2,6 +2,8 @@ import { useEffect, useRef, useState } from "react";
 import { useEnigmaStore } from "../store";
 import { ENIGMAS } from "../config";
 import { sndLoveClose, sndHeartPop } from "../../../audio";
+import { OrnamentDivider } from "../../../components/ui/OrnamentDivider";
+import { CornerOrnaments } from "../../../components/ui/CornerOrnaments";
 
 const CLOSE_MS = 500;
 const BURST_COUNT = 40;
@@ -145,9 +147,7 @@ export function LoveLetterModal() {
           ))}
 
           {/* Corner decorations */}
-          <div className="absolute top-[10px] left-[10px] w-3 h-3 border-t border-l border-[#c9a03260] opacity-60" />
-          <div className="absolute bottom-[10px] left-[10px] w-3 h-3 border-b border-l border-[#c9a03260] opacity-60" />
-          <div className="absolute bottom-[10px] right-[10px] w-3 h-3 border-b border-r border-[#c9a03260] opacity-60" />
+          <CornerOrnaments color="border-[#c9a03260]" size="w-3 h-3" offset="10px" opacity="opacity-60" corners={["tl", "bl", "br"]} />
 
           {/* Close button */}
           <button
@@ -188,14 +188,7 @@ export function LoveLetterModal() {
             </p>
 
             {/* Gold separator */}
-            <div className="flex items-center justify-center gap-3 mb-5">
-              <div className="h-px flex-1 bg-gradient-to-r from-transparent to-[#c9a03240]" />
-              <div
-                className="w-1.5 h-1.5 rounded-full"
-                style={{ background: "radial-gradient(circle, #e8c96a, #c9a032)" }}
-              />
-              <div className="h-px flex-1 bg-gradient-to-l from-transparent to-[#c9a03240]" />
-            </div>
+            <OrnamentDivider className="mb-5" />
 
             {/* Message */}
             <div
@@ -209,14 +202,7 @@ export function LoveLetterModal() {
             </div>
 
             {/* Gold separator */}
-            <div className="flex items-center justify-center gap-3 mb-5">
-              <div className="h-px flex-1 bg-gradient-to-r from-transparent to-[#c9a03240]" />
-              <div
-                className="w-1.5 h-1.5 rounded-full"
-                style={{ background: "radial-gradient(circle, #e8c96a, #c9a032)" }}
-              />
-              <div className="h-px flex-1 bg-gradient-to-l from-transparent to-[#c9a03240]" />
-            </div>
+            <OrnamentDivider className="mb-5" />
 
             {/* Signature */}
             <p

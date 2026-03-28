@@ -7,6 +7,8 @@ import { CELEBRATION_SCROLL_SETTLE_MS, CELEBRATION_DURATION_MS } from "../timing
 import { triggerUnlockEffect, playUnlockCardEffect } from "../unlock";
 import { LockIcon } from "../../../components/LockIcon";
 import { LockedModal } from "./LockedModal";
+import { Button } from "../../../components/ui/Button";
+import { CornerOrnaments } from "../../../components/ui/CornerOrnaments";
 
 export function EnigmaCard({ enigma, isAdmin }: { enigma: Enigma; isAdmin: boolean }) {
   const state = useEnigmaStore((s) => s.enigmas[enigma.id]);
@@ -153,12 +155,7 @@ export function EnigmaCard({ enigma, isAdmin }: { enigma: Enigma; isAdmin: boole
 
       {/* Corner decorations */}
       {!isLocked && (
-        <>
-          <div className={`absolute top-[7px] left-[7px] w-2.5 h-2.5 border-t border-l opacity-45 transition-colors duration-700 ${isSolved ? "border-[#c9a03260]" : "border-unlocked-border"}`} />
-          <div className={`absolute top-[7px] right-[7px] w-2.5 h-2.5 border-t border-r opacity-45 transition-colors duration-700 ${isSolved ? "border-[#c9a03260]" : "border-unlocked-border"}`} />
-          <div className={`absolute bottom-[7px] left-[7px] w-2.5 h-2.5 border-b border-l opacity-45 transition-colors duration-700 ${isSolved ? "border-[#c9a03260]" : "border-unlocked-border"}`} />
-          <div className={`absolute bottom-[7px] right-[7px] w-2.5 h-2.5 border-b border-r opacity-45 transition-colors duration-700 ${isSolved ? "border-[#c9a03260]" : "border-unlocked-border"}`} />
-        </>
+        <CornerOrnaments color={isSolved ? "border-[#c9a03260]" : "border-unlocked-border"} size="w-2.5 h-2.5" offset="7px" opacity="opacity-45" className="transition-colors duration-700" />
       )}
 
       {/* Card content */}
@@ -213,20 +210,10 @@ export function EnigmaCard({ enigma, isAdmin }: { enigma: Enigma; isAdmin: boole
       )}
       {/* Admin buttons */}
       {isAdmin && isLocked && (
-        <button
-          onClick={handleAdminUnlock}
-          className="absolute bottom-2 z-10 px-2 py-0.5 text-[0.55rem] rounded-full bg-accent/20 border border-accent/40 text-accent hover:bg-accent/30 transition-colors"
-        >
-          unlock
-        </button>
+        <Button variant="admin" color="accent" className="absolute bottom-2 z-10" onClick={handleAdminUnlock}>unlock</Button>
       )}
       {isAdmin && !isLocked && (
-        <button
-          onClick={handleAdminRelock}
-          className="absolute bottom-2 z-10 px-2 py-0.5 text-[0.55rem] rounded-full bg-danger/20 border border-danger/40 text-danger hover:bg-danger/30 transition-colors"
-        >
-          relock
-        </button>
+        <Button variant="admin" color="danger" className="absolute bottom-2 z-10" onClick={handleAdminRelock}>relock</Button>
       )}
 
       {/* Rune */}
