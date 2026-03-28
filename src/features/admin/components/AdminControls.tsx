@@ -1,4 +1,6 @@
-import { useStore } from "../../../store";
+import { useEnigmaStore } from "../../enigma/store";
+import { useCooldownStore } from "../../cooldown/store";
+import { useForgeStore } from "../../forges/store";
 import { ENIGMAS } from "../../enigma/config";
 import { FORGES } from "../../forges/forges.config";
 import type { EnigmaPersistedStatus } from "../../enigma/types";
@@ -29,10 +31,10 @@ function getEnigmaCurrentStatus(
  * - Reset cooldown timer
  */
 export function AdminControls() {
-  const setEnigmaStatus = useStore((s) => s.setEnigmaStatus);
-  const resetAttempt = useStore((s) => s.resetAttempt);
-  const enigmas = useStore((s) => s.enigmas);
-  const readLetters = useStore((s) => s.readLetters);
+  const setEnigmaStatus = useEnigmaStore((s) => s.setEnigmaStatus);
+  const resetAttempt = useCooldownStore((s) => s.resetAttempt);
+  const enigmas = useEnigmaStore((s) => s.enigmas);
+  const readLetters = useEnigmaStore((s) => s.readLetters);
 
   return (
     <div className="mb-6 p-3 rounded-xl border border-amber-400/20 bg-amber-400/5">
@@ -44,7 +46,7 @@ export function AdminControls() {
       <div className="flex gap-2 justify-center mb-4">
         <button
           onClick={() => {
-            const { unlock } = useStore.getState();
+            const { unlock } = useEnigmaStore.getState();
             ENIGMAS.forEach((e) => unlock(e.id));
           }}
           className="px-3 py-1 text-[0.55rem] rounded-md border border-accent/30 text-accent/60 hover:text-accent hover:border-accent/60 bg-accent/5 transition-colors cursor-pointer"
@@ -53,9 +55,10 @@ export function AdminControls() {
         </button>
         <button
           onClick={() => {
-            const s = useStore.getState();
-            ENIGMAS.forEach((e) => { s.unlock(e.id); s.solve(e.id); });
-            FORGES.forEach((f) => { s.solveForge(f.key); s.revealForge(f.key); });
+            const es = useEnigmaStore.getState();
+            const fs = useForgeStore.getState();
+            ENIGMAS.forEach((e) => { es.unlock(e.id); es.solve(e.id); });
+            FORGES.forEach((f) => { fs.solveForge(f.key); fs.revealForge(f.key); });
           }}
           className="px-3 py-1 text-[0.55rem] rounded-md border border-success/30 text-success/60 hover:text-success hover:border-success/60 bg-success/5 transition-colors cursor-pointer"
         >

@@ -1,12 +1,12 @@
 import { sndClick } from "../../../audio";
 import { triggerUnlockEffect } from "../unlock";
 import { ENIGMAS } from "../config";
-import { useStore } from "../../../store";
+import { useEnigmaStore } from "../store";
 
 const EXCLUDED_IDS = new Set(["Y", "F"]);
 
 export function EnigmaPicker({ onClose }: { onClose?: () => void }) {
-  const enigmaStates = useStore((s) => s.enigmas);
+  const enigmaStates = useEnigmaStore((s) => s.enigmas);
 
   const pickable = ENIGMAS.filter(
     (e) =>

@@ -1,17 +1,18 @@
-import { useStore } from "../../store";
+import { useEnigmaStore } from "./store";
+import { useUIStore } from "../../store";
 import { spawnParticles } from "../../particles";
 import { sndOk } from "../../audio";
 
 /** Called by admin button — starts the cinematic overlay animation */
 export function triggerUnlockEffect(id: string, enigmaTitle: string) {
-  const store = useStore.getState();
+  const store = useEnigmaStore.getState();
   if (!store.enigmas[id] || store.enigmas[id].unlocked || store.enigmas[id].solved) return;
   store.startUnlocking(id, enigmaTitle);
 }
 
 /** Called by UnlockOverlay when the animation reaches its climax — actually unlocks the card */
 export function triggerUnlockReveal(id: string) {
-  const store = useStore.getState();
+  const store = useEnigmaStore.getState();
   if (!store.enigmas[id] || store.enigmas[id].unlocked || store.enigmas[id].solved) return;
 
   store.unlock(id);
@@ -20,7 +21,6 @@ export function triggerUnlockReveal(id: string) {
 
 /** Called by EnigmaCard after the overlay has fully closed */
 export function playUnlockCardEffect(id: string, enigmaTitle?: string) {
-  const store = useStore.getState();
   const el = document.querySelector(`[data-card-id="${id}"]`);
   if (!el) return;
 
@@ -29,7 +29,7 @@ export function playUnlockCardEffect(id: string, enigmaTitle?: string) {
 
   // Toast maintenant que l'overlay est parti
   if (enigmaTitle) {
-    store.showToast(`✦ « ${enigmaTitle} » déverrouillé !`);
+    useUIStore.getState().showToast(`✦ « ${enigmaTitle} » déverrouillé !`);
   }
 
   el.scrollIntoView({ behavior: "smooth", block: "center" });

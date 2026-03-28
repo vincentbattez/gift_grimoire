@@ -1,6 +1,6 @@
 import { useRef, useEffect, useState } from "react";
 import type { Enigma } from "../config";
-import { useStore } from "../../../store";
+import { useEnigmaStore } from "../store";
 import { sndClick, sndVictory, sndGoldenSeal } from "../../../audio";
 import { spawnCelebration } from "../../../particles";
 import { CELEBRATION_SCROLL_SETTLE_MS, CELEBRATION_DURATION_MS } from "../../../timings";
@@ -9,16 +9,16 @@ import { LockIcon } from "../../../components/LockIcon";
 import { LockedModal } from "./LockedModal";
 
 export function EnigmaCard({ enigma, isAdmin }: { enigma: Enigma; isAdmin: boolean }) {
-  const state = useStore((s) => s.enigmas[enigma.id]);
-  const openModal = useStore((s) => s.openModal);
-  const acknowledgeUnlock = useStore((s) => s.acknowledgeUnlock);
-  const relock = useStore((s) => s.relock);
-  const isCelebrating = useStore((s) => s.celebrateCardId === enigma.id);
-  const clearCelebrate = useStore((s) => s.clearCelebrate);
-  const showSuccessBox = useStore((s) => s.showSuccessBox);
-  const isNew = useStore((s) => s.newlyUnlocked.has(enigma.id));
-  const letterRead = useStore((s) => s.readLetters[enigma.id]);
-  const unlockingId = useStore((s) => s.unlockingCardId);
+  const state = useEnigmaStore((s) => s.enigmas[enigma.id]);
+  const openModal = useEnigmaStore((s) => s.openModal);
+  const acknowledgeUnlock = useEnigmaStore((s) => s.acknowledgeUnlock);
+  const relock = useEnigmaStore((s) => s.relock);
+  const isCelebrating = useEnigmaStore((s) => s.celebrateCardId === enigma.id);
+  const clearCelebrate = useEnigmaStore((s) => s.clearCelebrate);
+  const showSuccessBox = useEnigmaStore((s) => s.showSuccessBox);
+  const isNew = useEnigmaStore((s) => s.newlyUnlocked.has(enigma.id));
+  const letterRead = useEnigmaStore((s) => s.readLetters[enigma.id]);
+  const unlockingId = useEnigmaStore((s) => s.unlockingCardId);
   const ref = useRef<HTMLDivElement>(null);
   const [showLocked, setShowLocked] = useState(false);
   const prevUnlockingRef = useRef(unlockingId);

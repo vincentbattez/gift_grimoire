@@ -1,14 +1,14 @@
 import { useEffect, useState } from "react";
 import { ENIGMAS } from "../config";
-import { useStore } from "../../../store";
+import { useEnigmaStore } from "../store";
 import { sndClick } from "../../../audio";
 import { fireEvent } from "../../../ha";
 
 export function SuccessModal() {
-  const boxNumber = useStore((s) => s.successBoxNumber);
-  const haEvent = useStore((s) => s.successHaEvent);
-  const enigmaId = useStore((s) => s.successEnigmaId);
-  const hideSuccessBox = useStore((s) => s.hideSuccessBox);
+  const boxNumber = useEnigmaStore((s) => s.successBoxNumber);
+  const haEvent = useEnigmaStore((s) => s.successHaEvent);
+  const enigmaId = useEnigmaStore((s) => s.successEnigmaId);
+  const hideSuccessBox = useEnigmaStore((s) => s.hideSuccessBox);
   const [entered, setEntered] = useState(false);
   const [closing, setClosing] = useState(false);
   const [displayBoxNumber, setDisplayBoxNumber] = useState<number | null>(null);

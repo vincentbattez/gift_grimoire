@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState, useCallback } from "react";
-import { useStore } from "../../../store";
+import { useEnigmaStore } from "../../enigma/store";
+import { useFinaleStore } from "../store";
 import { ENIGMAS } from "../../enigma/config";
 import { sndFinale, sndHeartPop, sndPageTurn, sndGoldenSeal, sndCrackle, sndFireworkLaunch, sndWaxMelt, sndWaxStamp, sndQuillTap, sndGoldenWord, sndCardFlip, sndConvergence } from "../../../audio";
 import { spawnParticles, spawnCelebration } from "../../../particles";
@@ -108,8 +109,8 @@ C'était ma façon de te dire ce que les mots seuls n'auraient pas suffi à expr
 }
 
 function SlideStats() {
-  const enigmas = useStore((s) => s.enigmas);
-  const readLetters = useStore((s) => s.readLetters);
+  const enigmas = useEnigmaStore((s) => s.enigmas);
+  const readLetters = useEnigmaStore((s) => s.readLetters);
   const solvedCount = Object.values(enigmas).filter((e) => e.solved).length;
   const lettersRead = Object.values(readLetters).filter(Boolean).length;
 
@@ -520,8 +521,8 @@ const NARRATIVE_TEXTS = [
  * forges glow, everything converges to center, then fireworks begin.
  */
 function NarrativeSequence() {
-  const finaleNarrative = useStore((s) => s.finaleNarrative);
-  const startFinale = useStore((s) => s.startFinale);
+  const finaleNarrative = useFinaleStore((s) => s.finaleNarrative);
+  const startFinale = useFinaleStore((s) => s.startFinale);
   const [phase, setPhase] = useState<"idle" | "text-intro" | "flipping" | "converging" | "glowing" | "done">("idle");
   const [flipIndex, setFlipIndex] = useState(-1);
   const [textIndex, setTextIndex] = useState(-1);
@@ -700,10 +701,10 @@ function NarrativeSequence() {
 // ── Main Component ──
 
 export function FinaleModal() {
-  const finaleActive = useStore((s) => s.finaleActive);
-  const finaleModalOpen = useStore((s) => s.finaleModalOpen);
-  const openFinaleModal = useStore((s) => s.openFinaleModal);
-  const closeFinaleModal = useStore((s) => s.closeFinaleModal);
+  const finaleActive = useFinaleStore((s) => s.finaleActive);
+  const finaleModalOpen = useFinaleStore((s) => s.finaleModalOpen);
+  const openFinaleModal = useFinaleStore((s) => s.openFinaleModal);
+  const closeFinaleModal = useFinaleStore((s) => s.closeFinaleModal);
 
   const [celebrationPhase, setCelebrationPhase] = useState<"idle" | "launching" | "exploding" | "stars" | "converge" | "nova" | "done">("idle");
   const [rockets, setRockets] = useState<Rocket[]>([]);

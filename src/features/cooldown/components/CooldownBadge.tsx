@@ -1,4 +1,5 @@
-import { useStore } from "../../../store";
+import { useEnigmaStore } from "../../enigma/store";
+import { useCooldownStore } from "../store";
 import { useCooldown } from "../useCooldown";
 
 /**
@@ -7,9 +8,9 @@ import { useCooldown } from "../useCooldown";
  * - Rouge avec countdown si l'essai est épuisé
  */
 export function CooldownBadge() {
-  const enigmas = useStore((s) => s.enigmas);
+  const enigmas = useEnigmaStore((s) => s.enigmas);
   const hasUnlocked = Object.values(enigmas).some((e) => e.unlocked || e.solved);
-  const lastAttempt = useStore((s) => s.lastAttempt);
+  const lastAttempt = useCooldownStore((s) => s.lastAttempt);
   const { active, label } = useCooldown(lastAttempt);
 
   if (!hasUnlocked) return null;

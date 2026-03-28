@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from "react";
-import { useStore } from "../../../store";
+import { useForgeStore } from "../store";
 import { useInkStore } from "../forge-ink/store";
 import { sndForgeReveal, sndClick } from "../../../audio";
 import { spawnParticles } from "../../../particles";
@@ -120,11 +120,11 @@ interface ForgeSectionProps {
 export function ForgeSection({ forge, isAdmin }: ForgeSectionProps) {
   const { key, title, successMessage, introText, component: ForgeComponent, onReset } = forge;
 
-  const revealed = useStore((s) => s.forgeRevealed[key]);
-  const revealForge = useStore((s) => s.revealForge);
-  const solved = useStore((s) => s.forges[key] ?? false);
-  const solveForge = useStore((s) => s.solveForge);
-  const resetForge = useStore((s) => s.resetForge);
+  const revealed = useForgeStore((s) => s.forgeRevealed[key]);
+  const revealForge = useForgeStore((s) => s.revealForge);
+  const solved = useForgeStore((s) => s.forges[key] ?? false);
+  const solveForge = useForgeStore((s) => s.solveForge);
+  const resetForge = useForgeStore((s) => s.resetForge);
 
   const [phase, setPhase] = useState<ForgePhase>("locked");
   const [showIntro, setShowIntro] = useState(false);

@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect } from "react";
-import { useStore, isAttemptUsedToday } from "../../../store";
+import { useEnigmaStore } from "../store";
+import { useCooldownStore, isAttemptUsedToday } from "../../cooldown/store";
 import { ENIGMAS, type Enigma } from "../config";
 import { sndOk, sndBad, sndClick, sndLoveReveal, sndAnalysis, sndDoubt } from "../../../audio";
 import { SOLVE_FEEDBACK_MS, INPUT_FOCUS_DELAY_MS, ERROR_FEEDBACK_MS, SUSPENSE_MS } from "../../../timings";
@@ -26,11 +27,11 @@ function ModalBody({
   /** Événements lifecycle émis au parent orchestrateur */
   lifecycle: EnigmaLifecycleEvents;
 }) {
-  const lastAttempt = useStore((s) => s.lastAttempt);
+  const lastAttempt = useCooldownStore((s) => s.lastAttempt);
   const cooldown = useCooldown(lastAttempt);
-  const closeModal = useStore((s) => s.closeModal);
-  const openLoveLetter = useStore((s) => s.openLoveLetter);
-  const letterRead = useStore((s) => s.readLetters[enigma.id]);
+  const closeModal = useEnigmaStore((s) => s.closeModal);
+  const openLoveLetter = useEnigmaStore((s) => s.openLoveLetter);
+  const letterRead = useEnigmaStore((s) => s.readLetters[enigma.id]);
 
   const [value, setValue] = useState("");
   const [feedback, setFeedback] = useState<"ok" | "err" | "suspense" | null>(isSolved ? "ok" : null);
@@ -320,12 +321,12 @@ function ModalBody({
 }
 
 export function EnigmaModal() {
-  const modalId = useStore((s) => s.modalEnigmaId);
-  const closingId = useStore((s) => s.modalClosingId);
+  const modalId = useEnigmaStore((s) => s.modalEnigmaId);
+  const closingId = useEnigmaStore((s) => s.modalClosingId);
   const displayId = modalId ?? closingId;
-  const state = useStore((s) => (displayId ? s.enigmas[displayId] : null));
-  const closeModal = useStore((s) => s.closeModal);
-  const lastAttempt = useStore((s) => s.lastAttempt);
+  const state = useEnigmaStore((s) => (displayId ? s.enigmas[displayId] : null));
+  const closeModal = useEnigmaStore((s) => s.closeModal);
+  const lastAttempt = useCooldownStore((s) => s.lastAttempt);
   const lifecycle = useEnigmaOrchestrator();
 
   const attemptUsed = isAttemptUsedToday(lastAttempt);

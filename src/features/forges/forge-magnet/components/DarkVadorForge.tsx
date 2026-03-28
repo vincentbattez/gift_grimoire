@@ -1,5 +1,6 @@
 import { useState, useRef } from "react";
-import { useStore, isAttemptUsedToday } from "../../../../store";
+import { useForgeStore } from "../../store";
+import { isAttemptUsedToday } from "../../../cooldown/store";
 import { useMagnetStore } from "../store";
 import { ENTITY_ID, CHECK_DURATION_MS } from "../config";
 import { getEntityState } from "../../../../ha";
@@ -8,7 +9,7 @@ import { EnigmaPicker } from "../../../enigma/components/EnigmaPicker";
 import { PlayCountDot } from "../../../../components/PlayCountDot";
 import { AudioWarningModal } from "../../../../components/AudioWarningModal";
 import { LastAttemptModal } from "../../../../components/LastAttemptModal";
-import { useCountdown } from "../../../cooldown/useCountdown";
+import { useCooldown } from "../../../cooldown/useCooldown";
 import { WideWaveform } from "./WideWaveform";
 import type { ForgeProps } from "../../types";
 import darkVadorSrc from "../../../../assets/audios/pascale-dark_vador-enigme.mp3";
@@ -20,7 +21,7 @@ import darkVadorSrc from "../../../../assets/audios/pascale-dark_vador-enigme.mp
 export function DarkVadorForge({ solved, onSolve }: ForgeProps) {
   const darkVadorPlayedAt = useMagnetStore((s) => s.darkVadorPlayedAt);
   const recordDarkVadorPlay = useMagnetStore((s) => s.recordDarkVadorPlay);
-  const audioWarningAcknowledged = useStore((s) => s.audioWarningAcknowledged);
+  const audioWarningAcknowledged = useForgeStore((s) => s.audioWarningAcknowledged);
   const playedToday = isAttemptUsedToday(darkVadorPlayedAt);
 
   const [isPlaying, setIsPlaying] = useState(false);
@@ -30,7 +31,7 @@ export function DarkVadorForge({ solved, onSolve }: ForgeProps) {
   const [showWarning, setShowWarning] = useState(false);
   const [showLastAttempt, setShowLastAttempt] = useState(false);
   const shakeRef = useRef<HTMLButtonElement>(null);
-  const countdown = useCountdown();
+  const cooldown = useCooldown(darkVadorPlayedAt);
 
   async function playAudio() {
     const audio = new Audio(darkVadorSrc);
@@ -227,9 +228,9 @@ export function DarkVadorForge({ solved, onSolve }: ForgeProps) {
             {isChecking ? "Les forces convergent…" : hasError ? "Rien ne s'est produit" : showPicker ? "Une nouvelle amitié s'est formée !" : "Tenter un rapprochement"}
           </span>
         </div>
-        {!isChecking && !showPicker && countdown && (
+        {!isChecking && !showPicker && cooldown.active && (
           <span className="relative text-[0.5rem] tracking-[0.15em] text-accent/25 font-mono">
-            Répéter l'énigme dans {countdown}
+            Répéter l'énigme dans {cooldown.label}
           </span>
         )}
       </button>

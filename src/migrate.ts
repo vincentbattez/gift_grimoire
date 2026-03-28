@@ -1,0 +1,69 @@
+/**
+ * Migration one-shot : distribue les données de grimoire_v3
+ * (store monolithique) vers les stores par feature.
+ *
+ * Exécuté comme side-effect avant le rendu React.
+ * Se supprime automatiquement après migration réussie.
+ */
+const V3_KEY = "grimoire_v3";
+
+function migrateFromV3() {
+  const raw = localStorage.getItem(V3_KEY);
+  if (!raw) return;
+
+  try {
+    const { state } = JSON.parse(raw);
+    if (!state) return;
+
+    // Enigma store
+    if (!localStorage.getItem("grimoire_enigma")) {
+      localStorage.setItem("grimoire_enigma", JSON.stringify({
+        state: {
+          enigmas: state.enigmas ?? {},
+          readLetters: state.readLetters ?? {},
+        },
+        version: 0,
+      }));
+    }
+
+    // Forge store
+    if (!localStorage.getItem("grimoire_forge")) {
+      localStorage.setItem("grimoire_forge", JSON.stringify({
+        state: {
+          forges: state.forges ?? {},
+          forgeRevealed: state.forgeRevealed ?? {},
+          audioWarningAcknowledged: state.audioWarningAcknowledged ?? false,
+        },
+        version: 0,
+      }));
+    }
+
+    // Cooldown store
+    if (!localStorage.getItem("grimoire_cooldown")) {
+      localStorage.setItem("grimoire_cooldown", JSON.stringify({
+        state: {
+          lastAttempt: state.lastAttempt ?? null,
+          audioPlayCounts: state.audioPlayCounts ?? {},
+        },
+        version: 0,
+      }));
+    }
+
+    // Finale store
+    if (!localStorage.getItem("grimoire_finale")) {
+      localStorage.setItem("grimoire_finale", JSON.stringify({
+        state: {
+          finaleDone: state.finaleDone ?? false,
+        },
+        version: 0,
+      }));
+    }
+
+    localStorage.removeItem(V3_KEY);
+  } catch {
+    // Migration failure — ne pas supprimer les anciennes données
+  }
+}
+
+// Exécution immédiate au chargement du module
+migrateFromV3();

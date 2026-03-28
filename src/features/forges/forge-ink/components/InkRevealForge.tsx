@@ -22,9 +22,9 @@ export function InkRevealForge({ solved: propSolved, onSolve }: ForgeProps) {
     <div className="mt-4">
       <InkDropIndicator dropsLeft={engine.dropsLeft} />
 
-      {engine.countdown && (
+      {engine.cooldownLabel && (
         <div className="text-center text-[0.45rem] tracking-[0.15em] text-muted/30 font-mono mb-4">
-          Reset dans {engine.countdown}
+          Reset dans {engine.cooldownLabel}
         </div>
       )}
 

@@ -1,5 +1,5 @@
 import { useEffect, useCallback, useRef, useState } from "react";
-import { useStore } from "../../../store";
+import { useEnigmaStore } from "../store";
 import { ENIGMAS } from "../config";
 import { sndKeyInsert, sndLockOpen, sndUnlock, sndAmbientTension, sndClick } from "../../../audio";
 import { spawnParticles } from "../../../particles";
@@ -13,9 +13,9 @@ const FRAG_DISTANCES = Array.from({ length: 8 }, () => 80 + Math.random() * 40);
 type Phase = "drag" | "unlocking" | "done";
 
 export function UnlockOverlay() {
-  const unlockingId = useStore((s) => s.unlockingCardId);
-  const unlockingTitle = useStore((s) => s.unlockingTitle);
-  const clearUnlocking = useStore((s) => s.clearUnlocking);
+  const unlockingId = useEnigmaStore((s) => s.unlockingCardId);
+  const unlockingTitle = useEnigmaStore((s) => s.unlockingTitle);
+  const clearUnlocking = useEnigmaStore((s) => s.clearUnlocking);
 
   const [phase, setPhase] = useState<Phase>("drag");
   const [keyPos, setKeyPos] = useState<{ x: number; y: number } | null>(null);

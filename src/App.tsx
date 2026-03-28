@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
-import { useStore } from "./store";
+import { useEnigmaStore } from "./features/enigma/store";
+import { useCooldownStore } from "./features/cooldown/store";
 import { ENIGMAS } from "./features/enigma/config";
 import { Starfield } from "./components/Starfield";
 import { Header } from "./components/Header";
@@ -47,7 +48,7 @@ function useQRUnlock() {
 }
 
 function ScreenFlash() {
-  const celebrateCardId = useStore((s) => s.celebrateCardId);
+  const celebrateCardId = useEnigmaStore((s) => s.celebrateCardId);
   const ref = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -72,7 +73,7 @@ function ScreenFlash() {
 
 export default function App() {
   useQRUnlock();
-  const resetAttempt = useStore((s) => s.resetAttempt);
+  const resetAttempt = useCooldownStore((s) => s.resetAttempt);
   const isAdmin = useAdmin();
   const [showIntro, setShowIntro] = useState(shouldShowIntro);
 

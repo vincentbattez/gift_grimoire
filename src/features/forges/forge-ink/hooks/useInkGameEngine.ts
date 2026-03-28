@@ -14,7 +14,7 @@ import {
   type WordState,
 } from "../config";
 import { useInkStore } from "../store";
-import { useCountdown } from "../../../cooldown/useCountdown";
+import { useCooldown } from "../../../cooldown/useCooldown";
 import {
   sndInkDrop,
   sndInkHit,
@@ -86,7 +86,7 @@ export interface InkGameEngine {
   tapMessage: string | null;
   showSolvedModal: boolean;
   solved: boolean;
-  countdown: string;
+  cooldownLabel: string;
   activeWords: string[];
   handleCellTap: (row: number, col: number) => void;
   handleWordGuess: (
@@ -108,7 +108,9 @@ export function useInkGameEngine(
   const storedGame = useInkStore((s) => s.inkGameState);
   const setInkGameState = useInkStore((s) => s.setInkGameState);
   const dropResetCounter = useInkStore((s) => s.dropResetCounter);
-  const countdown = useCountdown();
+  // Cooldown daily : les drops se reset à minuit.
+  // On utilise Date.now() pour forcer un cooldown "toujours actif" qui affiche le countdown.
+  const dailyCooldown = useCooldown(Date.now());
 
   const isStale = storedGame != null && storedGame.dayStamp !== todayStamp();
   const freshGame = isStale ? null : storedGame;
@@ -416,7 +418,7 @@ export function useInkGameEngine(
     tapMessage,
     showSolvedModal,
     solved,
-    countdown,
+    cooldownLabel: dailyCooldown.label,
     activeWords,
     handleCellTap,
     handleWordGuess,

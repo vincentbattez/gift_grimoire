@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { useStore } from "../../../store";
+import { useEnigmaStore } from "../store";
 import { ENIGMAS } from "../config";
 import { sndLoveClose, sndHeartPop } from "../../../audio";
 
@@ -33,8 +33,8 @@ const GOLD_PARTICLES = Array.from({ length: 20 }, (_, i) => ({
 }));
 
 export function LoveLetterModal() {
-  const enigmaId = useStore((s) => s.loveLetterEnigmaId);
-  const closeLoveLetter = useStore((s) => s.closeLoveLetter);
+  const enigmaId = useEnigmaStore((s) => s.loveLetterEnigmaId);
+  const closeLoveLetter = useEnigmaStore((s) => s.closeLoveLetter);
   const [entered, setEntered] = useState(false);
   const [closing, setClosing] = useState(false);
   const [showHearts, setShowHearts] = useState(false);

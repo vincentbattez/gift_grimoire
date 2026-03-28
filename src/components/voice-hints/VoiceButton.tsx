@@ -1,5 +1,7 @@
 import { useState } from "react";
-import { useStore } from "../../store";
+import { useCooldownStore } from "../../features/cooldown/store";
+import { useForgeStore } from "../../features/forges/store";
+import { useEnigmaStore } from "../../features/enigma/store";
 import { WaveformIcon } from "./WaveformIcon";
 import { MAX_PLAYS, type VoiceHint } from "./constants";
 import { PlayCountDot } from "../PlayCountDot";
@@ -7,10 +9,10 @@ import { AudioWarningModal } from "../AudioWarningModal";
 import { LastAttemptModal } from "../LastAttemptModal";
 
 export function VoiceButton({ hint }: { hint: VoiceHint }) {
-  const count = useStore((s) => s.audioPlayCounts[hint.key] ?? 0);
-  const incrementAudioPlay = useStore((s) => s.incrementAudioPlay);
-  const audioWarningAcknowledged = useStore((s) => s.audioWarningAcknowledged);
-  const anyUnlocked = useStore((s) =>
+  const count = useCooldownStore((s) => s.audioPlayCounts[hint.key] ?? 0);
+  const incrementAudioPlay = useCooldownStore((s) => s.incrementAudioPlay);
+  const audioWarningAcknowledged = useForgeStore((s) => s.audioWarningAcknowledged);
+  const anyUnlocked = useEnigmaStore((s) =>
     Object.values(s.enigmas).some((e) => e.unlocked || e.solved),
   );
 

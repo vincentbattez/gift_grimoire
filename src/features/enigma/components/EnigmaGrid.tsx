@@ -1,4 +1,5 @@
-import { useStore } from "../../../store";
+import { useEnigmaStore } from "../store";
+import { useFinaleStore } from "../../finale/store";
 import { ENIGMAS } from "../config";
 import { FORGES } from "../../forges/forges.config";
 import { EnigmaCard } from "./EnigmaCard";
@@ -15,11 +16,11 @@ function SectionLabel({ children }: { children: React.ReactNode }) {
 }
 
 function FinaleButton() {
-  const enigmas = useStore((s) => s.enigmas);
-  const startNarrative = useStore((s) => s.startNarrative);
-  const finaleActive = useStore((s) => s.finaleActive);
-  const finaleNarrative = useStore((s) => s.finaleNarrative);
-  const finaleDone = useStore((s) => s.finaleDone);
+  const enigmas = useEnigmaStore((s) => s.enigmas);
+  const startNarrative = useFinaleStore((s) => s.startNarrative);
+  const finaleActive = useFinaleStore((s) => s.finaleActive);
+  const finaleNarrative = useFinaleStore((s) => s.finaleNarrative);
+  const finaleDone = useFinaleStore((s) => s.finaleDone);
   const allSolved = Object.values(enigmas).every((e) => e.solved);
 
   if (!allSolved || finaleActive || finaleDone) return null;
@@ -52,7 +53,7 @@ function FinaleButton() {
 }
 
 function EnigmaSection({ isAdmin }: { isAdmin: boolean }) {
-  const enigmas = useStore((s) => s.enigmas);
+  const enigmas = useEnigmaStore((s) => s.enigmas);
   const solvedCount = Object.values(enigmas).filter((e) => e.solved).length;
 
   return (
@@ -93,7 +94,7 @@ function ForgeList({ isAdmin }: { isAdmin: boolean }) {
 }
 
 export function EnigmaGrid({ isAdmin }: { isAdmin: boolean }) {
-  const enigmas = useStore((s) => s.enigmas);
+  const enigmas = useEnigmaStore((s) => s.enigmas);
   const prologueCompleted = Object.values(enigmas).some((e) => e.unlocked || e.solved);
 
   return (

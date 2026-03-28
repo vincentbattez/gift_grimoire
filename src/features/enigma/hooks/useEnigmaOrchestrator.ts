@@ -1,5 +1,6 @@
 import { useCallback } from "react";
-import { useStore } from "../../../store";
+import { useEnigmaStore } from "../store";
+import { useCooldownStore } from "../../cooldown/store";
 import type { EnigmaLifecycleEvents } from "../types";
 
 /**
@@ -13,9 +14,9 @@ import type { EnigmaLifecycleEvents } from "../types";
  * il se contente d'appeler onTry / onSuccess / onFail.
  */
 export function useEnigmaOrchestrator(): EnigmaLifecycleEvents {
-  const recordAttempt = useStore((s) => s.recordAttempt);
-  const celebrate = useStore((s) => s.celebrate);
-  const closeModal = useStore((s) => s.closeModal);
+  const recordAttempt = useCooldownStore((s) => s.recordAttempt);
+  const celebrate = useEnigmaStore((s) => s.celebrate);
+  const closeModal = useEnigmaStore((s) => s.closeModal);
 
   const onTry = useCallback(
     (_enigmaId: string, _answer: string) => {
