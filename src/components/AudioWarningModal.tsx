@@ -1,8 +1,8 @@
 import { useState, useEffect } from "react";
-import { useStore } from "../store";
+import { useForgeStore } from "../features/forges/store";
 
 export function AudioWarningModal({ onConfirm }: { onConfirm: () => void }) {
-  const acknowledgeAudioWarning = useStore((s) => s.acknowledgeAudioWarning);
+  const acknowledgeAudioWarning = useForgeStore((s) => s.acknowledgeAudioWarning);
   const [entered, setEntered] = useState(false);
   const [exiting, setExiting] = useState(false);
 

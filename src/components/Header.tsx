@@ -1,9 +1,9 @@
-import {useStore} from "../store";
-import {ENIGMAS} from "../config";
+import { useEnigmaStore } from "../features/enigma/store";
+import {ENIGMAS} from "../features/enigma/config";
 import {ProgressBar} from "./ProgressBar.tsx";
 
 export function Header() {
-  const enigmas = useStore((s) => s.enigmas);
+  const enigmas = useEnigmaStore((s) => s.enigmas);
   const solved = Object.values(enigmas).filter((e) => e.solved).length;
   const pct = (solved / ENIGMAS.length) * 100;
 

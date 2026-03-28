@@ -1,9 +1,9 @@
 import { useEffect } from "react";
-import { useStore } from "../store";
+import { useUIStore } from "../store";
 
 export function Toast() {
-  const message = useStore((s) => s.toastMessage);
-  const hideToast = useStore((s) => s.hideToast);
+  const message = useUIStore((s) => s.toastMessage);
+  const hideToast = useUIStore((s) => s.hideToast);
 
   useEffect(() => {
     if (!message) return;

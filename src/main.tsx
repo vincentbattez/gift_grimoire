@@ -1,3 +1,4 @@
+import "./migrate"; // side-effect: migration v3 → feature stores
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import "./env";

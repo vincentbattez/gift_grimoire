@@ -1,20 +1,22 @@
 import { useEffect, useRef, useState } from "react";
-import { useStore, isAttemptUsedToday, msUntilMidnight } from "./store";
-import { ENIGMAS } from "./config";
+import { useEnigmaStore } from "./features/enigma/store";
+import { useCooldownStore } from "./features/cooldown/store";
+import { ENIGMAS } from "./features/enigma/config";
 import { Starfield } from "./components/Starfield";
 import { Header } from "./components/Header";
-import { EnigmaGrid } from "./components/EnigmaGrid";
-import { EnigmaModal } from "./components/EnigmaModal";
+import { EnigmaGrid } from "./features/enigma/components/EnigmaGrid";
+import { EnigmaModal } from "./features/enigma/components/EnigmaModal";
 import { Toast } from "./components/Toast";
-import { UnlockOverlay } from "./components/UnlockOverlay";
-import { SuccessModal } from "./components/SuccessModal";
-import { LoveLetterModal } from "./components/LoveLetterModal";
-import { FinaleModal } from "./components/FinaleModal";
+import { UnlockOverlay } from "./features/enigma/components/UnlockOverlay";
+import { SuccessModal } from "./features/enigma/components/SuccessModal";
+import { LoveLetterModal } from "./features/enigma/components/LoveLetterModal";
+import { FinaleModal } from "./features/finale/components/FinaleModal";
 import { IntroModal } from "./components/IntroModal";
-import { triggerUnlockEffect } from "./unlock";
-import { initAdmin, logoutAdmin, useAdmin } from "./useAdmin";
+import { CooldownBadge } from "./features/cooldown/components/CooldownBadge";
+import { triggerUnlockEffect } from "./features/enigma/unlock";
+import { initAdmin, logoutAdmin, useAdmin } from "./features/admin/useAdmin";
 import { fireEvent } from "./ha";
-import { useMagnetStore } from "./modules/forges/forge-magnet/store";
+import { useMagnetStore } from "./features/forges/forge-magnet/store";
 
 initAdmin();
 
@@ -45,52 +47,8 @@ function useQRUnlock() {
   }, []);
 }
 
-function AttemptBadge() {
-  const enigmas = useStore((s) => s.enigmas);
-  const hasUnlocked = Object.values(enigmas).some((e) => e.unlocked || e.solved);
-  const lastAttempt = useStore((s) => s.lastAttempt);
-  const attemptUsed = isAttemptUsedToday(lastAttempt);
-  const [countdown, setCountdown] = useState("");
-
-  useEffect(() => {
-    if (!attemptUsed) return;
-    function tick() {
-      const ms = msUntilMidnight();
-      const h = Math.floor(ms / 3_600_000);
-      const m = Math.floor((ms % 3_600_000) / 60_000);
-      const s = Math.floor((ms % 60_000) / 1_000);
-      setCountdown(`${String(h).padStart(2, "0")}:${String(m).padStart(2, "0")}:${String(s).padStart(2, "0")}`);
-    }
-    tick();
-    const id = setInterval(tick, 1_000);
-    return () => clearInterval(id);
-  }, [attemptUsed]);
-
-  if (!hasUnlocked) return null;
-
-  return (
-    <div className="fixed bottom-5 left-1/2 -translate-x-1/2 z-50">
-      {attemptUsed ? (
-        <div className="flex items-center gap-2 py-2 px-4 rounded-full bg-[#1c1438]/90 border border-danger/30 backdrop-blur-md shadow-[0_0_20px_#ff6b8a15]">
-          <span className="w-2 h-2 rounded-full bg-danger" />
-          <span className="text-[0.7rem] text-danger font-semibold tracking-wide">
-            {countdown}
-          </span>
-        </div>
-      ) : (
-        <div className="flex items-center gap-2 py-2 px-4 rounded-full bg-[#1c1438]/90 border border-success/30 backdrop-blur-md shadow-[0_0_20px_#4ecca315]">
-          <span className="w-2 h-2 rounded-full bg-success animate-pulse" />
-          <span className="text-[0.7rem] text-success font-semibold tracking-wide">
-            1 essai disponible
-          </span>
-        </div>
-      )}
-    </div>
-  );
-}
-
 function ScreenFlash() {
-  const celebrateCardId = useStore((s) => s.celebrateCardId);
+  const celebrateCardId = useEnigmaStore((s) => s.celebrateCardId);
   const ref = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -115,7 +73,7 @@ function ScreenFlash() {
 
 export default function App() {
   useQRUnlock();
-  const resetAttempt = useStore((s) => s.resetAttempt);
+  const resetAttempt = useCooldownStore((s) => s.resetAttempt);
   const isAdmin = useAdmin();
   const [showIntro, setShowIntro] = useState(shouldShowIntro);
 
@@ -144,7 +102,7 @@ export default function App() {
         )}
       </div>
       <ScreenFlash />
-      <AttemptBadge />
+      <CooldownBadge />
       <EnigmaModal />
       <Toast />
       <UnlockOverlay />
