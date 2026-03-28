@@ -1,4 +1,4 @@
-import { INK_CONFIG, LETTER_MAP } from "./ink-config";
+import { INK_CONFIG, LETTER_MAP } from "../config";
 
 export function InkSolvedView() {
   return (

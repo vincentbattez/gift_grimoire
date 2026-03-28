@@ -1,7 +1,7 @@
 import type { RefObject } from "react";
-import { spawnParticles } from "../../particles";
-import { sndInkLetterReveal } from "../../audio";
-import { getWordCells, type WordConfig } from "./ink-config";
+import { spawnParticles } from "../../../../particles";
+import { sndInkLetterReveal } from "../../../../audio";
+import { getWordCells, type WordConfig } from "../config";
 
 export function playHitParticles(
   gridRef: RefObject<HTMLDivElement | null>,

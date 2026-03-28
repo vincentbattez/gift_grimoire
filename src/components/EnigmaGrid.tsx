@@ -1,8 +1,8 @@
 import { useStore } from "../store";
 import { ENIGMAS } from "../config";
-import { FORGES } from "../config/forges";
+import { FORGES } from "../modules/forges/forges.config";
 import { EnigmaCard } from "./EnigmaCard";
-import { ForgeSection } from "./ForgeSection";
+import { ForgeSection } from "../modules/forges/components/ForgeSection";
 import { VoiceHints } from "./voice-hints/VoiceHints";
 
 function SectionLabel({ children }: { children: React.ReactNode }) {

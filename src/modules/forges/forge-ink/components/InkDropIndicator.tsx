@@ -1,4 +1,4 @@
-import { INK_CONFIG } from "./ink-config";
+import { INK_CONFIG } from "../config";
 
 interface InkDropIndicatorProps {
   dropsLeft: number;

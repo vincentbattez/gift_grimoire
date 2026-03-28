@@ -1,8 +1,8 @@
 import { useRef } from "react";
-import { INK_CONFIG, LETTER_MAP, PROXIMITY_MAP } from "./ink-config";
-import { useInkGameEngine } from "./useInkGameEngine";
-import { useAdmin } from "../../useAdmin";
-import type { ForgeProps } from "../../types/forge";
+import { INK_CONFIG, LETTER_MAP, PROXIMITY_MAP } from "../config";
+import { useInkGameEngine } from "../hooks/useInkGameEngine";
+import { useAdmin } from "../../../../useAdmin";
+import type { ForgeProps } from "../../types";
 import { InkCell } from "./InkCell";
 import { InkDropIndicator } from "./InkDropIndicator";
 import { InkWordCard } from "./InkWordCard";

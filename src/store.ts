@@ -9,7 +9,6 @@ type EnigmaState = { unlocked: boolean; solved: boolean };
 type GrimoireStore = {
   enigmas: Record<EnigmaId, EnigmaState>;
   lastAttempt: number | null;
-  darkVadorPlayedAt: number | null;
   audioPlayCounts: Record<string, number>;
   toastMessage: string | null;
   modalEnigmaId: EnigmaId | null;
@@ -20,15 +19,6 @@ type GrimoireStore = {
   unlockingTitle: string | null;
   /** État de complétion des forges — clé = ForgeModule.key */
   forges: Record<string, boolean>;
-  /** État en cours de la forge encre (progression, non lié à solved) */
-  inkGameState: {
-    revealedCells: string[];
-    missedCells: string[];
-    wordStates: Record<string, { solved: boolean; guessesLeft: number }>;
-    dropsLeft: number;
-    /** Date du jour (YYYY-MM-DD) où l'état a été sauvegardé — sert au reset quotidien */
-    dayStamp: string;
-  } | null;
   successBoxNumber: number | null;
   successHaEvent: string | null;
   successEnigmaId: EnigmaId | null;
@@ -46,7 +36,6 @@ type GrimoireStore = {
   relock: (id: EnigmaId) => void;
   recordAttempt: () => void;
   resetAttempt: () => void;
-  recordDarkVadorPlay: () => void;
   incrementAudioPlay: (key: string) => void;
   acknowledgeUnlock: (id: EnigmaId) => void;
   openModal: (id: EnigmaId) => void;
@@ -59,13 +48,6 @@ type GrimoireStore = {
   clearUnlocking: () => void;
   solveForge: (key: string) => void;
   resetForge: (key: string) => void;
-  setInkGameState: (state: {
-    revealedCells: string[];
-    missedCells: string[];
-    wordStates: Record<string, { solved: boolean; guessesLeft: number }>;
-    dropsLeft: number;
-    dayStamp: string;
-  }) => void;
   showSuccessBox: (boxNumber: number, haEvent: string, enigmaId: EnigmaId) => void;
   hideSuccessBox: () => void;
   openLoveLetter: (id: EnigmaId) => void;
@@ -88,7 +70,6 @@ export const useStore = create<GrimoireStore>()(
     (set, get) => ({
       enigmas: initialEnigmas,
       lastAttempt: null,
-      darkVadorPlayedAt: null,
       audioPlayCounts: {},
       toastMessage: null,
       modalEnigmaId: null,
@@ -98,7 +79,6 @@ export const useStore = create<GrimoireStore>()(
       unlockingCardId: null,
       unlockingTitle: null,
       forges: {},
-      inkGameState: null,
       successBoxNumber: null,
       successHaEvent: null,
       successEnigmaId: null,
@@ -138,8 +118,7 @@ export const useStore = create<GrimoireStore>()(
         }),
 
       recordAttempt: () => set({ lastAttempt: Date.now() }),
-      resetAttempt: () => set({ lastAttempt: null, darkVadorPlayedAt: null, audioPlayCounts: {} }),
-      recordDarkVadorPlay: () => set({ darkVadorPlayedAt: Date.now() }),
+      resetAttempt: () => set({ lastAttempt: null, audioPlayCounts: {} }),
       incrementAudioPlay: (key) =>
         set((s) => ({
           audioPlayCounts: { ...s.audioPlayCounts, [key]: (s.audioPlayCounts[key] ?? 0) + 1 },
@@ -168,11 +147,7 @@ export const useStore = create<GrimoireStore>()(
       solveForge: (key) =>
         set((s) => ({ forges: { ...s.forges, [key]: true } })),
       resetForge: (key) =>
-        set((s) => ({
-          forges: { ...s.forges, [key]: false },
-          ...(key === "ink" ? { inkGameState: null } : {}),
-        })),
-      setInkGameState: (state) => set({ inkGameState: state }),
+        set((s) => ({ forges: { ...s.forges, [key]: false } })),
 
       showSuccessBox: (boxNumber, haEvent, enigmaId) =>
         set({ successBoxNumber: boxNumber, successHaEvent: haEvent, successEnigmaId: enigmaId }),
@@ -216,10 +191,8 @@ export const useStore = create<GrimoireStore>()(
       partialize: (s) => ({
         enigmas: s.enigmas,
         lastAttempt: s.lastAttempt,
-        darkVadorPlayedAt: s.darkVadorPlayedAt,
         audioPlayCounts: s.audioPlayCounts,
         forges: s.forges,
-        inkGameState: s.inkGameState,
         audioWarningAcknowledged: s.audioWarningAcknowledged,
         forgeRevealed: s.forgeRevealed,
         readLetters: s.readLetters,

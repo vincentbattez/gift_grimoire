@@ -1,11 +1,9 @@
 import { useState, useRef, useEffect } from "react";
-import { pollEntityState } from "../../ha";
-import { sndDeepListen, sndOk } from "../../audio";
-import { EnigmaPicker } from "../../components/EnigmaPicker";
-import type { ForgeProps } from "../../types/forge";
-
-const ENTITY_ID = "binary_sensor.gift_grimoire_vibration_vibration";
-const LISTEN_DURATION_MS = 10_000;
+import { pollEntityState } from "../../../../ha";
+import { sndDeepListen, sndOk } from "../../../../audio";
+import { EnigmaPicker } from "../../../../components/EnigmaPicker";
+import type { ForgeProps } from "../../types";
+import { ENTITY_ID, LISTEN_DURATION_MS } from "../config";
 
 type Phase = "idle" | "listening" | "detected" | "failed";
 

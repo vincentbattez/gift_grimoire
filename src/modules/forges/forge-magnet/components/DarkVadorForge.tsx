@@ -1,26 +1,25 @@
 import { useState, useRef } from "react";
-import { useStore, isAttemptUsedToday } from "../../store";
-import { getEntityState } from "../../ha";
-import { sndAnalysis, sndScrambleSolved } from "../../audio";
-import { EnigmaPicker } from "../../components/EnigmaPicker";
-import { PlayCountDot } from "../../components/PlayCountDot";
-import { AudioWarningModal } from "../../components/AudioWarningModal";
-import { LastAttemptModal } from "../../components/LastAttemptModal";
-import { useCountdown } from "../../hooks/useCountdown";
+import { useStore, isAttemptUsedToday } from "../../../../store";
+import { useMagnetStore } from "../store";
+import { ENTITY_ID, CHECK_DURATION_MS } from "../config";
+import { getEntityState } from "../../../../ha";
+import { sndAnalysis, sndScrambleSolved } from "../../../../audio";
+import { EnigmaPicker } from "../../../../components/EnigmaPicker";
+import { PlayCountDot } from "../../../../components/PlayCountDot";
+import { AudioWarningModal } from "../../../../components/AudioWarningModal";
+import { LastAttemptModal } from "../../../../components/LastAttemptModal";
+import { useCountdown } from "../../../../hooks/useCountdown";
 import { WideWaveform } from "./WideWaveform";
-import type { ForgeProps } from "../../types/forge";
-import darkVadorSrc from "../../assets/audios/pascale-dark_vador-enigme.mp3";
-
-const ENTITY_ID = "input_boolean.gift_grimoire_aimant";
-const CHECK_DURATION_MS = 5000;
+import type { ForgeProps } from "../../types";
+import darkVadorSrc from "../../../../assets/audios/pascale-dark_vador-enigme.mp3";
 
 /**
  * Forge : La chaleur de l'Arc-en-ciel
  * Joue l'audio Dark Vador, puis détecte le signal Home Assistant de l'aimant.
  */
 export function DarkVadorForge({ solved, onSolve }: ForgeProps) {
-  const darkVadorPlayedAt = useStore((s) => s.darkVadorPlayedAt);
-  const recordDarkVadorPlay = useStore((s) => s.recordDarkVadorPlay);
+  const darkVadorPlayedAt = useMagnetStore((s) => s.darkVadorPlayedAt);
+  const recordDarkVadorPlay = useMagnetStore((s) => s.recordDarkVadorPlay);
   const audioWarningAcknowledged = useStore((s) => s.audioWarningAcknowledged);
   const playedToday = isAttemptUsedToday(darkVadorPlayedAt);
 

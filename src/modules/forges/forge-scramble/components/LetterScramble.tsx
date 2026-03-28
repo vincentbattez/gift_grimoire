@@ -1,27 +1,8 @@
 import { useState, useRef, useCallback, useLayoutEffect, useEffect } from "react";
-import { sndLetterSwap, sndScrambleSolved } from "../../audio";
-import { EnigmaPicker } from "../../components/EnigmaPicker";
-import type { ForgeProps } from "../../types/forge";
-
-const SOLUTION = "HWHRESSKDS";
-
-interface Letter {
-  id: number;
-  char: string;
-}
-
-const INITIAL_LETTERS: Letter[] = [
-  { id: 1, char: "S" },
-  { id: 2, char: "W" },
-  { id: 3, char: "R" },
-  { id: 4, char: "H" },
-  { id: 5, char: "K" },
-  { id: 6, char: "D" },
-  { id: 7, char: "E" },
-  { id: 8, char: "H" },
-  { id: 9, char: "S" },
-  { id: 10, char: "S" },
-];
+import { sndLetterSwap, sndScrambleSolved } from "../../../../audio";
+import { EnigmaPicker } from "../../../../components/EnigmaPicker";
+import type { ForgeProps } from "../../types";
+import { SOLUTION, INITIAL_LETTERS, type Letter } from "../config";
 
 function shuffle<T>(arr: T[]): T[] {
   const a = [...arr];

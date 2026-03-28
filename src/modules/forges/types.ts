@@ -14,4 +14,6 @@ export interface ForgeModule {
   /** Texte narratif affiché dans une modal au moment du déblocage */
   introText?: string;
   component: ComponentType<ForgeProps>;
+  /** Appelé lors du reset admin pour réinitialiser le store propre au module */
+  onReset?: () => void;
 }

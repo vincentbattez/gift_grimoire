@@ -1,8 +1,10 @@
-import type { ForgeModule } from "../types/forge";
-import { DarkVadorForge } from "../features/forge-magnet/DarkVadorForge";
-import { LetterScramble } from "../features/forge-scramble/LetterScramble";
-import { VibrationForge } from "../features/forge-vibration/VibrationForge";
-import { InkRevealForge } from "../features/forge-ink/InkRevealForge";
+import type { ForgeModule } from "./types";
+import { DarkVadorForge } from "./forge-magnet/components/DarkVadorForge";
+import { LetterScramble } from "./forge-scramble/components/LetterScramble";
+import { VibrationForge } from "./forge-vibration/components/VibrationForge";
+import { InkRevealForge } from "./forge-ink/components/InkRevealForge";
+import { useMagnetStore } from "./forge-magnet/store";
+import { useInkStore } from "./forge-ink/store";
 
 /**
  * Registre des forges pluggables.
@@ -14,6 +16,7 @@ export const FORGES: ForgeModule[] = [
     title: "La chaleur de L'Arc-en-ciel",
     successMessage: "Pascal changea les couleurs sombres du cœur de Dark Vador. Le seigneur des ténèbres posa enfin son sabre et sourit.",
     component: DarkVadorForge,
+    onReset: () => useMagnetStore.getState().reset(),
   },
   {
     key: "scramble",
@@ -34,5 +37,6 @@ export const FORGES: ForgeModule[] = [
     introText:
       "Cette page du grimoire semble vide… mais tes doigts sentent les sillons d'une plume ancienne. Des mots y furent tracés à l'encre des secrets — une encre que seul un regard patient peut révéler. Verse tes gouttes avec discernement : l'encre révélatrice n'est pas inépuisable.",
     component: InkRevealForge,
+    onReset: () => useInkStore.getState().resetInkGame(),
   },
 ];

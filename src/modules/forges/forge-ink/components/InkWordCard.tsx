@@ -1,5 +1,5 @@
 import { useState, useCallback } from "react";
-import { INK_CONFIG, type WordState } from "./ink-config";
+import { INK_CONFIG, type WordState } from "../config";
 
 interface InkWordCardProps {
   wordText: string;

@@ -1,9 +1,9 @@
 import { useState, useRef, useEffect } from "react";
-import { useStore } from "../store";
-import { sndForgeReveal, sndClick } from "../audio";
-import { spawnParticles } from "../particles";
-import { LockIcon } from "./LockIcon";
-import type { ForgeModule } from "../types/forge";
+import { useStore } from "../../../store";
+import { sndForgeReveal, sndClick } from "../../../audio";
+import { spawnParticles } from "../../../particles";
+import { LockIcon } from "../../../components/LockIcon";
+import type { ForgeModule } from "../types";
 
 type ForgePhase = "locked" | "shaking" | "shattering" | "revealing" | "done";
 
@@ -117,7 +117,7 @@ interface ForgeSectionProps {
 }
 
 export function ForgeSection({ forge, isAdmin }: ForgeSectionProps) {
-  const { key, title, successMessage, introText, component: ForgeComponent } = forge;
+  const { key, title, successMessage, introText, component: ForgeComponent, onReset } = forge;
 
   const revealed = useStore((s) => s.forgeRevealed[key]);
   const revealForge = useStore((s) => s.revealForge);
@@ -159,7 +159,7 @@ export function ForgeSection({ forge, isAdmin }: ForgeSectionProps) {
             </p>
             {isAdmin && (
               <button
-                onClick={() => resetForge(key)}
+                onClick={() => { resetForge(key); onReset?.(); }}
                 className="mt-3 px-3 py-1 rounded-md text-[0.55rem] tracking-[0.15em] uppercase border border-danger/30 text-danger/50 bg-danger/5 hover:border-danger/60 hover:text-danger/80 hover:bg-danger/10 transition-all duration-150 active:scale-95"
               >
                 ↺ Re-lock

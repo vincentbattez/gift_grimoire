@@ -12,9 +12,9 @@ import {
   PROXIMITY_MAP,
   getWordCells,
   type WordState,
-} from "./ink-config";
-import { useStore } from "../../store";
-import { useCountdown } from "../../hooks/useCountdown";
+} from "../config";
+import { useInkStore } from "../store";
+import { useCountdown } from "../../../../hooks/useCountdown";
 import {
   sndInkDrop,
   sndInkHit,
@@ -23,13 +23,13 @@ import {
   sndInkWordSolved,
   sndInkGuessError,
   sndScrambleSolved,
-} from "../../audio";
+} from "../../../../audio";
 import {
   playHitParticles,
   playWordRipple,
   playCelebration,
   playVictoryShimmer,
-} from "./ink-vfx";
+} from "../vfx/ink-vfx";
 
 // ── Private helpers ───────────────────────────────────────────────────────
 
@@ -105,8 +105,8 @@ export function useInkGameEngine(
   propSolved: boolean,
   onSolve: () => void,
 ): InkGameEngine {
-  const storedGame = useStore((s) => s.inkGameState);
-  const setInkGameState = useStore((s) => s.setInkGameState);
+  const storedGame = useInkStore((s) => s.inkGameState);
+  const setInkGameState = useInkStore((s) => s.setInkGameState);
   const countdown = useCountdown();
 
   const isStale = storedGame != null && storedGame.dayStamp !== todayStamp();

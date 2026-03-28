@@ -14,6 +14,7 @@ import { IntroModal } from "./components/IntroModal";
 import { triggerUnlockEffect } from "./unlock";
 import { initAdmin, logoutAdmin, useAdmin } from "./useAdmin";
 import { fireEvent } from "./ha";
+import { useMagnetStore } from "./modules/forges/forge-magnet/store";
 
 initAdmin();
 
@@ -128,7 +129,7 @@ export default function App() {
           <span className="text-danger/50 font-bold">❤</span> Imaginé et developpé <span className="text-danger/50 font-bold">avec amour</span> pour Léamour - 2026 <span className="text-danger/50 font-bold">❤</span>
         </p>
         <button
-          onClick={resetAttempt}
+          onClick={() => { resetAttempt(); useMagnetStore.getState().reset(); }}
           className="w-full mt-2 mb-4 py-2 text-[0.5rem] text-muted/20 bg-transparent border-none cursor-default select-none"
         >
           reset
