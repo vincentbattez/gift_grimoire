@@ -1,6 +1,6 @@
 import type { RefObject } from "react";
 import { spawnParticles } from "../../../../particles";
-import { sndInkLetterReveal } from "../../../../audio";
+import { sndInkLetterReveal } from "../sfx/ink-sfx";
 import { getWordCells, type WordConfig } from "../config";
 
 export function playHitParticles(

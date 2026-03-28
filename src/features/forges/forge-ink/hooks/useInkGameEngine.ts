@@ -14,6 +14,7 @@ import {
   type WordState,
 } from "../config";
 import { useInkStore } from "../store";
+import { sndScrambleSolved } from "../../../../audio";
 import {
   sndInkDrop,
   sndInkHit,
@@ -21,8 +22,7 @@ import {
   sndInkMissAdjacent,
   sndInkWordSolved,
   sndInkGuessError,
-  sndScrambleSolved,
-} from "../../../../audio";
+} from "../sfx/ink-sfx";
 import {
   playHitParticles,
   playWordRipple,
