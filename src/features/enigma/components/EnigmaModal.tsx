@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from "react";
+import { Input } from "../../../components/ui/Input";
 import { useEnigmaStore } from "../store";
 import { useCooldownStore, isAttemptUsedToday } from "../../cooldown/store";
 import { ENIGMAS, type Enigma } from "../config";
@@ -178,13 +179,10 @@ function ModalBody({
   }
 
   const isSuspense = feedback === "suspense";
-  const inputBorder = feedback === "ok"
-    ? "border-success shadow-[0_0_14px_#4ecca328]"
-    : feedback === "err"
-      ? "border-danger shadow-[0_0_14px_#ff6b8a28]"
-      : isSuspense
-        ? "border-accent shadow-[0_0_14px_#9b6dff40]"
-        : "border-[#3a2a5a] focus:border-accent focus:shadow-[0_0_14px_#9b6dff28]";
+  const inputState = feedback === "ok" ? "success" as const
+    : feedback === "err" ? "danger" as const
+    : isSuspense ? "loading" as const
+    : "default" as const;
 
   return (
     <div
@@ -226,16 +224,15 @@ function ModalBody({
 
       {!isSolved && !attemptUsed && (
         <>
-          <input
+          <Input
             ref={inputRef}
-            type="text"
+            state={inputState}
             placeholder="Murmure ta réponse ici…"
-            autoComplete="off" autoCorrect="off" spellCheck={false}
             value={value}
             disabled={isSuspense}
             onChange={(e) => setValue(e.target.value)}
-            onKeyDown={(e) => e.key === "Enter" && submit(Date.now(), Math.random(), Math.random())}
-            className={`w-full bg-[#0d0a1a] border-[1.5px] rounded-[14px] py-3.5 px-4 text-base text-text font-[var(--font-cinzel)] text-center outline-none transition-all duration-300 tracking-[0.1em] ${inputBorder}`}
+            onSubmit={() => submit(Date.now(), Math.random(), Math.random())}
+            className="w-full bg-[#0d0a1a] border-[1.5px] rounded-[14px] py-3.5 px-4 text-base text-text text-center tracking-[0.1em]"
           />
 
           {isSuspense ? (

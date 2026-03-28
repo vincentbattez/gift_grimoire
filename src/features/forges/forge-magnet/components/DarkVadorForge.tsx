@@ -10,6 +10,7 @@ import { PlayCountDot } from "../../../../components/PlayCountDot";
 import { AudioWarningModal } from "../../../../components/AudioWarningModal";
 import { LastAttemptModal } from "../../../../components/LastAttemptModal";
 import { CooldownLabel } from "../../../cooldown/components/CooldownLabel";
+import { CornerOrnaments } from "../../../../components/ui/CornerOrnaments";
 import { WideWaveform } from "./WideWaveform";
 import type { ForgeProps } from "../../types";
 import darkVadorSrc from "../../../../assets/audios/pascale-dark_vador-enigme.mp3";
@@ -103,10 +104,7 @@ export function DarkVadorForge({ solved, onSolve }: ForgeProps) {
           style={{ background: "linear-gradient(155deg, #0a1f1a, #080f0c)" }}
         >
           <div className="absolute inset-0 pointer-events-none" style={{ background: "radial-gradient(ellipse at 50% 50%, #4ecca318, transparent 65%)" }} />
-          <div className="absolute top-[6px] left-[6px] w-2 h-2 border-t border-l border-solved-border/50" />
-          <div className="absolute top-[6px] right-[6px] w-2 h-2 border-t border-r border-solved-border/50" />
-          <div className="absolute bottom-[6px] left-[6px] w-2 h-2 border-b border-l border-solved-border/50" />
-          <div className="absolute bottom-[6px] right-[6px] w-2 h-2 border-b border-r border-solved-border/50" />
+          <CornerOrnaments color="border-solved-border/50" opacity="" />
           <div className="absolute top-2.5 right-3 w-4 h-4 rounded-full bg-success flex items-center justify-center text-[0.5rem] shadow-[0_0_8px_var(--color-success)]">✓</div>
           <div className="relative w-full px-1">
             <WideWaveform playing={false} color="var(--color-success)" />
@@ -129,10 +127,7 @@ export function DarkVadorForge({ solved, onSolve }: ForgeProps) {
           style={{ background: "linear-gradient(155deg, #130f26, #0b0917)" }}
         >
           <div className="absolute inset-0 pointer-events-none" style={{ background: "radial-gradient(ellipse at 50% 20%, #3a2a5a12, transparent 60%)" }} />
-          <div className="absolute top-[6px] left-[6px] w-2 h-2 border-t border-l border-accent/30 opacity-50" />
-          <div className="absolute top-[6px] right-[6px] w-2 h-2 border-t border-r border-accent/30 opacity-50" />
-          <div className="absolute bottom-[6px] left-[6px] w-2 h-2 border-b border-l border-accent/30 opacity-50" />
-          <div className="absolute bottom-[6px] right-[6px] w-2 h-2 border-b border-r border-accent/30 opacity-50" />
+          <CornerOrnaments color="border-accent/30" opacity="opacity-50" />
           <div className="relative w-full px-1">
             <WideWaveform playing={false} color="#7a55cc" />
           </div>
@@ -141,8 +136,8 @@ export function DarkVadorForge({ solved, onSolve }: ForgeProps) {
           </span>
           <PlayCountDot total={1} remaining={1} />
         </button>
-        {showWarning && <AudioWarningModal onConfirm={() => { setShowWarning(false); setShowLastAttempt(true); }} />}
-        {showLastAttempt && <LastAttemptModal onConfirm={() => { setShowLastAttempt(false); playAudio(); }} />}
+        <AudioWarningModal isOpen={showWarning} onConfirm={() => { setShowWarning(false); setShowLastAttempt(true); }} />
+        <LastAttemptModal isOpen={showLastAttempt} onConfirm={() => { setShowLastAttempt(false); playAudio(); }} />
       </div>
     );
   }
@@ -157,10 +152,7 @@ export function DarkVadorForge({ solved, onSolve }: ForgeProps) {
           style={{ background: "linear-gradient(155deg, #130f26, #0b0917)" }}
         >
           <div className="absolute inset-0 pointer-events-none" style={{ background: "radial-gradient(ellipse at 50% 50%, #9b6dff22, transparent 65%)" }} />
-          <div className="absolute top-[6px] left-[6px] w-2 h-2 border-t border-l border-accent/50 opacity-60" />
-          <div className="absolute top-[6px] right-[6px] w-2 h-2 border-t border-r border-accent/50 opacity-60" />
-          <div className="absolute bottom-[6px] left-[6px] w-2 h-2 border-b border-l border-accent/50 opacity-60" />
-          <div className="absolute bottom-[6px] right-[6px] w-2 h-2 border-b border-r border-accent/50 opacity-60" />
+          <CornerOrnaments color="border-accent/50" opacity="opacity-60" />
           <div className="relative w-full px-1">
             <WideWaveform playing={true} color="var(--color-accent)" />
           </div>
@@ -210,10 +202,7 @@ export function DarkVadorForge({ solved, onSolve }: ForgeProps) {
         {showPicker && (
           <div className="absolute top-2.5 right-3 w-4 h-4 rounded-full bg-success flex items-center justify-center text-[0.5rem] shadow-[0_0_8px_var(--color-success)]">✓</div>
         )}
-        <div className={`absolute top-[6px] left-[6px] w-2 h-2 border-t border-l opacity-50 ${cornerColor}`} />
-        <div className={`absolute top-[6px] right-[6px] w-2 h-2 border-t border-r opacity-50 ${cornerColor}`} />
-        <div className={`absolute bottom-[6px] left-[6px] w-2 h-2 border-b border-l opacity-50 ${cornerColor}`} />
-        <div className={`absolute bottom-[6px] right-[6px] w-2 h-2 border-b border-r opacity-50 ${cornerColor}`} />
+        <CornerOrnaments color={cornerColor} opacity="opacity-50" />
         {(isChecking || showPicker || hasError) && (
           <div className={`relative w-full px-1 ${isChecking || showPicker ? "" : "opacity-35"}`}>
             <WideWaveform playing={isChecking} color={barColor} />

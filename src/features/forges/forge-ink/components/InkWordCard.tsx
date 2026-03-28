@@ -1,4 +1,5 @@
 import { useState, useCallback } from "react";
+import { Input } from "../../../../components/ui/Input";
 import { INK_CONFIG, type WordState } from "../config";
 
 interface InkWordCardProps {
@@ -111,20 +112,15 @@ export function InkWordCard({
       {/* Input */}
       {!state.solved && !isLocked && (
         <div className="flex gap-2">
-          <input
-            type="text"
+          <Input
+            state={hasError ? "danger" : "default"}
             value={inputValue}
             onChange={(e) => setInputValue(e.target.value)}
-            onKeyDown={(e) => e.key === "Enter" && handleSubmit()}
+            onSubmit={handleSubmit}
             placeholder="Deviner…"
             maxLength={wordText.length + 2}
             autoCapitalize="characters"
-            autoCorrect="off"
-            spellCheck={false}
-            className="flex-1 px-2.5 py-1.5 rounded-lg text-[0.65rem] font-cinzel
-              bg-transparent outline-none
-              placeholder:text-muted/25 text-text tracking-widest uppercase
-              transition-colors duration-200"
+            className="flex-1 px-2.5 py-1.5 rounded-lg text-[0.65rem] bg-transparent placeholder:text-muted/25 text-text tracking-widest uppercase transition-colors duration-200"
             style={{
               border: `1px solid ${
                 hasError ? "#ff6b8a50" : "rgba(34,26,53,0.7)"
