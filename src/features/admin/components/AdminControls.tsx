@@ -1,6 +1,5 @@
 import { useEnigmaStore } from "../../enigma/store";
 import { useCooldownStore } from "../../cooldown/store";
-import { useForgeStore } from "../../forges/store";
 import { ENIGMAS } from "../../enigma/config";
 import { FORGES } from "../../forges/forges.config";
 import type { EnigmaPersistedStatus } from "../../enigma/types";
@@ -56,9 +55,8 @@ export function AdminControls() {
         <button
           onClick={() => {
             const es = useEnigmaStore.getState();
-            const fs = useForgeStore.getState();
             ENIGMAS.forEach((e) => { es.unlock(e.id); es.solve(e.id); });
-            FORGES.forEach((f) => { fs.solveForge(f.key); fs.revealForge(f.key); });
+            FORGES.forEach((f) => { f.solve(); f.reveal(); });
           }}
           className="px-3 py-1 text-[0.55rem] rounded-md border border-success/30 text-success/60 hover:text-success hover:border-success/60 bg-success/5 transition-colors cursor-pointer"
         >

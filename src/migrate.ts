@@ -26,16 +26,30 @@ function migrateFromV3() {
       }));
     }
 
-    // Forge store
+    // Forge global store (audio warning only)
     if (!localStorage.getItem("grimoire_forge")) {
       localStorage.setItem("grimoire_forge", JSON.stringify({
         state: {
-          forges: state.forges ?? {},
-          forgeRevealed: state.forgeRevealed ?? {},
           audioWarningAcknowledged: state.audioWarningAcknowledged ?? false,
         },
         version: 0,
       }));
+    }
+
+    // Distribute per-forge solved/revealed to individual forge stores
+    const forges: Record<string, boolean> = state.forges ?? {};
+    const forgeRevealed: Record<string, boolean> = state.forgeRevealed ?? {};
+    for (const key of ["magnet", "scramble", "vibration", "ink"]) {
+      const storeKey = `grimoire_forge_${key}`;
+      if (!localStorage.getItem(storeKey)) {
+        localStorage.setItem(storeKey, JSON.stringify({
+          state: {
+            solved: forges[key] ?? false,
+            revealed: forgeRevealed[key] ?? false,
+          },
+          version: 0,
+        }));
+      }
     }
 
     // Cooldown store

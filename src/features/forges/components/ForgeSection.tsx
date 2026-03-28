@@ -1,5 +1,4 @@
 import { useState, useRef, useEffect } from "react";
-import { useForgeStore } from "../store";
 import { sndForgeReveal, sndClick } from "../../../audio";
 import { spawnParticles } from "../../../particles";
 import { LockIcon } from "../../../components/LockIcon";
@@ -117,13 +116,10 @@ interface ForgeSectionProps {
 }
 
 export function ForgeSection({ forge, isAdmin }: ForgeSectionProps) {
-  const { key, title, successMessage, introText, component: ForgeComponent, onReset } = forge;
+  const { key, title, successMessage, introText, component: ForgeComponent } = forge;
 
-  const revealed = useForgeStore((s) => s.forgeRevealed[key]);
-  const revealForge = useForgeStore((s) => s.revealForge);
-  const solved = useForgeStore((s) => s.forges[key] ?? false);
-  const solveForge = useForgeStore((s) => s.solveForge);
-  const resetForge = useForgeStore((s) => s.resetForge);
+  const revealed = forge.useRevealed();
+  const solved = forge.useSolved();
 
   const [phase, setPhase] = useState<ForgePhase>("locked");
   const [showIntro, setShowIntro] = useState(false);
@@ -148,11 +144,11 @@ export function ForgeSection({ forge, isAdmin }: ForgeSectionProps) {
           <div className={`text-center text-[0.5rem] tracking-[0.25em] mb-2 uppercase transition-colors duration-700 ${solved ? "text-success/60" : "text-muted/50"}`}>
             {title}
           </div>
-          <ForgeComponent solved={solved} onSolve={() => solveForge(key)} />
+          <ForgeComponent solved={solved} onSolve={() => forge.solve()} />
         {!solved && isAdmin && (
           <div className="mt-4 flex gap-2 justify-center flex-wrap">
             <button
-              onClick={() => { revealForge(key); solveForge(key); }}
+              onClick={() => { forge.reveal(); forge.solve(); }}
               className="px-3 py-1 rounded-md text-[0.55rem] tracking-[0.15em] uppercase border border-success/30 text-success/50 bg-success/5 hover:border-success/60 hover:text-success/80 hover:bg-success/10 transition-all duration-150 active:scale-95"
             >
               ✦ unlock
@@ -181,7 +177,7 @@ export function ForgeSection({ forge, isAdmin }: ForgeSectionProps) {
             </p>
             {isAdmin && (
               <button
-                onClick={() => { resetForge(key); onReset?.(); }}
+                onClick={() => forge.reset()}
                 className="mt-3 px-3 py-1 rounded-md text-[0.55rem] tracking-[0.15em] uppercase border border-danger/30 text-danger/50 bg-danger/5 hover:border-danger/60 hover:text-danger/80 hover:bg-danger/10 transition-all duration-150 active:scale-95"
               >
                 ↺ Re-lock
@@ -214,7 +210,7 @@ export function ForgeSection({ forge, isAdmin }: ForgeSectionProps) {
 
       setTimeout(() => {
         setPhase("revealing");
-        revealForge(key);
+        forge.reveal();
         if (introText) setShowIntro(true);
         if (containerRef.current) {
           const r = containerRef.current.getBoundingClientRect();
@@ -249,7 +245,7 @@ export function ForgeSection({ forge, isAdmin }: ForgeSectionProps) {
       >
         <div className="text-center text-[0.5rem] tracking-[0.25em] text-muted/50 mb-2 uppercase">{title}</div>
         {phase === "revealing" ? (
-          <ForgeComponent solved={solved} onSolve={() => solveForge(key)} />
+          <ForgeComponent solved={solved} onSolve={() => forge.solve()} />
         ) : (
           <div className="h-24" />
         )}
@@ -305,8 +301,8 @@ export function ForgeSection({ forge, isAdmin }: ForgeSectionProps) {
             <button
               onClick={(e) => {
                 e.stopPropagation();
-                revealForge(key);
-                solveForge(key);
+                forge.reveal();
+                forge.solve();
               }}
               className="mt-2 px-3 py-1 rounded-md text-[0.55rem] tracking-[0.15em] uppercase border border-success/30 text-success/50 bg-success/5 hover:border-success/60 hover:text-success/80 hover:bg-success/10 transition-all duration-150 active:scale-95 z-10"
             >
