@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect } from "react";
 import { useStore } from "../../../store";
+import { useInkStore } from "../forge-ink/store";
 import { sndForgeReveal, sndClick } from "../../../audio";
 import { spawnParticles } from "../../../particles";
 import { LockIcon } from "../../../components/LockIcon";
@@ -149,6 +150,24 @@ export function ForgeSection({ forge, isAdmin }: ForgeSectionProps) {
             {title}
           </div>
           <ForgeComponent solved={solved} onSolve={() => solveForge(key)} />
+        {!solved && isAdmin && (
+          <div className="mt-4 flex gap-2 justify-center flex-wrap">
+            <button
+              onClick={() => { revealForge(key); solveForge(key); }}
+              className="px-3 py-1 rounded-md text-[0.55rem] tracking-[0.15em] uppercase border border-success/30 text-success/50 bg-success/5 hover:border-success/60 hover:text-success/80 hover:bg-success/10 transition-all duration-150 active:scale-95"
+            >
+              ✦ unlock
+            </button>
+            {key === "ink" && (
+              <button
+                onClick={() => useInkStore.getState().resetInkDrops()}
+                className="px-3 py-1 rounded-md text-[0.55rem] tracking-[0.15em] uppercase border border-sky-400/30 text-sky-400/50 bg-sky-400/5 hover:border-sky-400/60 hover:text-sky-400/80 hover:bg-sky-400/10 transition-all duration-150 active:scale-95"
+              >
+                ↺ reset ink drops
+              </button>
+            )}
+          </div>
+        )}
         {solved && (
           <div className="mt-6 pt-4 border-t border-success/15 text-center animate-[forge-unblur_0.8s_ease-out_both]">
             <div className="text-[0.5rem] text-success/40 tracking-[0.2em] uppercase mb-1.5">
@@ -279,6 +298,18 @@ export function ForgeSection({ forge, isAdmin }: ForgeSectionProps) {
         >
           <LockIcon />
           <span className="text-[0.55rem] tracking-[0.25em] text-muted uppercase">{title}</span>
+          {isAdmin && (
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                revealForge(key);
+                solveForge(key);
+              }}
+              className="mt-2 px-3 py-1 rounded-md text-[0.55rem] tracking-[0.15em] uppercase border border-success/30 text-success/50 bg-success/5 hover:border-success/60 hover:text-success/80 hover:bg-success/10 transition-all duration-150 active:scale-95 z-10"
+            >
+              ✦ unlock
+            </button>
+          )}
         </div>
       )}
     </div>

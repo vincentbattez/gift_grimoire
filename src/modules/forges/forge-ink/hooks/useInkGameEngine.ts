@@ -107,6 +107,7 @@ export function useInkGameEngine(
 ): InkGameEngine {
   const storedGame = useInkStore((s) => s.inkGameState);
   const setInkGameState = useInkStore((s) => s.setInkGameState);
+  const dropResetCounter = useInkStore((s) => s.dropResetCounter);
   const countdown = useCountdown();
 
   const isStale = storedGame != null && storedGame.dayStamp !== todayStamp();
@@ -143,6 +144,7 @@ export function useInkGameEngine(
     new Set(),
   );
   const prevPropSolvedRef = useRef(propSolved);
+  const dropResetRef = useRef(dropResetCounter);
   const lastTapRef = useRef(0);
 
   const solved = propSolved || localSolved;
@@ -177,6 +179,24 @@ export function useInkGameEngine(
     }
     prevPropSolvedRef.current = propSolved;
   }, [propSolved]);
+
+  // ── Admin ink-drop reset (signal via store counter) ──
+  useEffect(() => {
+    if (dropResetCounter === dropResetRef.current) return;
+    dropResetRef.current = dropResetCounter;
+    setDropsLeft(INK_CONFIG.maxDrops);
+    setAnimatingMissCells(new Set());
+    setProximityCenter(null);
+    setWordStates((prev) => {
+      const next = { ...prev };
+      for (const word of INK_CONFIG.words) {
+        if (!next[word.text]?.solved) {
+          next[word.text] = { ...next[word.text], guessesLeft: INK_CONFIG.maxGuessesPerWord };
+        }
+      }
+      return next;
+    });
+  }, [dropResetCounter]);
 
   // ── Victory check ──
   useEffect(() => {
