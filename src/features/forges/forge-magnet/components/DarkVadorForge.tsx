@@ -9,7 +9,7 @@ import { EnigmaPicker } from "../../../enigma/components/EnigmaPicker";
 import { PlayCountDot } from "../../../../components/PlayCountDot";
 import { AudioWarningModal } from "../../../../components/AudioWarningModal";
 import { LastAttemptModal } from "../../../../components/LastAttemptModal";
-import { useCooldown } from "../../../cooldown/useCooldown";
+import { CooldownLabel } from "../../../cooldown/components/CooldownLabel";
 import { WideWaveform } from "./WideWaveform";
 import type { ForgeProps } from "../../types";
 import darkVadorSrc from "../../../../assets/audios/pascale-dark_vador-enigme.mp3";
@@ -31,7 +31,6 @@ export function DarkVadorForge({ solved, onSolve }: ForgeProps) {
   const [showWarning, setShowWarning] = useState(false);
   const [showLastAttempt, setShowLastAttempt] = useState(false);
   const shakeRef = useRef<HTMLButtonElement>(null);
-  const cooldown = useCooldown(darkVadorPlayedAt);
 
   async function playAudio() {
     const audio = new Audio(darkVadorSrc);
@@ -228,10 +227,12 @@ export function DarkVadorForge({ solved, onSolve }: ForgeProps) {
             {isChecking ? "Les forces convergent…" : hasError ? "Rien ne s'est produit" : showPicker ? "Une nouvelle amitié s'est formée !" : "Tenter un rapprochement"}
           </span>
         </div>
-        {!isChecking && !showPicker && cooldown.active && (
-          <span className="relative text-[0.5rem] tracking-[0.15em] text-accent/25 font-mono">
-            Répéter l'énigme dans {cooldown.label}
-          </span>
+        {!isChecking && !showPicker && (
+          <CooldownLabel
+            lastTriggeredAt={darkVadorPlayedAt}
+            prefix="Répéter l'énigme dans"
+            className="relative text-[0.5rem] tracking-[0.15em] text-accent/25 font-mono"
+          />
         )}
       </button>
 

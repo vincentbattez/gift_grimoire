@@ -4,7 +4,7 @@ import { useCooldownStore, isAttemptUsedToday } from "../../cooldown/store";
 import { ENIGMAS, type Enigma } from "../config";
 import { sndOk, sndBad, sndClick, sndLoveReveal, sndAnalysis, sndDoubt } from "../../../audio";
 import { SOLVE_FEEDBACK_MS, INPUT_FOCUS_DELAY_MS, ERROR_FEEDBACK_MS, SUSPENSE_MS } from "../timings";
-import { useCooldown } from "../../cooldown/useCooldown";
+import { CooldownLabel } from "../../cooldown/components/CooldownLabel";
 import { useEnigmaOrchestrator } from "../hooks/useEnigmaOrchestrator";
 import type { EnigmaLifecycleEvents } from "../types";
 import { DoubtOverlay } from "./DoubtOverlay";
@@ -28,7 +28,6 @@ function ModalBody({
   lifecycle: EnigmaLifecycleEvents;
 }) {
   const lastAttempt = useCooldownStore((s) => s.lastAttempt);
-  const cooldown = useCooldown(lastAttempt);
   const closeModal = useEnigmaStore((s) => s.closeModal);
   const openLoveLetter = useEnigmaStore((s) => s.openLoveLetter);
   const letterRead = useEnigmaStore((s) => s.readLetters[enigma.id]);
@@ -272,7 +271,9 @@ function ModalBody({
             <span className="text-[0.72rem] text-danger font-semibold tracking-wide">Le grimoire se repose…</span>
           </div>
           <p className="text-[0.72rem] text-muted">Prochaine tentative dans</p>
-          <p className="text-[1.4rem] font-[var(--font-cinzel)] text-accent tracking-[0.15em] mt-1.5">{cooldown.label}</p>
+          <p className="text-[1.4rem] font-[var(--font-cinzel)] text-accent tracking-[0.15em] mt-1.5">
+            <CooldownLabel lastTriggeredAt={lastAttempt} />
+          </p>
         </div>
       )}
 

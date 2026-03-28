@@ -1,7 +1,8 @@
-import { useRef } from "react";
+import { useRef, useState } from "react";
 import { INK_CONFIG, LETTER_MAP, PROXIMITY_MAP } from "../config";
 import { useInkGameEngine } from "../hooks/useInkGameEngine";
 import { useAdmin } from "../../../admin/useAdmin";
+import { CooldownLabel } from "../../../cooldown/components/CooldownLabel";
 import type { ForgeProps } from "../../types";
 import { InkCell } from "./InkCell";
 import { InkDropIndicator } from "./InkDropIndicator";
@@ -13,6 +14,7 @@ export function InkRevealForge({ solved: propSolved, onSolve }: ForgeProps) {
   const isAdmin = useAdmin();
   const gridRef = useRef<HTMLDivElement>(null);
   const engine = useInkGameEngine(gridRef, propSolved, onSolve);
+  const [mountedAt] = useState(() => Date.now());
 
   if (propSolved && !engine.showSolvedModal) {
     return <InkSolvedView />;
@@ -22,11 +24,9 @@ export function InkRevealForge({ solved: propSolved, onSolve }: ForgeProps) {
     <div className="mt-4">
       <InkDropIndicator dropsLeft={engine.dropsLeft} />
 
-      {engine.cooldownLabel && (
-        <div className="text-center text-[0.45rem] tracking-[0.15em] text-muted/30 font-mono mb-4">
-          Reset dans {engine.cooldownLabel}
-        </div>
-      )}
+      <div className="text-center text-[0.45rem] tracking-[0.15em] text-muted/30 font-mono mb-4">
+        <CooldownLabel lastTriggeredAt={mountedAt} prefix="Reset dans" />
+      </div>
 
       {engine.tapMessage && (
         <div

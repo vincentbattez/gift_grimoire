@@ -1,25 +1,13 @@
 import { useState, useEffect } from "react";
-import { msUntilMidnight } from "../store";
-
-function formatCountdown(ms: number) {
-  const h = Math.floor(ms / 3_600_000);
-  const m = Math.floor((ms % 3_600_000) / 60_000);
-  const s = Math.floor((ms % 60_000) / 1_000);
-  return `${String(h).padStart(2, "0")}:${String(m).padStart(2, "0")}:${String(s).padStart(2, "0")}`;
-}
+import { CooldownLabel } from "../features/cooldown/components/CooldownLabel";
 
 export function LastAttemptModal({ onConfirm }: { onConfirm: () => void }) {
   const [entered, setEntered] = useState(false);
   const [exiting, setExiting] = useState(false);
-  const [countdown, setCountdown] = useState(() => formatCountdown(msUntilMidnight()));
+  const [mountedAt] = useState(() => Date.now());
 
   useEffect(() => {
     requestAnimationFrame(() => setEntered(true));
-  }, []);
-
-  useEffect(() => {
-    const id = setInterval(() => setCountdown(formatCountdown(msUntilMidnight())), 1_000);
-    return () => clearInterval(id);
   }, []);
 
   function handleConfirm() {
@@ -57,11 +45,10 @@ export function LastAttemptModal({ onConfirm }: { onConfirm: () => void }) {
           C'est ta dernière écoute. Après celle-ci, les voix se tairont jusqu'à l'aube. Ferme les yeux, fais le silence, et absorbe chaque mot.
         </p>
 
-        <span
+        <CooldownLabel
+          lastTriggeredAt={mountedAt}
           className="text-[1.1rem] font-mono tracking-[0.2em] text-danger/90 mb-6 drop-shadow-[0_0_12px_#ff6b8a50]"
-        >
-          {countdown}
-        </span>
+        />
 
         <button
           onClick={handleConfirm}
