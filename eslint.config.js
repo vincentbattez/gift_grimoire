@@ -65,6 +65,42 @@ export default tseslint.config(
       "@typescript-eslint/prefer-nullish-coalescing": "warn",
       "@typescript-eslint/no-dynamic-delete": "warn",
       "@typescript-eslint/no-shadow": "warn",
+      "@typescript-eslint/naming-convention": [
+        "error",
+        // — Variables & params: camelCase (+ UPPER_CASE for constants)
+        {
+          selector: "variable",
+          format: ["camelCase", "UPPER_CASE", "PascalCase"],
+          leadingUnderscore: "allow",
+        },
+        {
+          selector: "parameter",
+          format: ["camelCase"],
+          leadingUnderscore: "allow",
+        },
+        // — Booleans: prefix is/has/should/can/did/will/must
+        {
+          selector: "variable",
+          types: ["boolean"],
+          format: ["PascalCase"],
+          prefix: ["is", "has", "should", "can", "did", "will", "must"],
+        },
+        // — Functions: camelCase (+ PascalCase for React components & HOCs)
+        {
+          selector: "function",
+          format: ["camelCase", "PascalCase"],
+        },
+        // — Types & interfaces: PascalCase
+        {
+          selector: "typeLike",
+          format: ["PascalCase"],
+        },
+        // — Enums members: PascalCase
+        {
+          selector: "enumMember",
+          format: ["PascalCase"],
+        },
+      ],
 
       // — Code style
       "consistent-return": "warn",
