@@ -23,8 +23,12 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
         autoCorrect="off"
         spellCheck={false}
         onKeyDown={(e) => {
-          if (e.key === "Enter") onSubmit?.();
           onKeyDown?.(e);
+          if (e.defaultPrevented) return;
+          if (e.key === "Enter") {
+            e.preventDefault();
+            onSubmit?.();
+          }
         }}
         className={`outline-none transition-all duration-300 font-[var(--font-cinzel)] ${STATE_BORDERS[state]} ${className}`}
         {...props}

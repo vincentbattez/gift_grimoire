@@ -14,7 +14,7 @@ export function OrnamentDivider({
   return (
     <div className={`flex items-center justify-center gap-3 ${className}`}>
       <div className={`h-px ${lineClass}`} style={{ backgroundImage: `linear-gradient(to right, transparent, ${fadeColor})` }} />
-      <div className="w-1.5 h-1.5 rounded-full" style={{ background: "radial-gradient(circle, #e8c96a, #c9a032)" }} />
+      <div className="w-1.5 h-1.5 rounded-full" style={{ background: `radial-gradient(circle, ${color}, ${fadeColor})` }} />
       <div className={`h-px ${lineClass}`} style={{ backgroundImage: `linear-gradient(to left, transparent, ${fadeColor})` }} />
     </div>
   );
