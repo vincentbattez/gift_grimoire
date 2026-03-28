@@ -1,6 +1,8 @@
 import { useState, useRef, useCallback, useLayoutEffect, useEffect } from "react";
-import { sndLetterSwap, sndScrambleSolved } from "../../../../audio";
+import { sndScrambleSolved } from "../../../../audio";
+import { sndLetterSwap } from "../sfx/scramble-sfx";
 import { EnigmaPicker } from "../../../enigma/components/EnigmaPicker";
+import { snapPositions, animateFlip } from "../vfx/scramble-vfx";
 import type { ForgeProps } from "../../types";
 import { SOLUTION, INITIAL_LETTERS, type Letter } from "../config";
 
@@ -54,26 +56,7 @@ export function LetterScramble({ solved, onSolve }: ForgeProps) {
     const snapshot = flipSnapshotRef.current;
     if (!container || snapshot.size === 0) return;
     flipSnapshotRef.current = new Map();
-
-    const cards = container.querySelectorAll<HTMLElement>("[data-lid]");
-    cards.forEach((el) => {
-      const id = Number(el.dataset.lid);
-      const prev = snapshot.get(id);
-      if (!prev) return;
-      const curr = el.getBoundingClientRect();
-      const dx = prev.left - curr.left;
-      const dy = prev.top - curr.top;
-      if (dx === 0 && dy === 0) return;
-
-      el.style.transition = "none";
-      el.style.transform = `translate(${dx}px, ${dy}px)`;
-      el.getBoundingClientRect();
-      el.style.transition = "transform 220ms cubic-bezier(0.25, 0.46, 0.45, 0.94)";
-      el.style.transform = "";
-
-      const cleanup = () => { el.style.transition = ""; el.removeEventListener("transitionend", cleanup); };
-      el.addEventListener("transitionend", cleanup);
-    });
+    animateFlip(container, snapshot);
   }, [letters]);
 
   const getCardRects = useCallback(() => {
@@ -123,11 +106,7 @@ export function LetterScramble({ solved, onSolve }: ForgeProps) {
 
         const container = containerRef.current;
         if (container) {
-          const snapshot = new Map<number, DOMRect>();
-          container.querySelectorAll<HTMLElement>("[data-lid]").forEach((el) => {
-            snapshot.set(Number(el.dataset.lid), el.getBoundingClientRect());
-          });
-          flipSnapshotRef.current = snapshot;
+          flipSnapshotRef.current = snapPositions(container);
         }
 
         setLetters((prev) => {

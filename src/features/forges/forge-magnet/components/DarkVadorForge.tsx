@@ -5,6 +5,7 @@ import { useMagnetStore } from "../store";
 import { ENTITY_ID, CHECK_DURATION_MS } from "../config";
 import { getEntityState } from "../../../../ha";
 import { sndAnalysis, sndScrambleSolved } from "../../../../audio";
+import { playShake } from "../vfx/magnet-vfx";
 import { EnigmaPicker } from "../../../enigma/components/EnigmaPicker";
 import { PlayCountDot } from "../../../../components/PlayCountDot";
 import { AudioWarningModal } from "../../../../components/AudioWarningModal";
@@ -86,11 +87,7 @@ export function DarkVadorForge({ solved, onSolve }: ForgeProps) {
     } else {
       setHasError(true);
       const el = shakeRef.current;
-      if (el) {
-        el.style.animation = "none";
-        void el.offsetHeight;
-        el.style.animation = "shake 0.5s ease";
-      }
+      if (el) playShake(el);
       setTimeout(() => setHasError(false), 3000);
     }
   }

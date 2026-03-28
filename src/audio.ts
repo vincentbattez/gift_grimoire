@@ -1,11 +1,11 @@
 let ctx: AudioContext | null = null;
 
-function getCtx(): AudioContext {
+export function getCtx(): AudioContext {
   if (!ctx) ctx = new AudioContext();
   return ctx;
 }
 
-function tone(
+export function tone(
   freq: number,
   type: OscillatorType,
   vol: number,
@@ -67,35 +67,6 @@ export const sndHeartPop = (pitchOffset = 0) => {
   tone(base * 1.5, "sine", 0.025, 0.09, 0.01);
 };
 
-/** Modern fluid swap — letter slides into place */
-export const sndLetterSwap = () => {
-  const c = getCtx();
-  const t = c.currentTime;
-
-  // Main body — pitch arc up then resolves down ("spring into place")
-  const o = c.createOscillator();
-  const g = c.createGain();
-  o.connect(g);
-  g.connect(c.destination);
-  o.type = "sine";
-  o.frequency.setValueAtTime(310, t);
-  o.frequency.linearRampToValueAtTime(620, t + 0.022);
-  o.frequency.exponentialRampToValueAtTime(250, t + 0.14);
-  g.gain.setValueAtTime(0, t);
-  g.gain.linearRampToValueAtTime(0.17, t + 0.007);
-  g.gain.exponentialRampToValueAtTime(0.0001, t + 0.16);
-  o.start(t);
-  o.stop(t + 0.17);
-
-  // Octave harmonic — adds richness without harshness
-  tone(620, "sine", 0.04, 0.11, 0.005);
-
-  // High shimmer — modern sparkle
-  tone(2500, "sine", 0.016, 0.08, 0.006);
-
-  // Warm sub tail — fullness
-  tone(125, "triangle", 0.065, 0.13, 0.012);
-};
 
 /** Shimmering chime — scramble solved */
 export const sndScrambleSolved = () => {
@@ -320,101 +291,6 @@ export function sndDoubt(): void {
   pingG.gain.exponentialRampToValueAtTime(0.0001, t + 1.1);
   ping.start(t + 0.65);
   ping.stop(t + 1.15);
-}
-
-/** Deep listening drone — 10s meditative ambience, returns stop function */
-export function sndDeepListen(): () => void {
-  const c = getCtx();
-  const t = c.currentTime;
-  const DUR = 10;
-  const allNodes: { o: OscillatorNode; g: GainNode }[] = [];
-
-  // Warm sub-bass with slow breathing LFO (~0.15 Hz)
-  const sub = c.createOscillator();
-  const subG = c.createGain();
-  const breathLfo = c.createOscillator();
-  const breathDepth = c.createGain();
-  sub.connect(subG);
-  subG.connect(c.destination);
-  sub.type = "sine";
-  sub.frequency.value = 55;
-  breathLfo.connect(breathDepth);
-  breathDepth.connect(subG.gain);
-  breathLfo.type = "sine";
-  breathLfo.frequency.value = 0.15;
-  breathDepth.gain.value = 0.03;
-  subG.gain.setValueAtTime(0, t);
-  subG.gain.linearRampToValueAtTime(0.07, t + 2);
-  subG.gain.setValueAtTime(0.07, t + DUR - 2);
-  subG.gain.linearRampToValueAtTime(0.0001, t + DUR);
-  sub.start(t);
-  sub.stop(t + DUR);
-  breathLfo.start(t);
-  breathLfo.stop(t + DUR);
-  allNodes.push({ o: sub, g: subG });
-
-  // Binaural-like beating — two close frequencies creating a slow 3Hz pulse
-  for (const freq of [200, 203]) {
-    const o = c.createOscillator();
-    const g = c.createGain();
-    o.connect(g);
-    g.connect(c.destination);
-    o.type = "sine";
-    o.frequency.value = freq;
-    g.gain.setValueAtTime(0, t);
-    g.gain.linearRampToValueAtTime(0.025, t + 3);
-    g.gain.setValueAtTime(0.025, t + DUR - 2.5);
-    g.gain.linearRampToValueAtTime(0.0001, t + DUR);
-    o.start(t);
-    o.stop(t + DUR);
-    allNodes.push({ o, g });
-  }
-
-  // Ethereal high harmonic — slowly drifting pitch
-  const hi = c.createOscillator();
-  const hiG = c.createGain();
-  hi.connect(hiG);
-  hiG.connect(c.destination);
-  hi.type = "sine";
-  hi.frequency.setValueAtTime(660, t);
-  hi.frequency.linearRampToValueAtTime(880, t + DUR * 0.6);
-  hi.frequency.linearRampToValueAtTime(740, t + DUR);
-  hiG.gain.setValueAtTime(0, t);
-  hiG.gain.linearRampToValueAtTime(0.015, t + 4);
-  hiG.gain.setValueAtTime(0.015, t + DUR - 3);
-  hiG.gain.linearRampToValueAtTime(0.0001, t + DUR);
-  hi.start(t);
-  hi.stop(t + DUR);
-  allNodes.push({ o: hi, g: hiG });
-
-  // Soft periodic pings — 5 very subtle sonar-like tones spread across 10s
-  for (let i = 0; i < 5; i++) {
-    const pt = t + 1.5 + i * 1.8;
-    const o = c.createOscillator();
-    const g = c.createGain();
-    o.connect(g);
-    g.connect(c.destination);
-    o.type = "sine";
-    o.frequency.setValueAtTime(1200 + i * 40, pt);
-    o.frequency.exponentialRampToValueAtTime(800, pt + 0.8);
-    g.gain.setValueAtTime(0.0001, pt);
-    g.gain.linearRampToValueAtTime(0.04, pt + 0.05);
-    g.gain.exponentialRampToValueAtTime(0.0001, pt + 0.8);
-    o.start(pt);
-    o.stop(pt + 0.85);
-    allNodes.push({ o, g });
-  }
-
-  return () => {
-    const now = c.currentTime;
-    for (const { o, g } of allNodes) {
-      g.gain.cancelScheduledValues(now);
-      g.gain.setValueAtTime(g.gain.value, now);
-      g.gain.exponentialRampToValueAtTime(0.0001, now + 0.4);
-      o.stop(now + 0.45);
-    }
-    try { breathLfo.stop(now + 0.45); } catch { /* AudioNode déjà arrêté */ }
-  };
 }
 
 /** Modern slide transition — clean digital tick + airy swipe */
@@ -983,105 +859,6 @@ export const sndFinale = () => {
   // Final golden bell
   tone(880, "sine", 0.08, 2.0, 6.2);
   tone(1760, "sine", 0.03, 1.5, 6.3);
-};
-
-/** Ink drop falling — water plip. ratio 0→1 : encrier vide→plein */
-export const sndInkDrop = (ratio = 1) => {
-  const c = getCtx();
-  const t = c.currentTime;
-
-  const startFreq = 600 + ratio * 500;
-  const endFreq = 200 + ratio * 200;
-
-  const o = c.createOscillator();
-  const g = c.createGain();
-  o.connect(g);
-  g.connect(c.destination);
-  o.type = "sine";
-  o.frequency.setValueAtTime(startFreq, t);
-  o.frequency.exponentialRampToValueAtTime(endFreq, t + 0.12);
-  g.gain.setValueAtTime(0, t);
-  g.gain.linearRampToValueAtTime(0.1, t + 0.01);
-  g.gain.exponentialRampToValueAtTime(0.0001, t + 0.18);
-  o.start(t);
-  o.stop(t + 0.2);
-
-  // Sub plip for water weight
-  tone(200, "sine", 0.06, 0.1, 0.01);
-};
-
-/** Crystalline hit — letter revealed */
-export const sndInkHit = () => {
-  const c = getCtx();
-  const t = c.currentTime;
-
-  [1047, 1319, 1568].forEach((f, i) => {
-    const o = c.createOscillator();
-    const g = c.createGain();
-    o.connect(g);
-    g.connect(c.destination);
-    o.type = "sine";
-    o.frequency.value = f;
-    const start = t + i * 0.06;
-    g.gain.setValueAtTime(0, start);
-    g.gain.linearRampToValueAtTime(0.1, start + 0.015);
-    g.gain.exponentialRampToValueAtTime(0.0001, start + 0.6);
-    o.start(start);
-    o.stop(start + 0.65);
-  });
-  tone(2093, "sine", 0.025, 0.4, 0.1);
-};
-
-/** Dull thud — miss */
-export const sndInkMiss = () => {
-  const c = getCtx();
-  const t = c.currentTime;
-
-  const o = c.createOscillator();
-  const g = c.createGain();
-  o.connect(g);
-  g.connect(c.destination);
-  o.type = "sine";
-  o.frequency.setValueAtTime(110, t);
-  o.frequency.exponentialRampToValueAtTime(50, t + 0.2);
-  g.gain.setValueAtTime(0.14, t);
-  g.gain.exponentialRampToValueAtTime(0.0001, t + 0.3);
-  o.start(t);
-  o.stop(t + 0.35);
-
-  tone(220, "sawtooth", 0.04, 0.1);
-};
-
-/** Dull thud + warm tinkle — miss adjacent */
-export const sndInkMissAdjacent = () => {
-  sndInkMiss();
-  // Warm tinkle overlay
-  tone(1200, "triangle", 0.04, 0.5, 0.06);
-  tone(1500, "sine", 0.025, 0.4, 0.1);
-};
-
-/** Short triumph — word solved */
-export const sndInkWordSolved = () => {
-  [784, 988, 1175, 1568].forEach((f, i) =>
-    tone(f, "sine", 0.12, 0.5, i * 0.07),
-  );
-  [988, 1175].forEach((f, i) =>
-    tone(f, "triangle", 0.07, 1.0, 0.3 + i * 0.03),
-  );
-};
-
-/** Brief dissonant tone — wrong word guess */
-export const sndInkGuessError = () => {
-  tone(220, "triangle", 0.06, 0.2);
-  tone(233, "triangle", 0.05, 0.18, 0.01);
-};
-
-/** Crystalline ping — one per letter during word reveal cascade */
-export const sndInkLetterReveal = (index: number) => {
-  const scale = [587, 659, 784, 880, 988, 1175, 1319, 1568, 1760];
-  const freq = scale[index % scale.length];
-  tone(freq, "sine", 0.07, 0.32);
-  tone(freq * 2, "triangle", 0.025, 0.22, 0.01);
 };
 
 /** Ambient tension drone — crescendo over ~3s, returns stop function */

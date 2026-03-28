@@ -1,7 +1,9 @@
 import { useState, useRef, useEffect } from "react";
 import { pollEntityState } from "../../../../ha";
-import { sndDeepListen, sndOk } from "../../../../audio";
+import { sndOk } from "../../../../audio";
+import { sndDeepListen } from "../sfx/vibration-sfx";
 import { EnigmaPicker } from "../../../enigma/components/EnigmaPicker";
+import { playShake } from "../vfx/vibration-vfx";
 import type { ForgeProps } from "../../types";
 import { ENTITY_ID, LISTEN_DURATION_MS } from "../config";
 
@@ -54,11 +56,7 @@ export function VibrationForge({ solved, onSolve }: ForgeProps) {
     } else {
       setPhase("failed");
       const el = btnRef.current;
-      if (el) {
-        el.style.animation = "none";
-        void el.offsetHeight;
-        el.style.animation = "shake 0.5s ease";
-      }
+      if (el) playShake(el);
       setTimeout(() => setPhase("idle"), 3000);
     }
   }
