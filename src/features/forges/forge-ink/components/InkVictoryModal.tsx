@@ -1,6 +1,6 @@
-interface InkVictoryModalProps {
+type InkVictoryModalProps = {
   onContinue: () => void;
-}
+};
 
 export function InkVictoryModal({ onContinue }: InkVictoryModalProps) {
   return (
@@ -16,14 +16,11 @@ export function InkVictoryModal({ onContinue }: InkVictoryModalProps) {
         style={{
           border: "1px solid rgba(232,201,106,0.35)",
           background: "linear-gradient(155deg, #1a1430, #0d0920)",
-          boxShadow:
-            "0 0 60px rgba(232,201,106,0.15), 0 0 120px rgba(232,201,106,0.07)",
+          boxShadow: "0 0 60px rgba(232,201,106,0.15), 0 0 120px rgba(232,201,106,0.07)",
           animation: "ink-modal-reveal 0.55s ease-out both",
         }}
       >
-        <div className="text-[0.45rem] tracking-[0.4em] text-gold/40 uppercase">
-          ✦ L'Encre Révélatrice ✦
-        </div>
+        <div className="text-[0.45rem] tracking-[0.4em] text-gold/40 uppercase">✦ L'Encre Révélatrice ✦</div>
 
         <p
           className="text-[0.8rem] text-text/90 leading-loose italic"

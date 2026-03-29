@@ -37,15 +37,32 @@ const SYMBOLS: Record<ArcaneSymbol, React.ReactNode> = {
   wave: (
     <g>
       <path d="M20 45 Q30 35 40 45 Q50 55 60 45 Q70 35 80 45" fill="none" stroke="currentColor" strokeWidth="1.5" />
-      <path d="M20 55 Q30 45 40 55 Q50 65 60 55 Q70 45 80 55" fill="none" stroke="currentColor" strokeWidth="1" opacity="0.6" />
-      <path d="M25 65 Q35 58 45 65 Q55 72 65 65 Q72 60 75 62" fill="none" stroke="currentColor" strokeWidth="0.8" opacity="0.3" />
+      <path
+        d="M20 55 Q30 45 40 55 Q50 65 60 55 Q70 45 80 55"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="1"
+        opacity="0.6"
+      />
+      <path
+        d="M25 65 Q35 58 45 65 Q55 72 65 65 Q72 60 75 62"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="0.8"
+        opacity="0.3"
+      />
       <circle cx="50" cy="35" r="8" fill="none" stroke="currentColor" strokeWidth="1" opacity="0.5" />
       <circle cx="50" cy="35" r="3" fill="currentColor" opacity="0.4" />
     </g>
   ),
   star: (
     <g>
-      <polygon points="50,25 56,42 74,42 60,53 65,70 50,60 35,70 40,53 26,42 44,42" fill="none" stroke="currentColor" strokeWidth="1.5" />
+      <polygon
+        points="50,25 56,42 74,42 60,53 65,70 50,60 35,70 40,53 26,42 44,42"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="1.5"
+      />
       <circle cx="50" cy="48" r="5" fill="none" stroke="currentColor" strokeWidth="0.8" />
       <circle cx="50" cy="48" r="1.5" fill="currentColor" />
       <line x1="50" y1="18" x2="50" y2="22" stroke="currentColor" strokeWidth="0.8" opacity="0.5" />
@@ -56,14 +73,25 @@ const SYMBOLS: Record<ArcaneSymbol, React.ReactNode> = {
   ),
   flame: (
     <g>
-      <path d="M50 25 Q58 38 55 48 Q62 40 58 55 Q65 48 60 62 Q58 72 50 75 Q42 72 40 62 Q35 48 42 55 Q38 40 45 48 Q42 38 50 25 Z" fill="none" stroke="currentColor" strokeWidth="1.5" />
+      <path
+        d="M50 25 Q58 38 55 48 Q62 40 58 55 Q65 48 60 62 Q58 72 50 75 Q42 72 40 62 Q35 48 42 55 Q38 40 45 48 Q42 38 50 25 Z"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="1.5"
+      />
       <path d="M50 45 Q54 52 52 60 Q50 65 48 60 Q46 52 50 45 Z" fill="currentColor" opacity="0.3" />
       <circle cx="50" cy="58" r="2" fill="currentColor" opacity="0.5" />
     </g>
   ),
   lightning: (
     <g>
-      <path d="M55 22 L45 48 L55 48 L42 78" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinejoin="round" />
+      <path
+        d="M55 22 L45 48 L55 48 L42 78"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="1.8"
+        strokeLinejoin="round"
+      />
       <circle cx="55" cy="22" r="2" fill="currentColor" opacity="0.6" />
       <line x1="35" y1="30" x2="38" y2="32" stroke="currentColor" strokeWidth="0.8" opacity="0.4" />
       <line x1="65" y1="30" x2="62" y2="32" stroke="currentColor" strokeWidth="0.8" opacity="0.4" />
@@ -76,8 +104,26 @@ const SYMBOLS: Record<ArcaneSymbol, React.ReactNode> = {
     <g>
       <circle cx="50" cy="50" r="4" fill="currentColor" />
       <ellipse cx="50" cy="50" rx="25" ry="10" fill="none" stroke="currentColor" strokeWidth="1" />
-      <ellipse cx="50" cy="50" rx="25" ry="10" fill="none" stroke="currentColor" strokeWidth="1" transform="rotate(60 50 50)" />
-      <ellipse cx="50" cy="50" rx="25" ry="10" fill="none" stroke="currentColor" strokeWidth="1" transform="rotate(120 50 50)" />
+      <ellipse
+        cx="50"
+        cy="50"
+        rx="25"
+        ry="10"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="1"
+        transform="rotate(60 50 50)"
+      />
+      <ellipse
+        cx="50"
+        cy="50"
+        rx="25"
+        ry="10"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="1"
+        transform="rotate(120 50 50)"
+      />
       <circle cx="75" cy="50" r="2" fill="currentColor" opacity="0.5" />
       <circle cx="37" cy="28" r="2" fill="currentColor" opacity="0.5" />
       <circle cx="37" cy="72" r="2" fill="currentColor" opacity="0.5" />
@@ -96,15 +142,29 @@ const SYMBOLS: Record<ArcaneSymbol, React.ReactNode> = {
           fill="none"
           stroke="currentColor"
           strokeWidth="1"
-          transform={`rotate(${angle} 50 50)`}
+          transform={`rotate(${String(angle)} 50 50)`}
         />
       ))}
-      <circle cx="50" cy="50" r="18" fill="none" stroke="currentColor" strokeWidth="0.5" opacity="0.3" strokeDasharray="2 3" />
+      <circle
+        cx="50"
+        cy="50"
+        r="18"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="0.5"
+        opacity="0.3"
+        strokeDasharray="2 3"
+      />
     </g>
   ),
   eye: (
     <g>
-      <path d="M20 50 Q35 30 50 30 Q65 30 80 50 Q65 70 50 70 Q35 70 20 50 Z" fill="none" stroke="currentColor" strokeWidth="1.5" />
+      <path
+        d="M20 50 Q35 30 50 30 Q65 30 80 50 Q65 70 50 70 Q35 70 20 50 Z"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="1.5"
+      />
       <circle cx="50" cy="50" r="12" fill="none" stroke="currentColor" strokeWidth="1" />
       <circle cx="50" cy="50" r="5" fill="currentColor" />
       <circle cx="47" cy="47" r="1.5" fill="#0a0a0a" />

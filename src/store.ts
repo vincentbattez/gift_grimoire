@@ -8,6 +8,10 @@ type UIStore = {
 
 export const useUIStore = create<UIStore>()((set) => ({
   toastMessage: null,
-  showToast: (msg) => set({ toastMessage: msg }),
-  hideToast: () => set({ toastMessage: null }),
+  showToast: (msg) => {
+    set({ toastMessage: msg });
+  },
+  hideToast: () => {
+    set({ toastMessage: null });
+  },
 }));

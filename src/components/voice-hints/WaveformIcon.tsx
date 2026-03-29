@@ -14,10 +14,10 @@ export function WaveformIcon({ playing, color }: { playing: boolean; color: stri
           fill={color}
           className={playing ? "" : "opacity-55"}
           style={{
-            transformOrigin: `${i * 4 + 1.25}px 10px`,
+            transformOrigin: `${String(i * 4 + 1.25)}px 10px`,
             ...(playing && {
               animation: "sound-bar 0.8s ease-in-out infinite",
-              animationDelay: `${i * 90}ms`,
+              animationDelay: `${String(i * 90)}ms`,
             }),
           }}
         />

@@ -28,14 +28,15 @@ function DiamondLattice() {
 
   return (
     <svg className="back-lattice" viewBox="0 0 200 300" preserveAspectRatio="none">
-      {Array.from({ length: rows }, (_, r) =>
-        Array.from({ length: cols }, (_, c) => {
+      {Array.from({ length: rows }, (_row, r) =>
+        Array.from({ length: cols }, (_col, c) => {
           const cx = w * c + w / 2;
           const cy = h * r + h / 2;
+
           return (
-            <g key={`${r}-${c}`}>
+            <g key={`${String(r)}-${String(c)}`}>
               <polygon
-                points={`${cx},${cy - h / 2} ${cx + w / 2},${cy} ${cx},${cy + h / 2} ${cx - w / 2},${cy}`}
+                points={`${String(cx)},${String(cy - h / 2)} ${String(cx + w / 2)},${String(cy)} ${String(cx)},${String(cy + h / 2)} ${String(cx - w / 2)},${String(cy)}`}
                 fill="none"
                 stroke="var(--gold)"
                 strokeWidth="0.3"
@@ -56,7 +57,16 @@ function CentralMandala() {
     <svg className="back-mandala" viewBox="0 0 200 200">
       {/* Outermost circle */}
       <circle cx="100" cy="100" r="92" fill="none" stroke="var(--gold)" strokeWidth="0.6" opacity="0.3" />
-      <circle cx="100" cy="100" r="88" fill="none" stroke="var(--gold)" strokeWidth="0.3" strokeDasharray="2 3" opacity="0.2" />
+      <circle
+        cx="100"
+        cy="100"
+        r="88"
+        fill="none"
+        stroke="var(--gold)"
+        strokeWidth="0.3"
+        strokeDasharray="2 3"
+        opacity="0.2"
+      />
 
       {/* Second ring */}
       <circle cx="100" cy="100" r="76" fill="none" stroke="var(--gold)" strokeWidth="0.8" opacity="0.35" />
@@ -69,13 +79,8 @@ function CentralMandala() {
         const y1 = 100 + 44 * Math.sin(angle);
         const x2 = 100 + 76 * Math.cos(angle);
         const y2 = 100 + 76 * Math.sin(angle);
-        return (
-          <line
-            key={i}
-            x1={x1} y1={y1} x2={x2} y2={y2}
-            stroke="var(--gold)" strokeWidth="0.4" opacity="0.2"
-          />
-        );
+
+        return <line key={i} x1={x1} y1={y1} x2={x2} y2={y2} stroke="var(--gold)" strokeWidth="0.4" opacity="0.2" />;
       })}
 
       {/* Spoke end jewels — 12 dots on outer ring */}
@@ -83,12 +88,22 @@ function CentralMandala() {
         const angle = (i * 30 * Math.PI) / 180;
         const cx = 100 + 76 * Math.cos(angle);
         const cy = 100 + 76 * Math.sin(angle);
+
         return <circle key={i} cx={cx} cy={cy} r="1.5" fill="var(--gold)" opacity="0.3" />;
       })}
 
       {/* Inner ring */}
       <circle cx="100" cy="100" r="44" fill="none" stroke="var(--gold)" strokeWidth="0.6" opacity="0.3" />
-      <circle cx="100" cy="100" r="40" fill="none" stroke="var(--gold)" strokeWidth="0.3" strokeDasharray="3 3" opacity="0.15" />
+      <circle
+        cx="100"
+        cy="100"
+        r="40"
+        fill="none"
+        stroke="var(--gold)"
+        strokeWidth="0.3"
+        strokeDasharray="3 3"
+        opacity="0.15"
+      />
 
       {/* Vesica piscis — two interlocking circles */}
       <circle cx="84" cy="100" r="30" fill="none" stroke="var(--gold)" strokeWidth="0.5" opacity="0.2" />
@@ -108,35 +123,44 @@ function CentralMandala() {
         const y1 = 100 + outerR * Math.sin(angle);
         const x2 = 100 + innerR * Math.cos(nextAngle);
         const y2 = 100 + innerR * Math.sin(nextAngle);
-        return (
-          <line key={i} x1={x1} y1={y1} x2={x2} y2={y2}
-            stroke="var(--gold)" strokeWidth="0.6" opacity="0.35"
-          />
-        );
+
+        return <line key={i} x1={x1} y1={y1} x2={x2} y2={y2} stroke="var(--gold)" strokeWidth="0.6" opacity="0.35" />;
       })}
       {Array.from({ length: 8 }, (_, i) => {
         const angle = (i * 45 * Math.PI) / 180;
         const cx = 100 + 18 * Math.cos(angle);
         const cy = 100 + 18 * Math.sin(angle);
+
         return <circle key={i} cx={cx} cy={cy} r="1.2" fill="var(--gold)" opacity="0.4" />;
       })}
 
       {/* Central eye */}
       <circle cx="100" cy="100" r="6" fill="none" stroke="var(--gold)" strokeWidth="0.8" opacity="0.5" />
       <circle cx="100" cy="100" r="2.5" fill="var(--gold)" opacity="0.6" />
-      <circle cx="100" cy="100" r="10" fill="none" stroke="var(--gold)" strokeWidth="0.3" strokeDasharray="1 2" opacity="0.25" />
+      <circle
+        cx="100"
+        cy="100"
+        r="10"
+        fill="none"
+        stroke="var(--gold)"
+        strokeWidth="0.3"
+        strokeDasharray="1 2"
+        opacity="0.25"
+      />
 
       {/* Cardinal ornaments — small diamonds at N/S/E/W on outer ring */}
       {[0, 90, 180, 270].map((deg) => {
         const angle = (deg * Math.PI) / 180;
         const cx = 100 + 92 * Math.cos(angle);
         const cy = 100 + 92 * Math.sin(angle);
+
         return (
           <g key={deg}>
             <polygon
-              points={`${cx},${cy - 3} ${cx + 2},${cy} ${cx},${cy + 3} ${cx - 2},${cy}`}
-              fill="var(--gold)" opacity="0.35"
-              transform={`rotate(${deg} ${cx} ${cy})`}
+              points={`${String(cx)},${String(cy - 3)} ${String(cx + 2)},${String(cy)} ${String(cx)},${String(cy + 3)} ${String(cx - 2)},${String(cy)}`}
+              fill="var(--gold)"
+              opacity="0.35"
+              transform={`rotate(${String(deg)} ${String(cx)} ${String(cy)})`}
             />
           </g>
         );
@@ -150,12 +174,33 @@ function Banner() {
   return (
     <svg className="back-banner" viewBox="0 0 160 24">
       {/* Central cartouche */}
-      <rect x="40" y="6" width="80" height="12" rx="6" fill="none" stroke="var(--gold)" strokeWidth="0.5" opacity="0.3" />
+      <rect
+        x="40"
+        y="6"
+        width="80"
+        height="12"
+        rx="6"
+        fill="none"
+        stroke="var(--gold)"
+        strokeWidth="0.5"
+        opacity="0.3"
+      />
       {/* Inner line */}
-      <rect x="44" y="8" width="72" height="8" rx="4" fill="none" stroke="var(--gold)" strokeWidth="0.3" opacity="0.15" />
+      <rect
+        x="44"
+        y="8"
+        width="72"
+        height="8"
+        rx="4"
+        fill="none"
+        stroke="var(--gold)"
+        strokeWidth="0.3"
+        opacity="0.15"
+      />
       {/* Text: GRIMOIRE */}
       <text
-        x="80" y="15"
+        x="80"
+        y="15"
         textAnchor="middle"
         fontFamily="'Cinzel', serif"
         fontSize="5"
@@ -196,10 +241,18 @@ export function TarotCardBack() {
         <DiamondLattice />
 
         {/* Corner filigrees */}
-        <div className="corner-flourish corner-fl-tl"><CornerFiligreeBack /></div>
-        <div className="corner-flourish corner-fl-tr"><CornerFiligreeBack /></div>
-        <div className="corner-flourish corner-fl-bl"><CornerFiligreeBack /></div>
-        <div className="corner-flourish corner-fl-br"><CornerFiligreeBack /></div>
+        <div className="corner-flourish corner-fl-tl">
+          <CornerFiligreeBack />
+        </div>
+        <div className="corner-flourish corner-fl-tr">
+          <CornerFiligreeBack />
+        </div>
+        <div className="corner-flourish corner-fl-bl">
+          <CornerFiligreeBack />
+        </div>
+        <div className="corner-flourish corner-fl-br">
+          <CornerFiligreeBack />
+        </div>
 
         {/* Mid-frame accent dots */}
         <div className="frame-dot frame-dot-top" />
@@ -223,7 +276,11 @@ export function TarotCardBack() {
       </div>
       <button
         className="card-download-btn"
-        onClick={() => cardRef.current && downloadBack(cardRef.current)}
+        onClick={() => {
+          if (cardRef.current) {
+            void downloadBack(cardRef.current);
+          }
+        }}
       >
         PNG
       </button>

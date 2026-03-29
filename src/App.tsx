@@ -1,22 +1,22 @@
 import { useEffect, useRef, useState } from "react";
-import { useEnigmaStore } from "./features/enigma/store";
-import { useCooldownStore } from "./features/cooldown/store";
-import { ENIGMAS } from "./features/enigma/config";
-import { Starfield } from "./components/Starfield";
 import { Header } from "./components/Header";
+import { IntroModal } from "./components/IntroModal";
+import { Starfield } from "./components/Starfield";
+import { Toast } from "./components/Toast";
+import { initAdmin, logoutAdmin, useAdmin } from "./features/admin/useAdmin";
+import { CooldownBadge } from "./features/cooldown/components/CooldownBadge";
+import { useCooldownStore } from "./features/cooldown/store";
 import { EnigmaGrid } from "./features/enigma/components/EnigmaGrid";
 import { EnigmaModal } from "./features/enigma/components/EnigmaModal";
-import { Toast } from "./components/Toast";
-import { UnlockOverlay } from "./features/enigma/components/UnlockOverlay";
-import { SuccessModal } from "./features/enigma/components/SuccessModal";
 import { LoveLetterModal } from "./features/enigma/components/LoveLetterModal";
-import { FinaleModal } from "./features/finale/components/FinaleModal";
-import { IntroModal } from "./components/IntroModal";
-import { CooldownBadge } from "./features/cooldown/components/CooldownBadge";
+import { SuccessModal } from "./features/enigma/components/SuccessModal";
+import { UnlockOverlay } from "./features/enigma/components/UnlockOverlay";
+import { ENIGMAS } from "./features/enigma/config";
+import { useEnigmaStore } from "./features/enigma/store";
 import { triggerUnlockEffect } from "./features/enigma/unlock";
-import { initAdmin, logoutAdmin, useAdmin } from "./features/admin/useAdmin";
-import { fireEvent } from "./ha";
+import { FinaleModal } from "./features/finale/components/FinaleModal";
 import { useMagnetStore } from "./features/forges/forge-magnet/store";
+import { fireEvent } from "./ha";
 
 initAdmin();
 
@@ -24,11 +24,14 @@ let shouldShowIntro = false;
 
 function initGrimoireInit() {
   const params = new URLSearchParams(location.search);
-  if (params.get("init") !== "true") return;
+
+  if (params.get("init") !== "true") {
+    return;
+  }
   params.delete("init");
   const qs = params.toString();
   history.replaceState({}, "", location.pathname + (qs ? `?${qs}` : ""));
-  fireEvent("gift_grimoire-init");
+  void fireEvent("gift_grimoire-init");
   shouldShowIntro = true;
 }
 
@@ -38,11 +41,18 @@ function useQRUnlock() {
   useEffect(() => {
     const params = new URLSearchParams(location.search);
     const raw = params.get("unlock");
-    if (!raw) return;
-    const enigma = ENIGMAS.find((e) => String(e.id) === raw);
+
+    if (!raw) {
+      return;
+    }
+    const enigma = ENIGMAS.find((e) => e.id === raw);
+
     if (enigma) {
       history.replaceState({}, "", location.pathname);
-      setTimeout(() => triggerUnlockEffect(enigma.id, enigma.title), 700);
+
+      setTimeout(() => {
+        triggerUnlockEffect(enigma.id, enigma.title);
+      }, 700);
     }
   }, []);
 }
@@ -52,9 +62,14 @@ function ScreenFlash() {
   const ref = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    if (!celebrateCardId) return;
+    if (!celebrateCardId) {
+      return;
+    }
     const el = ref.current;
-    if (!el) return;
+
+    if (!el) {
+      return;
+    }
     el.style.animation = "none";
     void el.offsetHeight; // force reflow
     el.style.animation = "screen-flash 0.5s ease-out forwards";
@@ -75,7 +90,7 @@ export default function App() {
   useQRUnlock();
   const resetAttempt = useCooldownStore((s) => s.resetAttempt);
   const isAdmin = useAdmin();
-  const [showIntro, setShowIntro] = useState(shouldShowIntro);
+  const [isShowingIntro, setIsShowingIntro] = useState(shouldShowIntro);
 
   return (
     <>
@@ -84,10 +99,15 @@ export default function App() {
         <Header />
         <EnigmaGrid isAdmin={isAdmin} />
         <p className="mt-6 text-center text-[0.6rem] text-muted/80">
-          <span className="text-danger/50 font-bold">❤</span> Imaginé et developpé <span className="text-danger/50 font-bold">avec amour</span> pour Léamour - 2026 <span className="text-danger/50 font-bold">❤</span>
+          <span className="text-danger/50 font-bold">❤</span> Imaginé et developpé{" "}
+          <span className="text-danger/50 font-bold">avec amour</span> pour Léamour - 2026{" "}
+          <span className="text-danger/50 font-bold">❤</span>
         </p>
         <button
-          onClick={() => { resetAttempt(); useMagnetStore.getState().reset(); }}
+          onClick={() => {
+            resetAttempt();
+            useMagnetStore.getState().reset();
+          }}
           className="w-full mt-2 mb-4 py-2 text-[0.5rem] text-muted/20 bg-transparent border-none cursor-default select-none"
         >
           reset
@@ -109,7 +129,13 @@ export default function App() {
       <SuccessModal />
       <LoveLetterModal />
       <FinaleModal />
-      {showIntro && <IntroModal onClose={() => setShowIntro(false)} />}
+      {isShowingIntro && (
+        <IntroModal
+          onClose={() => {
+            setIsShowingIntro(false);
+          }}
+        />
+      )}
     </>
   );
 }

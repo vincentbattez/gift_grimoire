@@ -3,12 +3,15 @@ import { createPortal } from "react-dom";
 import { LockIcon } from "../../../components/LockIcon";
 
 export function LockedModal({ onClose }: { readonly onClose: () => void }) {
-  const [closing, setClosing] = useState(false);
+  const [isClosing, setIsClosing] = useState(false);
 
   function handleClose(e?: React.MouseEvent) {
     e?.stopPropagation();
-    if (closing) return;
-    setClosing(true);
+
+    if (isClosing) {
+      return;
+    }
+    setIsClosing(true);
     setTimeout(onClose, 300);
   }
 
@@ -17,17 +20,12 @@ export function LockedModal({ onClose }: { readonly onClose: () => void }) {
       className="fixed inset-0 z-[100] flex flex-col items-center justify-center"
       style={{
         background: "radial-gradient(ellipse at 50% 40%, #1a1040ee, #07060ffa)",
-        animation: closing
-          ? "locked-modal-out 0.3s ease-in forwards"
-          : "locked-modal-in 0.3s ease-out",
+        animation: isClosing ? "locked-modal-out 0.3s ease-in forwards" : "locked-modal-in 0.3s ease-out",
       }}
       onClick={handleClose}
     >
       {/* Floating lock — large version */}
-      <div
-        className="mb-8"
-        style={{ transform: "scale(2.2)", animation: "locked-lock-float 3s ease-in-out infinite" }}
-      >
+      <div className="mb-8" style={{ transform: "scale(2.2)", animation: "locked-lock-float 3s ease-in-out infinite" }}>
         <LockIcon />
       </div>
 

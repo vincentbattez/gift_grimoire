@@ -1,37 +1,35 @@
-import { useEnigmaStore } from "../store";
-import { useFinaleStore } from "../../finale/store";
-import { ENIGMAS } from "../config";
-import { FORGES } from "../../forges/forges.config";
-import { EnigmaCard } from "./EnigmaCard";
-import { ForgeSection } from "../../forges/components/ForgeSection";
 import { VoiceHints } from "../../../components/voice-hints/VoiceHints";
 import { AdminControls } from "../../admin/components/AdminControls";
+import { useFinaleStore } from "../../finale/store";
+import { ForgeSection } from "../../forges/components/ForgeSection";
+import { FORGES } from "../../forges/forges.config";
+import { ENIGMAS } from "../config";
+import { useEnigmaStore } from "../store";
+import { EnigmaCard } from "./EnigmaCard";
 
 function SectionLabel({ children }: { children: React.ReactNode }) {
-  return (
-    <div className="text-center text-[0.6rem] tracking-[0.35em] text-muted my-4 uppercase">
-      {children}
-    </div>
-  );
+  return <div className="text-center text-[0.6rem] tracking-[0.35em] text-muted my-4 uppercase">{children}</div>;
 }
 
 function FinaleButton() {
   const enigmas = useEnigmaStore((s) => s.enigmas);
   const startNarrative = useFinaleStore((s) => s.startNarrative);
-  const finaleActive = useFinaleStore((s) => s.finaleActive);
-  const finaleNarrative = useFinaleStore((s) => s.finaleNarrative);
-  const finaleDone = useFinaleStore((s) => s.finaleDone);
-  const allSolved = Object.values(enigmas).every((e) => e.solved);
+  const isFinaleActive = useFinaleStore((s) => s.finaleActive);
+  const isFinaleNarrative = useFinaleStore((s) => s.finaleNarrative);
+  const isFinaleDone = useFinaleStore((s) => s.finaleDone);
+  const isAllSolved = Object.values(enigmas).every((e) => e.solved);
 
-  if (!allSolved || finaleActive || finaleDone) return null;
+  if (!isAllSolved || isFinaleActive || isFinaleDone) {
+    return null;
+  }
 
   return (
     <div
       className="mt-12 mb-6 flex justify-center transition-opacity duration-500"
       style={{
-        animation: finaleNarrative ? undefined : "finale-btn-appear 0.8s ease-out both",
-        opacity: finaleNarrative ? 0 : undefined,
-        pointerEvents: finaleNarrative ? "none" : undefined,
+        animation: isFinaleNarrative ? undefined : "finale-btn-appear 0.8s ease-out both",
+        opacity: isFinaleNarrative ? 0 : undefined,
+        pointerEvents: isFinaleNarrative ? "none" : undefined,
       }}
     >
       <button
@@ -40,11 +38,14 @@ function FinaleButton() {
         style={{
           background: "linear-gradient(135deg, #1a1430, #2a1840, #1a1430)",
           border: "1.5px solid #e8c96a50",
-          animation: finaleNarrative ? undefined : "finale-btn-pulse 3s ease-in-out infinite",
+          animation: isFinaleNarrative ? undefined : "finale-btn-pulse 3s ease-in-out infinite",
           fontFamily: "var(--font-cinzel-decorative)",
         }}
       >
-        <span className="text-[0.75rem] tracking-[0.2em] uppercase" style={{ color: "var(--color-gold)", textShadow: "0 0 20px #e8c96a40" }}>
+        <span
+          className="text-[0.75rem] tracking-[0.2em] uppercase"
+          style={{ color: "var(--color-gold)", textShadow: "0 0 20px #e8c96a40" }}
+        >
           ✦ Refermer le Grimoire ✦
         </span>
       </button>
@@ -95,7 +96,7 @@ function ForgeList({ isAdmin }: { isAdmin: boolean }) {
 
 export function EnigmaGrid({ isAdmin }: { isAdmin: boolean }) {
   const enigmas = useEnigmaStore((s) => s.enigmas);
-  const prologueCompleted = Object.values(enigmas).some((e) => e.unlocked || e.solved);
+  const isPrologueCompleted = Object.values(enigmas).some((e) => e.unlocked || e.solved);
 
   return (
     <>
@@ -104,7 +105,7 @@ export function EnigmaGrid({ isAdmin }: { isAdmin: boolean }) {
       <div className="mt-12">
         <EnigmaSection isAdmin={isAdmin} />
       </div>
-      {prologueCompleted && (
+      {isPrologueCompleted && (
         <div className="mt-16">
           <ForgeList isAdmin={isAdmin} />
         </div>

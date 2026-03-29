@@ -41,6 +41,7 @@ type EnigmaStore = {
 };
 
 const initialEnigmas: Record<EnigmaId, EnigmaState> = {};
+
 ENIGMAS.forEach((e) => {
   initialEnigmas[e.id] = { unlocked: false, solved: false };
 });
@@ -63,9 +64,12 @@ export const useEnigmaStore = create<EnigmaStore>()(
 
       unlock: (id) =>
         set((s) => {
-          if (s.enigmas[id]?.unlocked || s.enigmas[id]?.solved) return s;
+          if (s.enigmas[id].unlocked || s.enigmas[id].solved) {
+            return s;
+          }
           const next = new Set(s.newlyUnlocked);
           next.add(id);
+
           return {
             enigmas: { ...s.enigmas, [id]: { ...s.enigmas[id], unlocked: true } },
             newlyUnlocked: next,
@@ -81,6 +85,7 @@ export const useEnigmaStore = create<EnigmaStore>()(
         set((s) => {
           const next = new Set(s.newlyUnlocked);
           next.delete(id);
+
           return {
             enigmas: { ...s.enigmas, [id]: { unlocked: false, solved: false } },
             newlyUnlocked: next,
@@ -90,25 +95,32 @@ export const useEnigmaStore = create<EnigmaStore>()(
       setEnigmaStatus: (id, status) =>
         set((s) => {
           switch (status) {
-            case "locked":
+            case "locked": {
               return {
                 enigmas: { ...s.enigmas, [id]: { unlocked: false, solved: false } },
                 readLetters: { ...s.readLetters, [id]: false },
               };
-            case "unlocked":
+            }
+            case "unlocked": {
               return {
                 enigmas: { ...s.enigmas, [id]: { unlocked: true, solved: false } },
                 readLetters: { ...s.readLetters, [id]: false },
               };
-            case "solved":
+            }
+            case "solved": {
               return {
                 enigmas: { ...s.enigmas, [id]: { unlocked: true, solved: true } },
               };
-            case "completed":
+            }
+            case "completed": {
               return {
                 enigmas: { ...s.enigmas, [id]: { unlocked: true, solved: true } },
                 readLetters: { ...s.readLetters, [id]: true },
               };
+            }
+            default: {
+              return status satisfies never;
+            }
           }
         }),
 
@@ -116,6 +128,7 @@ export const useEnigmaStore = create<EnigmaStore>()(
         set((s) => {
           const next = new Set(s.newlyUnlocked);
           next.delete(id);
+
           return { newlyUnlocked: next };
         }),
 
@@ -135,6 +148,7 @@ export const useEnigmaStore = create<EnigmaStore>()(
         set({ successBoxNumber: boxNumber, successHaEvent: haEvent, successEnigmaId: enigmaId }),
       hideSuccessBox: () => {
         const enigmaId = get().successEnigmaId;
+
         if (enigmaId) {
           set((s) => ({
             successBoxNumber: null,
@@ -151,12 +165,14 @@ export const useEnigmaStore = create<EnigmaStore>()(
       closeLoveLetter: () => {
         const id = get().loveLetterEnigmaId;
         const closingModalId = get().modalEnigmaId;
+
         set((s) => ({
           loveLetterEnigmaId: null,
           modalEnigmaId: null,
           ...(closingModalId ? { modalClosingId: closingModalId } : {}),
           ...(id ? { readLetters: { ...s.readLetters, [id]: true } } : {}),
         }));
+
         if (closingModalId) {
           setTimeout(() => set({ modalClosingId: null }), MODAL_CLOSE_MS);
         }

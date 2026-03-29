@@ -1,17 +1,12 @@
 let ctx: AudioContext | null = null;
 
 function getCtx(): AudioContext {
-  if (!ctx) ctx = new AudioContext();
+  ctx ??= new AudioContext();
+
   return ctx;
 }
 
-function tone(
-  freq: number,
-  type: OscillatorType,
-  vol: number,
-  dur: number,
-  delay = 0,
-) {
+function tone(freq: number, type: OscillatorType, vol: number, dur: number, delay = 0) {
   const c = getCtx();
   const o = c.createOscillator();
   const g = c.createGain();
@@ -27,11 +22,16 @@ function tone(
   o.stop(t + dur);
 }
 
-export const sndUnlock = () =>
-  [523, 659, 784, 1047, 1319].forEach((f, i) => tone(f, "sine", 0.22, 0.55, i * 0.09));
+export const sndUnlock = () => {
+  [523, 659, 784, 1047, 1319].forEach((f, i) => {
+    tone(f, "sine", 0.22, 0.55, i * 0.09);
+  });
+};
 
 export const sndOk = () => {
-  [523, 659, 784].forEach((f, i) => tone(f, "triangle", 0.18, 1.2, i * 0.05));
+  [523, 659, 784].forEach((f, i) => {
+    tone(f, "triangle", 0.18, 1.2, i * 0.05);
+  });
   tone(1047, "sine", 0.28, 1.8, 0.3);
 };
 
@@ -40,7 +40,9 @@ export const sndBad = () => {
   tone(148, "sawtooth", 0.3, 0.28, 0.12);
 };
 
-export const sndClick = () => tone(900, "sine", 0.09, 0.1);
+export const sndClick = () => {
+  tone(900, "sine", 0.09, 0.1);
+};
 
 /** Bubbly heart pop — pitch varies per call for organic feel */
 export const sndHeartPop = (pitchOffset = 0) => {
@@ -100,24 +102,26 @@ export const sndLetterSwap = () => {
 /** Shimmering chime — scramble solved */
 export const sndScrambleSolved = () => {
   // Quick ascending sparkle
-  [784, 988, 1175, 1568].forEach((f, i) =>
-    tone(f, "sine", 0.15, 0.4, i * 0.08),
-  );
+  [784, 988, 1175, 1568].forEach((f, i) => {
+    tone(f, "sine", 0.15, 0.4, i * 0.08);
+  });
+
   // Sustained resolve chord
-  [1047, 1319, 1568].forEach((f, i) =>
-    tone(f, "triangle", 0.12, 1.4, 0.35 + i * 0.03),
-  );
+  [1047, 1319, 1568].forEach((f, i) => {
+    tone(f, "triangle", 0.12, 1.4, 0.35 + i * 0.03);
+  });
 };
 
 export const sndVictory = () => {
   // Arpège ascendant rapide (Do-Mi-Sol-Do-Mi)
-  [523, 659, 784, 1047, 1319].forEach((f, i) =>
-    tone(f, "triangle", 0.16, 0.6, i * 0.07),
-  );
+  [523, 659, 784, 1047, 1319].forEach((f, i) => {
+    tone(f, "triangle", 0.16, 0.6, i * 0.07);
+  });
+
   // Accord majeur soutenu
-  [1047, 1319, 1568].forEach((f, i) =>
-    tone(f, "sine", 0.22, 2.2, 0.4 + i * 0.03),
-  );
+  [1047, 1319, 1568].forEach((f, i) => {
+    tone(f, "sine", 0.22, 2.2, 0.4 + i * 0.03);
+  });
   // Note haute scintillante
   tone(2093, "sine", 0.12, 1.5, 0.6);
 };
@@ -216,7 +220,10 @@ export function sndAnalysis(offsetSec = 0): () => void {
   drone.frequency.value = 85;
   const droneStart = Math.max(0, 0.5 - offsetSec);
   droneG.gain.setValueAtTime(offsetSec >= 0.5 ? 0.05 : 0, t);
-  if (offsetSec < 0.5) droneG.gain.linearRampToValueAtTime(0.05, t + droneStart);
+
+  if (offsetSec < 0.5) {
+    droneG.gain.linearRampToValueAtTime(0.05, t + droneStart);
+  }
   droneG.gain.setValueAtTime(0.05, t + Math.max(0, 5.8 - offsetSec));
   droneG.gain.exponentialRampToValueAtTime(0.0001, t + Math.max(0.01, DUR - offsetSec));
   drone.start(t);
@@ -226,7 +233,10 @@ export function sndAnalysis(offsetSec = 0): () => void {
   // 7 radar pings — one every ~0.85s
   for (let i = 0; i < 7; i++) {
     const pingTime = i * 0.85;
-    if (pingTime + 0.55 <= offsetSec) continue; // already played
+
+    if (pingTime + 0.55 <= offsetSec) {
+      continue;
+    } // already played
     const delay = Math.max(0, pingTime - offsetSec);
 
     // Ascending chirp
@@ -260,7 +270,6 @@ export function sndAnalysis(offsetSec = 0): () => void {
     allNodes.push({ o: oE, g: gE });
   }
 
-
   return () => {
     const now = c.currentTime;
     for (const { o, g } of allNodes) {
@@ -293,7 +302,10 @@ export function sndDoubt(): void {
   hum.stop(t + 0.85);
 
   // Two-note questioning motif — rising minor third (like "hm?")
-  for (const [freq, delay] of [[523, 0.15], [622, 0.4]] as const) {
+  for (const [freq, delay] of [
+    [523, 0.15],
+    [622, 0.4],
+  ] as const) {
     const o = c.createOscillator();
     const g = c.createGain();
     o.connect(g);
@@ -413,7 +425,12 @@ export function sndDeepListen(): () => void {
       g.gain.exponentialRampToValueAtTime(0.0001, now + 0.4);
       o.stop(now + 0.45);
     }
-    try { breathLfo.stop(now + 0.45); } catch { /* AudioNode déjà arrêté */ }
+
+    try {
+      breathLfo.stop(now + 0.45);
+    } catch {
+      /* AudioNode déjà arrêté */
+    }
   };
 }
 
@@ -622,7 +639,11 @@ export const sndWaxMelt = (): (() => void) => {
     humG.gain.cancelScheduledValues(now);
     humG.gain.setValueAtTime(humG.gain.value, now);
     humG.gain.exponentialRampToValueAtTime(0.0001, now + 0.2);
-    setTimeout(() => { noise.stop(); hum.stop(); }, 300);
+
+    setTimeout(() => {
+      noise.stop();
+      hum.stop();
+    }, 300);
   };
 };
 
@@ -904,6 +925,7 @@ export const sndFinale = () => {
 
   // Phase 2 (1.5-3.5s): Ascending pentatonic cascade — double speed
   const cascade = [262, 330, 392, 523, 659, 784, 1047, 1319, 1568, 2093];
+
   cascade.forEach((f, i) => {
     const start = 1.2 + i * 0.12;
     const o = c.createOscillator();
@@ -926,6 +948,7 @@ export const sndFinale = () => {
 
   // Phase 3 (3-5s): Full triumphant chord — C major with extensions
   const chordFreqs = [523, 659, 784, 1047, 1319, 1568];
+
   chordFreqs.forEach((f, i) => {
     const o = c.createOscillator();
     const g = c.createGain();
@@ -933,7 +956,7 @@ export const sndFinale = () => {
     g.connect(c.destination);
     o.type = i < 3 ? "triangle" : "sine";
     o.frequency.value = f;
-    const start = t + 3.0 + i * 0.04;
+    const start = t + 3 + i * 0.04;
     g.gain.setValueAtTime(0, start);
     g.gain.linearRampToValueAtTime(0.14, start + 0.1);
     g.gain.setValueAtTime(0.14, start + 1.5);
@@ -944,11 +967,12 @@ export const sndFinale = () => {
 
   // High crystalline shimmer over chord
   tone(2093, "sine", 0.06, 2.5, 3.2);
-  tone(2637, "sine", 0.04, 2.0, 3.5);
+  tone(2637, "sine", 0.04, 2, 3.5);
   tone(3520, "sine", 0.025, 1.8, 3.8);
 
   // Phase 4 (5-7s): Music-box descending resolution
   const musicBox = [1568, 1319, 1047, 784, 659, 523];
+
   musicBox.forEach((f, i) => {
     const o = c.createOscillator();
     const g = c.createGain();
@@ -956,7 +980,7 @@ export const sndFinale = () => {
     g.connect(c.destination);
     o.type = "sine";
     o.frequency.value = f;
-    const start = t + 5.0 + i * 0.18;
+    const start = t + 5 + i * 0.18;
     g.gain.setValueAtTime(0, start);
     g.gain.linearRampToValueAtTime(0.09, start + 0.02);
     g.gain.exponentialRampToValueAtTime(0.0001, start + 1.5);
@@ -975,13 +999,13 @@ export const sndFinale = () => {
     const start = t + 5.8 + i * 0.03;
     g.gain.setValueAtTime(0, start);
     g.gain.linearRampToValueAtTime(0.06, start + 0.3);
-    g.gain.exponentialRampToValueAtTime(0.0001, start + 2.0);
+    g.gain.exponentialRampToValueAtTime(0.0001, start + 2);
     o.start(start);
     o.stop(start + 2.1);
   });
 
   // Final golden bell
-  tone(880, "sine", 0.08, 2.0, 6.2);
+  tone(880, "sine", 0.08, 2, 6.2);
   tone(1760, "sine", 0.03, 1.5, 6.3);
 };
 
@@ -1062,12 +1086,13 @@ export const sndInkMissAdjacent = () => {
 
 /** Short triumph — word solved */
 export const sndInkWordSolved = () => {
-  [784, 988, 1175, 1568].forEach((f, i) =>
-    tone(f, "sine", 0.12, 0.5, i * 0.07),
-  );
-  [988, 1175].forEach((f, i) =>
-    tone(f, "triangle", 0.07, 1.0, 0.3 + i * 0.03),
-  );
+  [784, 988, 1175, 1568].forEach((f, i) => {
+    tone(f, "sine", 0.12, 0.5, i * 0.07);
+  });
+
+  [988, 1175].forEach((f, i) => {
+    tone(f, "triangle", 0.07, 1, 0.3 + i * 0.03);
+  });
 };
 
 /** Brief dissonant tone — wrong word guess */

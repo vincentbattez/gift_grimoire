@@ -19,13 +19,16 @@ export function CooldownLabel({
   prefix?: string;
   className?: string;
 }) {
-  const { active, label } = useCooldown(lastTriggeredAt, durationMs);
+  const { active: isActive, label } = useCooldown(lastTriggeredAt, durationMs);
 
-  if (!active) return null;
+  if (!isActive) {
+    return null;
+  }
 
   return (
     <span className={className}>
-      {prefix && <>{prefix} </>}{label}
+      {prefix && <>{prefix} </>}
+      {label}
     </span>
   );
 }

@@ -4,23 +4,62 @@ type ButtonVariant = "primary" | "gradient" | "ghost" | "icon" | "admin";
 type ButtonColor = "accent" | "success" | "danger" | "sky" | "amber";
 type ButtonSize = "sm" | "md" | "lg";
 
-interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
+type ButtonProps = {
   variant?: ButtonVariant;
   color?: ButtonColor;
   size?: ButtonSize;
-}
+} & ButtonHTMLAttributes<HTMLButtonElement>;
 
-const COLOR_MAP: Record<ButtonColor, { border: string; text: string; bg: string; hoverBorder: string; hoverText: string; hoverBg: string }> = {
-  accent: { border: "border-accent/30", text: "text-accent/50", bg: "bg-accent/5", hoverBorder: "hover:border-accent/60", hoverText: "hover:text-accent/80", hoverBg: "hover:bg-accent/10" },
-  success: { border: "border-success/30", text: "text-success/50", bg: "bg-success/5", hoverBorder: "hover:border-success/60", hoverText: "hover:text-success/80", hoverBg: "hover:bg-success/10" },
-  danger: { border: "border-danger/30", text: "text-danger/50", bg: "bg-danger/5", hoverBorder: "hover:border-danger/60", hoverText: "hover:text-danger/80", hoverBg: "hover:bg-danger/10" },
-  sky: { border: "border-sky-400/30", text: "text-sky-400/50", bg: "bg-sky-400/5", hoverBorder: "hover:border-sky-400/60", hoverText: "hover:text-sky-400/80", hoverBg: "hover:bg-sky-400/10" },
-  amber: { border: "border-amber-400/30", text: "text-amber-400/50", bg: "bg-amber-400/5", hoverBorder: "hover:border-amber-400/60", hoverText: "hover:text-amber-400/80", hoverBg: "hover:bg-amber-400/10" },
+const COLOR_MAP: Record<
+  ButtonColor,
+  { border: string; text: string; bg: string; hoverBorder: string; hoverText: string; hoverBg: string }
+> = {
+  accent: {
+    border: "border-accent/30",
+    text: "text-accent/50",
+    bg: "bg-accent/5",
+    hoverBorder: "hover:border-accent/60",
+    hoverText: "hover:text-accent/80",
+    hoverBg: "hover:bg-accent/10",
+  },
+  success: {
+    border: "border-success/30",
+    text: "text-success/50",
+    bg: "bg-success/5",
+    hoverBorder: "hover:border-success/60",
+    hoverText: "hover:text-success/80",
+    hoverBg: "hover:bg-success/10",
+  },
+  danger: {
+    border: "border-danger/30",
+    text: "text-danger/50",
+    bg: "bg-danger/5",
+    hoverBorder: "hover:border-danger/60",
+    hoverText: "hover:text-danger/80",
+    hoverBg: "hover:bg-danger/10",
+  },
+  sky: {
+    border: "border-sky-400/30",
+    text: "text-sky-400/50",
+    bg: "bg-sky-400/5",
+    hoverBorder: "hover:border-sky-400/60",
+    hoverText: "hover:text-sky-400/80",
+    hoverBg: "hover:bg-sky-400/10",
+  },
+  amber: {
+    border: "border-amber-400/30",
+    text: "text-amber-400/50",
+    bg: "bg-amber-400/5",
+    hoverBorder: "hover:border-amber-400/60",
+    hoverText: "hover:text-amber-400/80",
+    hoverBg: "hover:bg-amber-400/10",
+  },
 };
 
 export function Button({ variant = "primary", color = "accent", size = "md", className = "", ...props }: ButtonProps) {
   if (variant === "admin") {
     const c = COLOR_MAP[color];
+
     return (
       <button
         className={`px-3 py-1 rounded-md text-[0.55rem] tracking-[0.15em] uppercase border ${c.border} ${c.text} ${c.bg} ${c.hoverBorder} ${c.hoverText} ${c.hoverBg} transition-all duration-150 active:scale-95 ${className}`}
@@ -42,6 +81,7 @@ export function Button({ variant = "primary", color = "accent", size = "md", cla
       md: "py-3 px-8 text-[0.78rem]",
       lg: "py-3.5 px-10 text-[0.8rem]",
     };
+
     return (
       <button
         className={`rounded-full border font-[var(--font-cinzel)] tracking-[0.15em] uppercase transition-all duration-300 active:scale-95 cursor-pointer ${colorClasses[color]} ${sizeClasses[size]} ${className}`}
@@ -81,6 +121,7 @@ export function Button({ variant = "primary", color = "accent", size = "md", cla
     md: "py-3 px-8 text-[0.82rem]",
     lg: "py-4 px-8 text-[0.85rem]",
   };
+
   return (
     <button
       className={`border-none rounded-[14px] text-white font-[var(--font-cinzel)] font-semibold tracking-[0.12em] uppercase cursor-pointer transition-all duration-200 active:scale-[0.97] ${gradientColors[color]} ${gradientSizeClasses[size]} ${className}`}

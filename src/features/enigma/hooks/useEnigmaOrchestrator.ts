@@ -1,6 +1,6 @@
 import { useCallback } from "react";
-import { useEnigmaStore } from "../store";
 import { useCooldownStore } from "../../cooldown/store";
+import { useEnigmaStore } from "../store";
 import type { EnigmaLifecycleEvents } from "../types";
 
 /**
@@ -18,12 +18,9 @@ export function useEnigmaOrchestrator(): EnigmaLifecycleEvents {
   const celebrate = useEnigmaStore((s) => s.celebrate);
   const closeModal = useEnigmaStore((s) => s.closeModal);
 
-  const onTry = useCallback(
-    () => {
-      recordAttempt();
-    },
-    [recordAttempt],
-  );
+  const onTry = useCallback(() => {
+    recordAttempt();
+  }, [recordAttempt]);
 
   const onSuccess = useCallback(
     (enigmaId: string) => {

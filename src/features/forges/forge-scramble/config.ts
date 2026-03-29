@@ -1,9 +1,9 @@
 export const SOLUTION = "HWHRESSKDS";
 
-export interface Letter {
+export type Letter = {
   id: number;
   char: string;
-}
+};
 
 export const INITIAL_LETTERS: Letter[] = [
   { id: 1, char: "S" },

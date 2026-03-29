@@ -9,9 +9,13 @@ export async function getEntityState(entityId: string): Promise<string | null> {
         "Content-Type": "application/json",
       },
     });
-    if (!r.ok) return null;
-    const data = await r.json();
-    return data.state as string;
+
+    if (!r.ok) {
+      return null;
+    }
+    const data = (await r.json()) as { state: string };
+
+    return data.state;
   } catch {
     return null;
   }
@@ -25,23 +29,34 @@ export function pollEntityState(
   intervalMs = 500,
 ): Promise<boolean> {
   return new Promise((resolve) => {
-    let resolved = false;
+    let isResolved = false;
     const done = (result: boolean) => {
-      if (resolved) return;
-      resolved = true;
+      if (isResolved) {
+        return;
+      }
+      isResolved = true;
       clearTimeout(timer);
       clearInterval(poller);
       resolve(result);
     };
 
-    const timer = setTimeout(() => done(false), timeoutMs);
+    const timer = setTimeout(() => {
+      done(false);
+    }, timeoutMs);
     const poller = setInterval(async () => {
       const state = await getEntityState(entityId);
-      if (state === targetState) done(true);
+
+      if (state === targetState) {
+        done(true);
+      }
     }, intervalMs);
 
     // Check immediately
-    getEntityState(entityId).then((s) => { if (s === targetState) done(true); });
+    void getEntityState(entityId).then((s) => {
+      if (s === targetState) {
+        done(true);
+      }
+    });
   });
 }
 
@@ -56,8 +71,8 @@ export async function fireEvent(event: string) {
       },
       body: JSON.stringify({ source: "grimoire" }),
     });
-    console.log(r.ok ? `HA event: ${event}` : `HA error: ${r.status}`);
-  } catch (err) {
-    console.error("HA error:", err);
+    console.log(r.ok ? `HA event: ${event}` : `HA error: ${String(r.status)}`);
+  } catch (error) {
+    console.error("HA error:", error);
   }
 }

@@ -1,41 +1,54 @@
 import { useEffect, useState } from "react";
-import { ENIGMAS } from "../config";
-import { useEnigmaStore } from "../store";
 import { sndClick } from "../../../audio";
 import { fireEvent } from "../../../ha";
+import { ENIGMAS } from "../config";
+import { useEnigmaStore } from "../store";
 
 export function SuccessModal() {
   const boxNumber = useEnigmaStore((s) => s.successBoxNumber);
   const haEvent = useEnigmaStore((s) => s.successHaEvent);
   const enigmaId = useEnigmaStore((s) => s.successEnigmaId);
   const hideSuccessBox = useEnigmaStore((s) => s.hideSuccessBox);
-  const [entered, setEntered] = useState(false);
-  const [closing, setClosing] = useState(false);
+  const [hasEntered, setHasEntered] = useState(false);
+  const [isClosing, setIsClosing] = useState(false);
   const [displayBoxNumber, setDisplayBoxNumber] = useState<number | null>(null);
   const [displayEnigmaId, setDisplayEnigmaId] = useState<string | null>(null);
 
   useEffect(() => {
     if (boxNumber === null) {
       // eslint-disable-next-line react-hooks/set-state-in-effect
-      setEntered(false);
+      setHasEntered(false);
+
       return;
     }
-    setClosing(false);
+    setIsClosing(false);
     setDisplayBoxNumber(boxNumber);
     setDisplayEnigmaId(enigmaId);
-    const raf = requestAnimationFrame(() => setEntered(true));
-    return () => cancelAnimationFrame(raf);
+    const raf = requestAnimationFrame(() => {
+      setHasEntered(true);
+    });
+
+    // eslint-disable-next-line consistent-return
+    return () => {
+      cancelAnimationFrame(raf);
+    };
   }, [boxNumber, enigmaId]);
 
   function handleClose() {
-    if (closing) return;
+    if (isClosing) {
+      return;
+    }
     sndClick();
-    if (haEvent) fireEvent(haEvent);
-    setClosing(true);
-    setEntered(false);
+
+    if (haEvent) {
+      void fireEvent(haEvent);
+    }
+    setIsClosing(true);
+    setHasEntered(false);
+
     setTimeout(() => {
       hideSuccessBox();
-      setClosing(false);
+      setIsClosing(false);
       setDisplayBoxNumber(null);
       setDisplayEnigmaId(null);
     }, 500);
@@ -43,33 +56,35 @@ export function SuccessModal() {
 
   const enigmaData = displayEnigmaId ? ENIGMAS.find((e) => e.id === displayEnigmaId) : null;
   const flavorText = enigmaData?.successFlavor ?? null;
-  const isVisible = boxNumber !== null || closing;
+  const isVisible = boxNumber !== null || isClosing;
 
   return (
     <div
       className={`fixed inset-0 z-[110] bg-black/85 backdrop-blur-[6px] flex items-center justify-center transition-opacity duration-400 ${
-        isVisible && !closing ? "opacity-100 pointer-events-auto" : closing ? "opacity-0 pointer-events-none" : "opacity-0 pointer-events-none"
+        isVisible && !isClosing ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"
       }`}
       onClick={handleClose}
     >
       <div
         className={`max-w-[340px] w-[85%] rounded-2xl border border-success/30 px-6 py-8 text-center transition-all duration-500 ${
-          entered && !closing ? "scale-100 opacity-100" : "scale-90 opacity-0"
+          hasEntered && !isClosing ? "scale-100 opacity-100" : "scale-90 opacity-0"
         }`}
         style={{
           background: "linear-gradient(155deg, #1c1438, #0f1a14)",
           boxShadow: "0 0 40px #4ecca320, 0 0 80px #4ecca310",
           transitionTimingFunction: "cubic-bezier(.34,1.56,.64,1)",
         }}
-        onClick={(e) => e.stopPropagation()}
+        onClick={(e) => {
+          e.stopPropagation();
+        }}
       >
         {/* Rune — stagger 0 */}
         {enigmaData && (
           <div
             className="text-[1.6rem] text-success/30 mb-1 tracking-[0.3em]"
             style={{
-              opacity: entered && !closing ? 1 : 0,
-              transform: entered && !closing ? "translateY(0)" : "translateY(8px)",
+              opacity: hasEntered && !isClosing ? 1 : 0,
+              transform: hasEntered && !isClosing ? "translateY(0)" : "translateY(8px)",
               transition: "opacity 0.5s ease-out, transform 0.5s ease-out",
               transitionDelay: "0.1s",
             }}
@@ -81,8 +96,8 @@ export function SuccessModal() {
         <div
           className="text-[3rem] mb-2"
           style={{
-            opacity: entered && !closing ? 1 : 0,
-            transform: entered && !closing ? "translateY(0) scale(1)" : "translateY(12px) scale(0.8)",
+            opacity: hasEntered && !isClosing ? 1 : 0,
+            transform: hasEntered && !isClosing ? "translateY(0) scale(1)" : "translateY(12px) scale(0.8)",
             transition: "opacity 0.5s ease-out, transform 0.6s cubic-bezier(.34,1.56,.64,1)",
             transitionDelay: "0.25s",
           }}
@@ -93,8 +108,8 @@ export function SuccessModal() {
         <h2
           className="font-[var(--font-cinzel-decorative)] text-[1.1rem] text-success mb-2 drop-shadow-[0_0_20px_#4ecca340]"
           style={{
-            opacity: entered && !closing ? 1 : 0,
-            transform: entered && !closing ? "translateY(0)" : "translateY(8px)",
+            opacity: hasEntered && !isClosing ? 1 : 0,
+            transform: hasEntered && !isClosing ? "translateY(0)" : "translateY(8px)",
             transition: "opacity 0.4s ease-out, transform 0.4s ease-out",
             transitionDelay: "0.45s",
           }}
@@ -106,8 +121,8 @@ export function SuccessModal() {
           <p
             className="text-[1rem] text-text/70 mb-4"
             style={{
-              opacity: entered && !closing ? 1 : 0,
-              transform: entered && !closing ? "translateY(0)" : "translateY(8px)",
+              opacity: hasEntered && !isClosing ? 1 : 0,
+              transform: hasEntered && !isClosing ? "translateY(0)" : "translateY(8px)",
               transition: "opacity 0.5s ease-out, transform 0.5s ease-out",
               transitionDelay: "0.65s",
             }}
@@ -119,7 +134,7 @@ export function SuccessModal() {
         <div
           className="h-px mx-auto mb-4"
           style={{
-            width: entered && !closing ? "40px" : "0px",
+            width: hasEntered && !isClosing ? "40px" : "0px",
             background: "linear-gradient(to right, transparent, #4ecca34d, transparent)",
             transition: "width 0.6s ease-out",
             transitionDelay: "0.85s",
@@ -128,8 +143,8 @@ export function SuccessModal() {
         {/* Box reveal — stagger 5 */}
         <div
           style={{
-            opacity: entered && !closing ? 1 : 0,
-            transform: entered && !closing ? "translateY(0)" : "translateY(12px)",
+            opacity: hasEntered && !isClosing ? 1 : 0,
+            transform: hasEntered && !isClosing ? "translateY(0)" : "translateY(12px)",
             transition: "opacity 0.5s ease-out, transform 0.5s ease-out",
             transitionDelay: "1s",
           }}
@@ -146,10 +161,10 @@ export function SuccessModal() {
           onClick={handleClose}
           className="mt-2 py-3 px-8 border-none rounded-[14px] bg-gradient-to-br from-[#2a6a4a] to-success text-white font-[var(--font-cinzel)] text-[0.82rem] font-semibold tracking-[0.12em] uppercase cursor-pointer transition-all duration-200 active:scale-[0.97] shadow-[0_4px_22px_#4ecca328]"
           style={{
-            opacity: entered && !closing ? 1 : 0,
-            transform: entered && !closing ? "translateY(0)" : "translateY(10px)",
+            opacity: hasEntered && !isClosing ? 1 : 0,
+            transform: hasEntered && !isClosing ? "translateY(0)" : "translateY(10px)",
             transition: "opacity 0.4s ease-out, transform 0.4s ease-out",
-            transitionDelay: entered && !closing ? "1.2s" : "0s",
+            transitionDelay: hasEntered && !isClosing ? "1.2s" : "0s",
           }}
         >
           Ouvrir

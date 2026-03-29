@@ -1,5 +1,5 @@
-import tableauxAudio from "../../assets/audios/tableaux_enigme.mp3";
 import kpopAudio from "../../assets/audios/kpop_enigme.mp3";
+import tableauxAudio from "../../assets/audios/tableaux_enigme.mp3";
 
 export const MAX_PLAYS = 3;
 

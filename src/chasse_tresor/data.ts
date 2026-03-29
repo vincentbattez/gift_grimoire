@@ -10,7 +10,7 @@ export type ArcaneSymbol =
   | "blossom"
   | "eye";
 
-export interface EnigmaData {
+export type EnigmaData = {
   number: string;
   title: string;
   riddle: string;
@@ -24,7 +24,7 @@ export interface EnigmaData {
     subject: string;
     destination: string;
   };
-}
+};
 
 export const ENIGMAS_DATA: EnigmaData[] = [
   {
@@ -38,7 +38,7 @@ export const ENIGMAS_DATA: EnigmaData[] = [
       order: 1,
       subject: "Dark Vador and Disney",
       destination: "Disneyland Paris",
-    }
+    },
   },
   {
     number: "III",
@@ -51,7 +51,7 @@ export const ENIGMAS_DATA: EnigmaData[] = [
       order: 2,
       subject: "Disneyland Paris",
       destination: "Kpop Demon Hunter",
-    }
+    },
   },
   {
     number: "IX",
@@ -64,7 +64,7 @@ export const ENIGMAS_DATA: EnigmaData[] = [
       order: 3,
       subject: "Kpop Demon Hunter",
       destination: "SNK",
-    }
+    },
   },
   {
     number: "I",
@@ -77,7 +77,7 @@ export const ENIGMAS_DATA: EnigmaData[] = [
       order: 4,
       subject: "SNK",
       destination: "Sardaigne",
-    }
+    },
   },
   {
     number: "VIII",
@@ -90,7 +90,7 @@ export const ENIGMAS_DATA: EnigmaData[] = [
       order: 5,
       subject: "Sardaigne",
       destination: "Encanto",
-    }
+    },
   },
   {
     number: "X",
@@ -103,7 +103,7 @@ export const ENIGMAS_DATA: EnigmaData[] = [
       order: 6,
       subject: "Encanto",
       destination: "Ratatouille",
-    }
+    },
   },
   {
     number: "II",
@@ -116,7 +116,7 @@ export const ENIGMAS_DATA: EnigmaData[] = [
       order: 7,
       subject: "Ratatouille",
       destination: "Harry Potter",
-    }
+    },
   },
   {
     number: "V",
@@ -129,7 +129,7 @@ export const ENIGMAS_DATA: EnigmaData[] = [
       order: 8,
       subject: "Harry Potter",
       destination: "Wall-E",
-    }
+    },
   },
   {
     number: "IV",
@@ -142,7 +142,7 @@ export const ENIGMAS_DATA: EnigmaData[] = [
       order: 9,
       subject: "Wall-E & Eve",
       destination: "Hori & Miyamura",
-    }
+    },
   },
   {
     number: "VII",
@@ -155,6 +155,6 @@ export const ENIGMAS_DATA: EnigmaData[] = [
       order: 10,
       subject: "Hori & Miyamura",
       destination: "Wall-E & Eve",
-    }
+    },
   },
 ];

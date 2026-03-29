@@ -3,8 +3,11 @@ import { useSyncExternalStore } from "react";
 const KEY = "admin";
 
 function subscribe(cb: () => void) {
-  window.addEventListener("storage", cb);
-  return () => window.removeEventListener("storage", cb);
+  globalThis.addEventListener("storage", cb);
+
+  return () => {
+    globalThis.removeEventListener("storage", cb);
+  };
 }
 
 function getSnapshot() {
@@ -14,6 +17,7 @@ function getSnapshot() {
 /** Reads `?admin=true` from URL once and persists to localStorage. */
 export function initAdmin() {
   const params = new URLSearchParams(location.search);
+
   if (params.get(KEY) === "true") {
     localStorage.setItem(KEY, "true");
     params.delete(KEY);
@@ -28,5 +32,5 @@ export function useAdmin(): boolean {
 
 export function logoutAdmin() {
   localStorage.removeItem(KEY);
-  window.dispatchEvent(new Event("storage"));
+  globalThis.dispatchEvent(new Event("storage"));
 }

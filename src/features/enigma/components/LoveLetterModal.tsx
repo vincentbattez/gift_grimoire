@@ -1,9 +1,9 @@
 import { useEffect, useRef, useState } from "react";
-import { useEnigmaStore } from "../store";
-import { ENIGMAS } from "../config";
-import { sndLoveClose, sndHeartPop } from "../../../audio";
-import { OrnamentDivider } from "../../../components/ui/OrnamentDivider";
+import { sndHeartPop, sndLoveClose } from "../../../audio";
 import { CornerOrnaments } from "../../../components/ui/CornerOrnaments";
+import { OrnamentDivider } from "../../../components/ui/OrnamentDivider";
+import { ENIGMAS } from "../config";
+import { useEnigmaStore } from "../store";
 
 const CLOSE_MS = 500;
 const BURST_COUNT = 40;
@@ -24,12 +24,13 @@ function buildBurst(emojis: string[]) {
     cumDelay += gap;
     gap *= 0.97;
   }
+
   return items;
 }
 
 const GOLD_PARTICLES = Array.from({ length: 20 }, (_, i) => ({
-  left: `${5 + (i % 5) * 22}%`,
-  top: `${5 + Math.floor(i / 5) * 23}%`,
+  left: `${String(5 + (i % 5) * 22)}%`,
+  top: `${String(Math.floor(i / 5) * 23 + 5)}%`,
   size: 2 + (i % 3) * 1.5,
   delay: i * 0.35,
 }));
@@ -37,50 +38,67 @@ const GOLD_PARTICLES = Array.from({ length: 20 }, (_, i) => ({
 export function LoveLetterModal() {
   const enigmaId = useEnigmaStore((s) => s.loveLetterEnigmaId);
   const closeLoveLetter = useEnigmaStore((s) => s.closeLoveLetter);
-  const [entered, setEntered] = useState(false);
-  const [closing, setClosing] = useState(false);
-  const [showHearts, setShowHearts] = useState(false);
+  const [hasEntered, setHasEntered] = useState(false);
+  const [isClosing, setIsClosing] = useState(false);
+  const [isShowingHearts, setIsShowingHearts] = useState(false);
   const closingEnigmaRef = useRef<string | null>(null);
   const popTimers = useRef<ReturnType<typeof setTimeout>[]>([]);
-  const burstRef = useRef(buildBurst(["❤️"]));
+  const [burstData, setBurstData] = useState(() => buildBurst(["❤️"]));
 
   useEffect(() => {
     if (!enigmaId) {
-      setEntered(false);
-      setShowHearts(false);
+      setHasEntered(false);
+      setIsShowingHearts(false);
+
       return;
     }
     closingEnigmaRef.current = enigmaId;
     const currentEnigma = ENIGMAS.find((e) => e.id === enigmaId);
-    burstRef.current = buildBurst(currentEnigma?.loveLetter.emojis ?? ["❤️"]);
-    setClosing(false);
-    const raf = requestAnimationFrame(() => setEntered(true));
+    const newBurst = buildBurst(currentEnigma?.loveLetter.emojis ?? ["❤️"]);
+    setBurstData(newBurst);
+    setIsClosing(false);
+    const raf = requestAnimationFrame(() => {
+      setHasEntered(true);
+    });
 
     // Launch heart burst with staggered pops
-    const showTimer = setTimeout(() => setShowHearts(true), 400);
-    popTimers.current = burstRef.current.map((h) =>
-      setTimeout(() => sndHeartPop(h.pitch), h.delay * 1000 + 400),
+    const showTimer = setTimeout(() => {
+      setIsShowingHearts(true);
+    }, 400);
+
+    popTimers.current = newBurst.map((h) =>
+      setTimeout(
+        () => {
+          sndHeartPop(h.pitch);
+        },
+        h.delay * 1000 + 400,
+      ),
     );
 
+    // eslint-disable-next-line consistent-return
     return () => {
       cancelAnimationFrame(raf);
       clearTimeout(showTimer);
-      popTimers.current.forEach(clearTimeout);
+
+      popTimers.current.forEach((t) => {
+        clearTimeout(t);
+      });
     };
   }, [enigmaId]);
 
   // eslint-disable-next-line react-hooks/refs
-  const displayId = enigmaId ?? (closing ? closingEnigmaRef.current : null);
+  const displayId = enigmaId ?? (isClosing ? closingEnigmaRef.current : null);
   // eslint-disable-next-line react-hooks/refs
   const enigma = displayId ? ENIGMAS.find((e) => e.id === displayId) : null;
-  const isOpen = !!enigmaId && !closing;
+  const isOpen = !!enigmaId && !isClosing;
 
   function handleClose() {
     sndLoveClose();
-    setClosing(true);
-    setEntered(false);
+    setIsClosing(true);
+    setHasEntered(false);
+
     setTimeout(() => {
-      setClosing(false);
+      setIsClosing(false);
       closeLoveLetter();
     }, CLOSE_MS);
   }
@@ -98,37 +116,39 @@ export function LoveLetterModal() {
       onClick={handleClose}
     >
       {/* Heart burst */}
-      {/* eslint-disable-next-line react-hooks/refs */}
-      {showHearts && burstRef.current.map((h, i) => (
-        <div
-          key={i}
-          className="absolute pointer-events-none z-10"
-          style={{
-            left: `${h.left}%`,
-            bottom: "20%",
-            fontSize: `${h.size}rem`,
-            ["--heart-rot" as string]: `${h.rot}deg`,
-            animation: `heart-float-up 3.5s linear ${h.delay}s both`,
-          }}
-        >
-          {h.emoji}
-        </div>
-      ))}
+      {}
+      {isShowingHearts &&
+        burstData.map((h, i) => (
+          <div
+            key={i}
+            className="absolute pointer-events-none z-10"
+            style={{
+              left: `${String(h.left)}%`,
+              bottom: "20%",
+              fontSize: `${String(h.size)}rem`,
+              ["--heart-rot" as string]: `${String(h.rot)}deg`,
+              animation: `heart-float-up 3.5s linear ${String(h.delay)}s both`,
+            }}
+          >
+            {h.emoji}
+          </div>
+        ))}
 
       {enigma && (
         <div
           className={`relative max-w-[380px] w-full rounded-[22px] overflow-hidden transition-all duration-700 ${
-            entered ? "opacity-100 scale-100 translate-y-0" : "opacity-0 scale-[0.82] translate-y-5"
+            hasEntered ? "opacity-100 scale-100 translate-y-0" : "opacity-0 scale-[0.82] translate-y-5"
           }`}
           style={{
             background: "linear-gradient(165deg, #fdf8ec, #f5e6c8, #ede0c0)",
             border: "1.5px solid #d4a94280",
-            boxShadow:
-              "0 0 30px #e8c96a50, 0 0 80px #e8c96a30, 0 0 160px #e8c96a18, inset 0 1px 0 #ffffff60",
+            boxShadow: "0 0 30px #e8c96a50, 0 0 80px #e8c96a30, 0 0 160px #e8c96a18, inset 0 1px 0 #ffffff60",
             animation: "love-glow-shine 4s ease-in-out infinite",
             transitionTimingFunction: "cubic-bezier(.22,1,.36,1)",
           }}
-          onClick={(e) => e.stopPropagation()}
+          onClick={(e) => {
+            e.stopPropagation();
+          }}
         >
           {/* Gold particles background */}
           {GOLD_PARTICLES.map((p, i) => (
@@ -141,13 +161,19 @@ export function LoveLetterModal() {
                 width: p.size,
                 height: p.size,
                 background: "radial-gradient(circle, #e8c96a, #c9a032)",
-                animation: `love-particle-float 3.2s ease-in-out ${p.delay}s infinite`,
+                animation: `love-particle-float 3.2s ease-in-out ${String(p.delay)}s infinite`,
               }}
             />
           ))}
 
           {/* Corner decorations */}
-          <CornerOrnaments color="border-[#c9a03260]" size="w-3 h-3" offset="10px" opacity="opacity-60" corners={["tl", "bl", "br"]} />
+          <CornerOrnaments
+            color="border-[#c9a03260]"
+            size="w-3 h-3"
+            offset="10px"
+            opacity="opacity-60"
+            corners={["tl", "bl", "br"]}
+          />
 
           {/* Close button */}
           <button
@@ -180,10 +206,7 @@ export function LoveLetterModal() {
               Une lettre pour toi
             </h2>
 
-            <p
-              className="text-center text-[0.68rem] tracking-[0.15em] uppercase mb-5"
-              style={{ color: "#a08a50" }}
-            >
+            <p className="text-center text-[0.68rem] tracking-[0.15em] uppercase mb-5" style={{ color: "#a08a50" }}>
               {enigma.title}
             </p>
 
@@ -214,10 +237,7 @@ export function LoveLetterModal() {
             >
               — {enigma.loveLetter.signature} —
             </p>
-            <p
-              className="text-center text-[0.65rem] mt-2 tracking-[0.12em]"
-              style={{ color: "#b09a60" }}
-            >
+            <p className="text-center text-[0.65rem] mt-2 tracking-[0.12em]" style={{ color: "#b09a60" }}>
               Avec tout mon amour ♡
             </p>
           </div>

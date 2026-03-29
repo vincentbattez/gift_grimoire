@@ -29,7 +29,7 @@ export type EnigmaStatus = EnigmaPersistedStatus | EnigmaTransientStatus;
  * L'enfant ne sait pas ce que le parent fera en réponse — il se contente
  * de signaler les transitions de son cycle de vie.
  */
-export interface EnigmaLifecycleEvents {
+export type EnigmaLifecycleEvents = {
   /** Déclenchée à chaque tentative de réponse */
   onTry?: (enigmaId: string, answer: string) => void;
   /** Déclenchée quand la réponse est correcte */
@@ -40,7 +40,7 @@ export interface EnigmaLifecycleEvents {
   onUnlock?: (enigmaId: string) => void;
   /** Déclenchée quand la lettre d'amour est lue */
   onLetterRead?: (enigmaId: string) => void;
-}
+};
 
 /**
  * Dérive le statut complet d'une énigme à partir de l'état persisté
@@ -51,9 +51,21 @@ export function getEnigmaStatus(
   letterRead: boolean,
   attemptUsedToday: boolean,
 ): EnigmaPersistedStatus | "cooldown" {
-  if (letterRead && persisted.solved) return "completed";
-  if (persisted.solved) return "solved";
-  if (!persisted.unlocked) return "locked";
-  if (attemptUsedToday) return "cooldown";
+  if (letterRead && persisted.solved) {
+    return "completed";
+  }
+
+  if (persisted.solved) {
+    return "solved";
+  }
+
+  if (!persisted.unlocked) {
+    return "locked";
+  }
+
+  if (attemptUsedToday) {
+    return "cooldown";
+  }
+
   return "unlocked";
 }

@@ -18,15 +18,22 @@ export function PlayCountDot({
   solvedClass = "bg-success/50",
   solved = false,
 }: Props) {
+  const getDotClass = (i: number) => {
+    if (solved) {
+      return solvedClass;
+    }
+
+    if (i < remaining) {
+      return activeClass;
+    }
+
+    return inactiveClass;
+  };
+
   return (
     <div className="relative flex gap-1.5">
       {Array.from({ length: total }, (_, i) => (
-        <span
-          key={i}
-          className={`w-1.5 h-1.5 rounded-full transition-colors duration-300 ${
-            solved ? solvedClass : i < remaining ? activeClass : inactiveClass
-          }`}
-        />
+        <span key={i} className={`w-1.5 h-1.5 rounded-full transition-colors duration-300 ${getDotClass(i)}`} />
       ))}
     </div>
   );

@@ -1,4 +1,4 @@
-interface InkCellProps {
+type InkCellProps = {
   cellKey: string;
   row: number;
   col: number;
@@ -15,7 +15,7 @@ interface InkCellProps {
   proximityCenter: string | null;
   disabled: boolean;
   onTap: (row: number, col: number) => void;
-}
+};
 
 export function InkCell({
   cellKey,
@@ -35,11 +35,81 @@ export function InkCell({
   disabled,
   onTap,
 }: InkCellProps) {
+  const cellBorderClass = (() => {
+    if (isRevealed) {
+      if (wordSolved) {
+        return "border border-gold/50 shadow-[0_0_10px_#e8c96a25]";
+      }
+
+      return `border border-gold/25 ${isNewlyRevealed ? "ink-cell-revealing" : ""}`;
+    }
+
+    if (isAnimating) {
+      return "border border-accent/50";
+    }
+
+    if (isMissed) {
+      return "border border-muted/20";
+    }
+
+    if (proximity === "hot") {
+      return "ink-proximity-hot border";
+    }
+
+    if (proximity === "warm") {
+      return "ink-proximity-warm border";
+    }
+
+    return "border border-locked-border/50 active:border-accent/40 active:scale-[0.93]";
+  })();
+
+  const cellBackground = (() => {
+    if (isRevealed) {
+      if (wordSolved) {
+        return "linear-gradient(135deg, #1c1a0a, #0f0e07)";
+      }
+
+      return "linear-gradient(135deg, #181508, #0c0b05)";
+    }
+
+    if (isAnimating) {
+      return "linear-gradient(135deg, #1a1030, #0d0920)";
+    }
+
+    if (isMissed) {
+      return "linear-gradient(135deg, #0d0a1a, #07060f)";
+    }
+
+    if (proximity === "hot") {
+      return "linear-gradient(135deg, #1e1400, #130e00)";
+    }
+
+    if (proximity === "warm") {
+      return "linear-gradient(135deg, #171200, #0e0c00)";
+    }
+
+    return "linear-gradient(135deg, #130f26, #0b0917)";
+  })();
+
+  const letterAnimation = (() => {
+    if (isNewlyRevealed) {
+      return "ink-letter-crystallize 0.85s ease-out both";
+    }
+
+    if (wordSolved) {
+      return "gold-letter-shimmer 2.5s ease-in-out infinite";
+    }
+
+    return "";
+  })();
+
   return (
     <button
       data-cell={cellKey}
       onClick={() => {
-        if (!disabled) onTap(row, col);
+        if (!disabled) {
+          onTap(row, col);
+        }
       }}
       className={[
         "relative flex items-center justify-center",
@@ -47,34 +117,10 @@ export function InkCell({
         "text-xs font-cinzel font-bold",
         "select-none outline-none",
         "transition-all duration-300",
-        isRevealed
-          ? wordSolved
-            ? "border border-gold/50 shadow-[0_0_10px_#e8c96a25]"
-            : `border border-gold/25 ${isNewlyRevealed ? "ink-cell-revealing" : ""}`
-          : isAnimating
-            ? "border border-accent/50"
-            : isMissed
-              ? "border border-muted/20"
-              : proximity === "hot"
-                ? "ink-proximity-hot border"
-                : proximity === "warm"
-                  ? "ink-proximity-warm border"
-                  : "border border-locked-border/50 active:border-accent/40 active:scale-[0.93]",
+        cellBorderClass,
       ].join(" ")}
       style={{
-        background: isRevealed
-          ? wordSolved
-            ? "linear-gradient(135deg, #1c1a0a, #0f0e07)"
-            : "linear-gradient(135deg, #181508, #0c0b05)"
-          : isAnimating
-            ? "linear-gradient(135deg, #1a1030, #0d0920)"
-            : isMissed
-              ? "linear-gradient(135deg, #0d0a1a, #07060f)"
-              : proximity === "hot"
-                ? "linear-gradient(135deg, #1e1400, #130e00)"
-                : proximity === "warm"
-                  ? "linear-gradient(135deg, #171200, #0e0c00)"
-                  : "linear-gradient(135deg, #130f26, #0b0917)",
+        background: cellBackground,
       }}
     >
       {/* Revealed letter */}
@@ -82,15 +128,9 @@ export function InkCell({
         <span
           className="text-gold leading-none z-10"
           style={{
-            textShadow: wordSolved
-              ? "0 0 12px #e8c96a90"
-              : "0 0 6px #e8c96a50",
+            textShadow: wordSolved ? "0 0 12px #e8c96a90" : "0 0 6px #e8c96a50",
             fontSize: "0.7rem",
-            animation: isNewlyRevealed
-              ? "ink-letter-crystallize 0.85s ease-out both"
-              : wordSolved
-                ? "gold-letter-shimmer 2.5s ease-in-out infinite"
-                : undefined,
+            animation: letterAnimation,
           }}
         >
           {letter}
@@ -110,16 +150,14 @@ export function InkCell({
               height: "130%",
               top: "-15%",
               left: 0,
-              background:
-                "linear-gradient(90deg, transparent, #f59e0b90, #fde68a55, transparent)",
+              background: "linear-gradient(90deg, transparent, #f59e0b90, #fde68a55, transparent)",
               animation: "proximity-sparkle-sweep 0.65s ease-out 0.08s both",
             }}
           />
           <span
             className="absolute inset-0"
             style={{
-              background:
-                "radial-gradient(circle, #f59e0b30 0%, transparent 65%)",
+              background: "radial-gradient(circle, #f59e0b30 0%, transparent 65%)",
               animation: "proximity-sparkle-flash 0.45s ease-out both",
             }}
           />
@@ -181,8 +219,7 @@ export function InkCell({
               style={{
                 width: "88%",
                 height: "88%",
-                background:
-                  "radial-gradient(circle, #e8c96a42 0%, #9b6dff22 55%, transparent 82%)",
+                background: "radial-gradient(circle, #e8c96a42 0%, #9b6dff22 55%, transparent 82%)",
               }}
             />
           </span>
@@ -193,8 +230,7 @@ export function InkCell({
               height: "65%",
               top: "12%",
               left: "18%",
-              background:
-                "radial-gradient(ellipse, #e8c96a30 0%, transparent 70%)",
+              background: "radial-gradient(ellipse, #e8c96a30 0%, transparent 70%)",
               animation: "ink-bleed-a 0.5s ease-out both",
             }}
           />
@@ -205,8 +241,7 @@ export function InkCell({
               height: "72%",
               top: "22%",
               left: "8%",
-              background:
-                "radial-gradient(ellipse, #9b6dff25 0%, transparent 65%)",
+              background: "radial-gradient(ellipse, #9b6dff25 0%, transparent 65%)",
               animation: "ink-bleed-b 0.48s ease-out 0.03s both",
             }}
           />
@@ -217,8 +252,7 @@ export function InkCell({
               height: "58%",
               top: "6%",
               left: "28%",
-              background:
-                "radial-gradient(ellipse, #e8c96a20 0%, transparent 68%)",
+              background: "radial-gradient(ellipse, #e8c96a20 0%, transparent 68%)",
               animation: "ink-bleed-c 0.52s ease-out 0.05s both",
             }}
           />
@@ -233,8 +267,7 @@ export function InkCell({
             style={{
               width: "66%",
               height: "66%",
-              background:
-                "radial-gradient(ellipse, #1a1240 0%, #0d0920 55%, transparent 82%)",
+              background: "radial-gradient(ellipse, #1a1240 0%, #0d0920 55%, transparent 82%)",
               animation: "ink-miss-splash 1.5s ease-out both",
             }}
           />
@@ -245,8 +278,7 @@ export function InkCell({
               height: "44%",
               top: "12%",
               left: "16%",
-              background:
-                "radial-gradient(ellipse, #130f26 0%, #09071a 68%, transparent)",
+              background: "radial-gradient(ellipse, #130f26 0%, #09071a 68%, transparent)",
               animation: "ink-miss-blob 1.5s ease-out 0.06s both",
             }}
           />
@@ -261,15 +293,11 @@ export function InkCell({
             style={{
               width: "42%",
               height: "42%",
-              background:
-                "radial-gradient(ellipse, #16122a 0%, #0d0920 65%, transparent 90%)",
+              background: "radial-gradient(ellipse, #16122a 0%, #0d0920 65%, transparent 90%)",
               opacity: 0.6,
             }}
           />
-          <span
-            className="absolute text-muted/18 z-10"
-            style={{ fontSize: "0.32rem" }}
-          >
+          <span className="absolute text-muted/18 z-10" style={{ fontSize: "0.32rem" }}>
             ✕
           </span>
         </span>

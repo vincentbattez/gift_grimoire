@@ -1,5 +1,5 @@
-import { useState, useRef, useEffect, useCallback } from "react";
-import { sndPageTurn, sndGrimoireOpen } from "../audio";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { sndGrimoireOpen, sndPageTurn } from "../audio";
 
 const SLIDES = [
   {
@@ -34,8 +34,8 @@ const VELOCITY_THRESHOLD = 0.3;
 
 export function IntroModal({ onClose }: { onClose: () => void }) {
   const [current, setCurrent] = useState(0);
-  const [entered, setEntered] = useState(false);
-  const [exiting, setExiting] = useState(false);
+  const [hasEntered, setHasEntered] = useState(false);
+  const [isExiting, setIsExiting] = useState(false);
   const [dragX, setDragX] = useState(0);
   const [isDragging, setIsDragging] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -43,20 +43,26 @@ export function IntroModal({ onClose }: { onClose: () => void }) {
   const drag = useRef<{ startX: number; startTime: number; currentX: number } | null>(null);
 
   useEffect(() => {
-    requestAnimationFrame(() => setEntered(true));
+    requestAnimationFrame(() => {
+      setHasEntered(true);
+    });
   }, []);
 
   const goTo = useCallback((i: number) => {
     const clamped = Math.max(0, Math.min(SLIDES.length - 1, i));
+
     setCurrent((prev) => {
-      if (prev !== clamped) sndPageTurn();
+      if (prev !== clamped) {
+        sndPageTurn();
+      }
+
       return clamped;
     });
   }, []);
 
   function handleClose() {
     sndGrimoireOpen();
-    setExiting(true);
+    setIsExiting(true);
     setTimeout(onClose, 400);
   }
 
@@ -68,20 +74,27 @@ export function IntroModal({ onClose }: { onClose: () => void }) {
   }
 
   function onDragMove(clientX: number) {
-    if (!drag.current) return;
+    if (!drag.current) {
+      return;
+    }
     drag.current.currentX = clientX;
     setDragX(clientX - drag.current.startX);
   }
 
   function onDragEnd() {
-    if (!drag.current) return;
+    if (!drag.current) {
+      return;
+    }
     const dx = drag.current.currentX - drag.current.startX;
     const dt = Date.now() - drag.current.startTime;
     const velocity = Math.abs(dx) / Math.max(dt, 1);
 
     if (Math.abs(dx) > SWIPE_THRESHOLD || velocity > VELOCITY_THRESHOLD) {
-      if (dx < 0 && current < SLIDES.length - 1) goTo(current + 1);
-      else if (dx > 0 && current > 0) goTo(current - 1);
+      if (dx < 0 && current < SLIDES.length - 1) {
+        goTo(current + 1);
+      } else if (dx > 0 && current > 0) {
+        goTo(current - 1);
+      }
     }
 
     drag.current = null;
@@ -100,30 +113,30 @@ export function IntroModal({ onClose }: { onClose: () => void }) {
   }
   function handleMouseDown(e: React.MouseEvent) {
     onDragStart(e.clientX);
-    const onMove = (ev: MouseEvent) => onDragMove(ev.clientX);
-    const onUp = () => {
-      onDragEnd();
-      window.removeEventListener("mousemove", onMove);
-      window.removeEventListener("mouseup", onUp);
+    // eslint-disable-next-line unicorn/consistent-function-scoping -- must capture fresh onDragMove ref
+    const handleMove = (ev: MouseEvent) => {
+      onDragMove(ev.clientX);
     };
-    window.addEventListener("mousemove", onMove);
-    window.addEventListener("mouseup", onUp);
+    const handleUp = () => {
+      onDragEnd();
+      globalThis.removeEventListener("mousemove", handleMove);
+      globalThis.removeEventListener("mouseup", handleUp);
+    };
+    globalThis.addEventListener("mousemove", handleMove);
+    globalThis.addEventListener("mouseup", handleUp);
   }
 
   const isLast = current === SLIDES.length - 1;
 
   // Clamp drag to avoid over-scrolling at edges
-  const clampedDragX =
-    (current === 0 && dragX > 0) || (isLast && dragX < 0)
-      ? dragX * 0.2
-      : dragX;
+  const clampedDragX = (current === 0 && dragX > 0) || (isLast && dragX < 0) ? dragX * 0.2 : dragX;
 
   const trackOffset = -(current * 100);
 
   return (
     <div
       className={`fixed inset-0 z-[300] bg-black/90 backdrop-blur-md flex items-center justify-center transition-opacity duration-400 ${
-        entered && !exiting ? "opacity-100" : "opacity-0"
+        hasEntered && !isExiting ? "opacity-100" : "opacity-0"
       }`}
     >
       <div className="w-full max-w-[400px] mx-4 flex flex-col items-center">
@@ -140,16 +153,12 @@ export function IntroModal({ onClose }: { onClose: () => void }) {
             className={isDragging ? "" : "transition-transform duration-500 ease-out"}
             style={{
               display: "flex",
-              width: `${SLIDES.length * 100}%`,
-              transform: `translateX(calc(${trackOffset}% / ${SLIDES.length} + ${clampedDragX}px))`,
+              width: `${String(SLIDES.length * 100)}%`,
+              transform: `translateX(calc(${String(trackOffset)}% / ${String(SLIDES.length)} + ${String(clampedDragX)}px))`,
             }}
           >
             {SLIDES.map((slide, i) => (
-              <div
-                key={i}
-                className="flex-shrink-0 px-2"
-                style={{ width: `${100 / SLIDES.length}%` }}
-              >
+              <div key={i} className="flex-shrink-0 px-2" style={{ width: `${String(100 / SLIDES.length)}%` }}>
                 <div className="flex flex-col items-center text-center py-8 px-4">
                   <span
                     className={`text-[3rem] mb-5 block transition-all duration-500 ${
@@ -178,11 +187,11 @@ export function IntroModal({ onClose }: { onClose: () => void }) {
           {SLIDES.map((_, i) => (
             <button
               key={i}
-              onClick={() => goTo(i)}
+              onClick={() => {
+                goTo(i);
+              }}
               className={`w-2 h-2 rounded-full transition-all duration-300 ${
-                i === current
-                  ? "bg-accent scale-125 shadow-[0_0_8px_#9b6dff]"
-                  : "bg-muted/40"
+                i === current ? "bg-accent scale-125 shadow-[0_0_8px_#9b6dff]" : "bg-muted/40"
               }`}
             />
           ))}
@@ -190,7 +199,13 @@ export function IntroModal({ onClose }: { onClose: () => void }) {
 
         {/* Action button */}
         <button
-          onClick={isLast ? handleClose : () => goTo(current + 1)}
+          onClick={
+            isLast
+              ? handleClose
+              : () => {
+                  goTo(current + 1);
+                }
+          }
           className="py-3.5 px-10 rounded-full border border-accent/40 bg-accent/10 text-accent text-[0.8rem] font-[var(--font-cinzel)] tracking-[0.15em] uppercase transition-all duration-300 hover:bg-accent/20 active:scale-95"
         >
           {isLast ? "Ouvrir le Grimoire ✦" : "Suivant"}

@@ -10,15 +10,11 @@ export type Particle = {
 
 export const particles: Particle[] = [];
 
-export function spawnParticles(
-  x: number,
-  y: number,
-  n = 22,
-  col = "#9b6dff",
-) {
+export function spawnParticles(x: number, y: number, n = 22, col = "#9b6dff") {
   for (let i = 0; i < n; i++) {
     const a = ((Math.PI * 2) / n) * i + Math.random() * 0.6;
     const s = Math.random() * 1.2 + 0.4;
+
     particles.push({
       x,
       y,
@@ -42,8 +38,10 @@ export function spawnCelebration(cx: number, cy: number) {
   for (let i = 0; i < 6; i++) {
     const angle = ((Math.PI * 2) / 6) * i;
     const delay = 120 + i * 100;
+
     setTimeout(() => {
       const col = FIREWORK_COLORS[Math.floor(Math.random() * FIREWORK_COLORS.length)];
+
       spawnParticles(
         cx + Math.cos(angle) * radius + Math.random() * 16 - 8,
         cy + Math.sin(angle) * radius + Math.random() * 16 - 8,

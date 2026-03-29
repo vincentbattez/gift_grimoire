@@ -1,6 +1,6 @@
 import type { Ref } from "react";
 
-interface LockIconProps {
+type LockIconProps = {
   /** Unique prefix for SVG defs IDs (avoids clashes when multiple instances exist) */
   readonly id?: string;
   /** SVG pixel width — default 36 */
@@ -20,7 +20,7 @@ interface LockIconProps {
     phase: "drag" | "unlocking" | "done";
     proximity: number;
   };
-}
+};
 
 export function LockIcon({
   id = "lock",
@@ -91,7 +91,9 @@ export function LockIcon({
 
         {/* Body */}
         <rect
-          className={unlock ? `unlock-body ${isUnlocking ? "is-reacting" : ""} ${isDone ? "is-dissolving" : ""}` : undefined}
+          className={
+            unlock ? `unlock-body ${isUnlocking ? "is-reacting" : ""} ${isDone ? "is-dissolving" : ""}` : undefined
+          }
           x="5"
           y="20"
           width="30"

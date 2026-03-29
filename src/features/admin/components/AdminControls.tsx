@@ -1,8 +1,8 @@
-import { useEnigmaStore } from "../../enigma/store";
 import { useCooldownStore } from "../../cooldown/store";
 import { ENIGMAS } from "../../enigma/config";
-import { FORGES } from "../../forges/forges.config";
+import { useEnigmaStore } from "../../enigma/store";
 import type { EnigmaPersistedStatus } from "../../enigma/types";
+import { FORGES } from "../../forges/forges.config";
 
 const STATUSES: EnigmaPersistedStatus[] = ["locked", "unlocked", "solved", "completed"];
 
@@ -17,9 +17,18 @@ function getEnigmaCurrentStatus(
   enigma: { unlocked: boolean; solved: boolean },
   letterRead: boolean,
 ): EnigmaPersistedStatus {
-  if (letterRead && enigma.solved) return "completed";
-  if (enigma.solved) return "solved";
-  if (enigma.unlocked) return "unlocked";
+  if (letterRead && enigma.solved) {
+    return "completed";
+  }
+
+  if (enigma.solved) {
+    return "solved";
+  }
+
+  if (enigma.unlocked) {
+    return "unlocked";
+  }
+
   return "locked";
 }
 
@@ -37,16 +46,17 @@ export function AdminControls() {
 
   return (
     <div className="mb-6 p-3 rounded-xl border border-amber-400/20 bg-amber-400/5">
-      <div className="text-center text-[0.5rem] tracking-[0.2em] text-amber-400/60 uppercase mb-3">
-        Admin Panel
-      </div>
+      <div className="text-center text-[0.5rem] tracking-[0.2em] text-amber-400/60 uppercase mb-3">Admin Panel</div>
 
       {/* Raccourcis globaux */}
       <div className="flex gap-2 justify-center mb-4">
         <button
           onClick={() => {
             const { unlock } = useEnigmaStore.getState();
-            ENIGMAS.forEach((e) => unlock(e.id));
+
+            ENIGMAS.forEach((e) => {
+              unlock(e.id);
+            });
           }}
           className="px-3 py-1 text-[0.55rem] rounded-md border border-accent/30 text-accent/60 hover:text-accent hover:border-accent/60 bg-accent/5 transition-colors cursor-pointer"
         >
@@ -55,15 +65,25 @@ export function AdminControls() {
         <button
           onClick={() => {
             const es = useEnigmaStore.getState();
-            ENIGMAS.forEach((e) => { es.unlock(e.id); es.solve(e.id); });
-            FORGES.forEach((f) => { f.solve(); f.reveal(); });
+
+            ENIGMAS.forEach((e) => {
+              es.unlock(e.id);
+              es.solve(e.id);
+            });
+
+            FORGES.forEach((f) => {
+              f.solve();
+              f.reveal();
+            });
           }}
           className="px-3 py-1 text-[0.55rem] rounded-md border border-success/30 text-success/60 hover:text-success hover:border-success/60 bg-success/5 transition-colors cursor-pointer"
         >
           solve all
         </button>
         <button
-          onClick={() => resetAttempt()}
+          onClick={() => {
+            resetAttempt();
+          }}
           className="px-3 py-1 text-[0.55rem] rounded-md border border-sky-400/30 text-sky-400/60 hover:text-sky-400 hover:border-sky-400/60 bg-sky-400/5 transition-colors cursor-pointer"
         >
           reset timer
@@ -74,8 +94,8 @@ export function AdminControls() {
       <div className="space-y-2">
         {ENIGMAS.map((e) => {
           const state = enigmas[e.id];
-          if (!state) return null;
-          const current = getEnigmaCurrentStatus(state, !!readLetters[e.id]);
+
+          const current = getEnigmaCurrentStatus(state, readLetters[e.id]);
 
           return (
             <div key={e.id} className="flex items-center gap-2">
@@ -86,10 +106,12 @@ export function AdminControls() {
                 {STATUSES.map((status) => (
                   <button
                     key={status}
-                    onClick={() => setEnigmaStatus(e.id, status)}
+                    onClick={() => {
+                      setEnigmaStatus(e.id, status);
+                    }}
                     className={`px-2 py-0.5 text-[0.45rem] rounded tracking-[0.1em] uppercase border transition-all cursor-pointer ${
                       current === status
-                        ? STATUS_STYLE[status] + " font-bold"
+                        ? `${STATUS_STYLE[status]} font-bold`
                         : "border-muted/15 text-muted/30 bg-transparent hover:border-muted/40 hover:text-muted/50"
                     }`}
                   >
