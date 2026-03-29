@@ -12,7 +12,7 @@ export function LastAttemptModal({
     <Modal
       isOpen={isOpen}
       zIndex={300}
-      className="border-danger/25 flex-color flex items-center px-6 py-8 text-center"
+      className="border-danger/25 flex flex-col items-center px-6 py-8 text-center"
       style={{
         background: "linear-gradient(155deg, #1a0f16, #0d0810)",
         boxShadow: "0 0 40px #ff6b8a15, inset 0 1px 0 #ffffff08",

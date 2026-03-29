@@ -12,7 +12,7 @@ export function InkVictoryModal({ onContinue }: Readonly<InkVictoryModalProps>):
       }}
     >
       <div
-        className="flex-color mx-6 flex items-center gap-5 rounded-2xl px-7 py-8 text-center"
+        className="mx-6 flex flex-col items-center gap-5 rounded-2xl px-7 py-8 text-center"
         style={{
           border: "1px solid rgba(232,201,106,0.35)",
           background: "linear-gradient(155deg, #1a1430, #0d0920)",

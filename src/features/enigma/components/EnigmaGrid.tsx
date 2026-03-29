@@ -85,7 +85,7 @@ function ForgeList({ isAdmin }: Readonly<{ isAdmin: boolean }>): React.JSX.Eleme
       <p className="text-muted/40 -mt-2 mb-5 text-center text-[0.5rem] tracking-wide">
         Résolvez les épreuves pour forger de nouvelles clés
       </p>
-      <div className="flex-color flex gap-10">
+      <div className="flex flex-col gap-10">
         {FORGE_LIST.map((forge) => (
           <ForgeSection key={forge.key} forge={forge} isAdmin={isAdmin} />
         ))}

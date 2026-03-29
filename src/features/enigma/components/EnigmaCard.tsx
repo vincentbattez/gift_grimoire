@@ -128,7 +128,7 @@ export function EnigmaCard({ enigma, isAdmin }: Readonly<{ enigma: Enigma; isAdm
   }
 
   const base =
-    "aspect-[2/3] rounded-[18px] border-[1.5px] relative overflow-hidden flex flex-color items-center justify-center p-3 px-2 select-none transition-all duration-700";
+    "aspect-[2/3] rounded-[18px] border-[1.5px] relative overflow-hidden flex flex-col items-center justify-center p-3 px-2 select-none transition-all duration-700";
 
   const stateClass = (() => {
     if (isSolved) {
@@ -202,7 +202,7 @@ export function EnigmaCard({ enigma, isAdmin }: Readonly<{ enigma: Enigma; isAdm
           <div className="text-muted text-[0.6rem] tracking-[0.2em] uppercase">Énigme {enigma.id}</div>
         </>
       ) : (
-        <div className="flex-color relative z-[1] flex items-center">
+        <div className="relative z-[1] flex flex-col items-center">
           <div className={`text-[0.6rem] tracking-[0.2em] ${isSolved ? "text-gold/50" : "text-muted"} mb-2 uppercase`}>
             Énigme {enigma.id}
           </div>

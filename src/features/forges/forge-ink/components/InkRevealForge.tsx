@@ -111,7 +111,7 @@ export function InkRevealForge({ solved: propSolved, onSolve }: Readonly<ForgePr
 
       {/* Words */}
       {engine.activeWordList.length > 0 && (
-        <div className="flex-color mt-5 flex gap-3">
+        <div className="mt-5 flex flex-col gap-3">
           <div className="text-muted/40 text-center text-[0.45rem] tracking-[0.25em] uppercase">— Mots à révéler —</div>
           {engine.activeWordList.map((wordText) => {
             const state = engine.wordStates[wordText];

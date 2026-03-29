@@ -139,7 +139,7 @@ export function IntroModal({ onClose }: Readonly<{ onClose: () => void }>): Reac
         hasEntered && !isExiting ? "opacity-100" : "opacity-0"
       }`}
     >
-      <div className="flex-color mx-4 flex w-full max-w-[400px] items-center">
+      <div className="mx-4 flex w-full max-w-[400px] flex-col items-center">
         {/* Slides track */}
         <div
           ref={containerRef}
@@ -160,7 +160,7 @@ export function IntroModal({ onClose }: Readonly<{ onClose: () => void }>): Reac
           >
             {SLIDE_LIST.map((slide, i) => (
               <div key={i} className="flex-shrink-0 px-2" style={{ width: `${String(100 / SLIDE_LIST.length)}%` }}>
-                <div className="flex-color flex items-center px-4 py-8 text-center">
+                <div className="flex flex-col items-center px-4 py-8 text-center">
                   <span
                     className={`mb-5 block text-[3rem] transition-all duration-500 ${
                       i === current ? "scale-100 opacity-100" : "scale-75 opacity-30"

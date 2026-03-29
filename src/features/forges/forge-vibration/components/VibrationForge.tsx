@@ -92,7 +92,7 @@ export function VibrationForge({ solved, onSolve }: Readonly<ForgeProps>): React
 
   if (solved) {
     return (
-      <div className="flex-color flex items-center gap-3">
+      <div className="flex flex-col items-center gap-3">
         <div className="relative" style={{ width: SIZE, height: SIZE }}>
           <svg className="absolute inset-0 -rotate-90" width={SIZE} height={SIZE}>
             <circle
@@ -180,7 +180,7 @@ export function VibrationForge({ solved, onSolve }: Readonly<ForgeProps>): React
   })();
 
   return (
-    <div className="flex-color flex items-center gap-3">
+    <div className="flex flex-col items-center gap-3">
       <button
         ref={btnRef}
         onClick={() => {

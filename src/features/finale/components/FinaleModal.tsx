@@ -436,7 +436,7 @@ function WaxSeal({ onComplete }: Readonly<{ onComplete: () => void }>): React.JS
   const dashOffset = circumference * (1 - progress);
 
   return (
-    <div className="flex-color itemList-center flex gap-2">
+    <div className="flex flex-col items-center gap-2">
       <div
         id="wax-seal"
         className="relative h-[68px] w-[68px] cursor-pointer select-none"
@@ -467,7 +467,7 @@ function WaxSeal({ onComplete }: Readonly<{ onComplete: () => void }>): React.JS
 
         {/* Wax seal body */}
         <div
-          className="itemList-center absolute inset-[6px] flex justify-center rounded-full"
+          className="absolute inset-[6px] flex items-center justify-center rounded-full"
           style={{
             background: isSealed
               ? "radial-gradient(circle at 40% 35%, #e8c96a, #c9a032, #8a6a20)"
@@ -776,10 +776,10 @@ function NarrativeSequence(): React.JSX.Element | null {
 
       {/* Narrative text */}
       {textIndex >= 0 && (
-        <div className="flex-color itemList-center pointer-events-none fixed inset-x-0 top-[12%] z-[195] flex px-6">
+        <div className="pointer-events-none fixed inset-x-0 top-[12%] z-[195] flex flex-col items-center px-6">
           <div
             key={textIndex}
-            className="flex-color itemList-center flex rounded-2xl px-8 py-5"
+            className="flex flex-col items-center rounded-2xl px-8 py-5"
             style={{
               background: "radial-gradient(ellipse at 50% 50%, #07060fE0, #07060fA0, transparent 80%)",
               animation: "narrative-text-fade 5s ease-in-out both",
@@ -1224,7 +1224,7 @@ export function FinaleModal(): React.JSX.Element {
 
             {/* Golden nova — fades in at nova phase */}
             <div
-              className="itemList-center absolute inset-0 flex justify-center transition-opacity duration-500"
+              className="absolute inset-0 flex items-center justify-center transition-opacity duration-500"
               style={{
                 opacity: celebrationPhase === "nova" ? 1 : 0,
               }}
@@ -1244,7 +1244,7 @@ export function FinaleModal(): React.JSX.Element {
       {/* ── Modal ── */}
       {(isFinaleModalOpen || isClosing) && (
         <div
-          className={`itemList-center fixed inset-0 z-[210] flex justify-center p-4 transition-opacity duration-600 ${
+          className={`fixed inset-0 z-[210] flex items-center justify-center p-4 transition-opacity duration-600 ${
             isModalOpen ? "pointer-events-auto opacity-100" : "pointer-events-none opacity-0"
           }`}
           style={{
@@ -1323,12 +1323,12 @@ export function FinaleModal(): React.JSX.Element {
               </div>
 
               {/* Navigation */}
-              <div className="itemList-center mt-6 flex justify-between">
+              <div className="mt-6 flex items-center justify-between">
                 {/* Prev */}
                 <button
                   onClick={prevSlide}
                   disabled={slideIndex === 0}
-                  className="itemList-center flex h-[32px] w-[32px] cursor-pointer justify-center rounded-full border text-[0.7rem] transition-all duration-200 disabled:cursor-default disabled:opacity-20"
+                  className="flex h-[32px] w-[32px] cursor-pointer items-center justify-center rounded-full border text-[0.7rem] transition-all duration-200 disabled:cursor-default disabled:opacity-20"
                   style={{
                     borderColor: "#c9a03240",
                     background: "#f5e6c8",
@@ -1339,7 +1339,7 @@ export function FinaleModal(): React.JSX.Element {
                 </button>
 
                 {/* Dots */}
-                <div className="itemList-center flex gap-2">
+                <div className="flex items-center gap-2">
                   {SLIDE_LIST.map((_, i) => (
                     <div
                       key={i}
@@ -1358,7 +1358,7 @@ export function FinaleModal(): React.JSX.Element {
                 {slideIndex < SLIDE_LIST.length - 1 ? (
                   <button
                     onClick={nextSlide}
-                    className="itemList-center flex h-[32px] w-[32px] cursor-pointer justify-center rounded-full border text-[0.7rem] transition-all duration-200"
+                    className="flex h-[32px] w-[32px] cursor-pointer items-center justify-center rounded-full border text-[0.7rem] transition-all duration-200"
                     style={{
                       borderColor: "#c9a03240",
                       background: "#f5e6c8",

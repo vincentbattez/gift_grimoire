@@ -107,7 +107,7 @@ export function LoveLetterModal(): React.JSX.Element {
 
   return (
     <div
-      className={`itemList-center fixed inset-0 z-[120] flex justify-center p-4 transition-opacity duration-500 ${
+      className={`fixed inset-0 z-[120] flex items-center justify-center p-4 transition-opacity duration-500 ${
         isOpen ? "pointer-events-auto opacity-100" : "pointer-events-none opacity-0"
       }`}
       style={{
@@ -182,7 +182,7 @@ export function LoveLetterModal(): React.JSX.Element {
           {/* Close button */}
           <button
             onClick={handleClose}
-            className="itemList-center absolute top-3 right-3 z-20 flex h-[28px] w-[28px] cursor-pointer justify-center rounded-full border border-[#c9a03230] bg-[#f5e6c8] text-[0.75rem] text-[#8a7040] transition-colors hover:bg-[#ede0c0]"
+            className="absolute top-3 right-3 z-20 flex h-[28px] w-[28px] cursor-pointer items-center justify-center rounded-full border border-[#c9a03230] bg-[#f5e6c8] text-[0.75rem] text-[#8a7040] transition-colors hover:bg-[#ede0c0]"
           >
             ✕
           </button>

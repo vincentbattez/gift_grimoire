@@ -114,7 +114,7 @@ export function DarkVadorForge({ solved, onSolve }: Readonly<ForgeProps>): React
     return (
       <div className="mt-6">
         <div
-          className="flex-color border-solved-border/50 relative flex w-full items-center gap-2 overflow-hidden rounded-[14px] border-[1.5px] px-4 py-4 shadow-[0_0_22px_#4ecca325]"
+          className="border-solved-border/50 relative flex w-full flex-col items-center gap-2 overflow-hidden rounded-[14px] border-[1.5px] px-4 py-4 shadow-[0_0_22px_#4ecca325]"
           style={{ background: "linear-gradient(155deg, #0a1f1a, #080f0c)" }}
         >
           <div
@@ -142,7 +142,7 @@ export function DarkVadorForge({ solved, onSolve }: Readonly<ForgeProps>): React
       <div className="mt-6">
         <button
           onClick={handlePlay}
-          className="flex-color border-accent/30 hover:border-accent/55 relative flex w-full cursor-pointer items-center gap-2 overflow-hidden rounded-[14px] border-[1.5px] px-4 py-4 transition-all duration-300 select-none active:scale-[0.98]"
+          className="border-accent/30 hover:border-accent/55 relative flex w-full cursor-pointer flex-col items-center gap-2 overflow-hidden rounded-[14px] border-[1.5px] px-4 py-4 transition-all duration-300 select-none active:scale-[0.98]"
           style={{ background: "linear-gradient(155deg, #130f26, #0b0917)" }}
         >
           <div
@@ -182,7 +182,7 @@ export function DarkVadorForge({ solved, onSolve }: Readonly<ForgeProps>): React
       <div className="mt-6">
         <button
           disabled
-          className="flex-color border-accent/60 relative flex w-full cursor-not-allowed items-center gap-2 overflow-hidden rounded-[14px] border-[1.5px] px-4 py-4 shadow-[0_0_28px_#9b6dff35] transition-all duration-300 select-none"
+          className="border-accent/60 relative flex w-full cursor-not-allowed flex-col items-center gap-2 overflow-hidden rounded-[14px] border-[1.5px] px-4 py-4 shadow-[0_0_28px_#9b6dff35] transition-all duration-300 select-none"
           style={{ background: "linear-gradient(155deg, #130f26, #0b0917)" }}
         >
           <div
@@ -270,7 +270,7 @@ export function DarkVadorForge({ solved, onSolve }: Readonly<ForgeProps>): React
           void handleCheck();
         }}
         disabled={isChecking || isShowingPicker}
-        className={`flex-color relative flex w-full cursor-pointer items-center gap-2 overflow-hidden rounded-[14px] border-[1.5px] px-4 py-4 transition-all duration-300 select-none ${borderClass}`}
+        className={`relative flex w-full cursor-pointer flex-col items-center gap-2 overflow-hidden rounded-[14px] border-[1.5px] px-4 py-4 transition-all duration-300 select-none ${borderClass}`}
         style={{
           background: (() => {
             if (isShowingPicker) {

@@ -271,7 +271,7 @@ function ModalBody({
     >
       {/* Drag handle */}
       <div
-        className="items-startList absolute top-0 right-0 left-0 flex h-10 cursor-grab touch-none justify-center pt-2.5 active:cursor-grabbing"
+        className="absolute top-0 right-0 left-0 flex h-10 cursor-grab touch-none items-start justify-center pt-2.5 active:cursor-grabbing"
         onTouchStart={handleTouchStart}
         onTouchMove={handleTouchMove}
         onTouchEnd={handleTouchEnd}

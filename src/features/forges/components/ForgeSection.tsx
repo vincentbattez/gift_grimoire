@@ -361,7 +361,7 @@ export function ForgeSection({ forge, isAdmin }: Readonly<ForgeSectionProps>): R
       {phase !== "revealing" && phase !== "done" && (
         <div
           ref={lockRef}
-          className="flex-color absolute inset-0 flex cursor-pointer items-center justify-center gap-3"
+          className="absolute inset-0 flex cursor-pointer flex-col items-center justify-center gap-3"
           role="button"
           tabIndex={0}
           onClick={handleUnlock}

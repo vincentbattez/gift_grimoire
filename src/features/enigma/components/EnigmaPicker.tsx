@@ -34,7 +34,7 @@ export function EnigmaPicker({ onClose }: Readonly<{ onClose?: () => void }>): R
   }
 
   return (
-    <div className="flex-color mt-4 flex items-center gap-3">
+    <div className="mt-4 flex flex-col items-center gap-3">
       <div className="text-gold text-[0.6rem] tracking-[0.25em] uppercase">Choisissez une énigme à déverrouiller</div>
       <div className="flex flex-wrap justify-center gap-2">
         {pickableList.map((e) => (
@@ -43,7 +43,7 @@ export function EnigmaPicker({ onClose }: Readonly<{ onClose?: () => void }>): R
             onClick={() => {
               handlePick(e.id);
             }}
-            className="flex-color border-accent/40 hover:border-accent flex items-center gap-1.5 rounded-xl border bg-gradient-to-br from-[#1c1438] to-[#130f26] px-3 py-2.5 transition-all duration-150 hover:shadow-[0_0_16px_#9b6dff30] active:scale-95"
+            className="border-accent/40 hover:border-accent flex flex-col items-center gap-1.5 rounded-xl border bg-gradient-to-br from-[#1c1438] to-[#130f26] px-3 py-2.5 transition-all duration-150 hover:shadow-[0_0_16px_#9b6dff30] active:scale-95"
           >
             <svg
               viewBox="0 0 40 120"

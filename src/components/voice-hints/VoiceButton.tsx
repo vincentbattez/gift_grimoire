@@ -99,7 +99,7 @@ export function VoiceButton({ hint }: Readonly<{ hint: VoiceHint }>): React.JSX.
       <button
         onClick={handlePlay}
         disabled={isExhausted}
-        className={`flex-color relative flex flex-1 cursor-pointer items-center gap-2 overflow-hidden rounded-[14px] border-[1.5px] px-3 py-3.5 transition-all duration-300 select-none ${borderClass}`}
+        className={`relative flex flex-1 cursor-pointer flex-col items-center gap-2 overflow-hidden rounded-[14px] border-[1.5px] px-3 py-3.5 transition-all duration-300 select-none ${borderClass}`}
         style={{
           background: isSuccess
             ? "linear-gradient(155deg, #0a1f1a, #080f0c)"

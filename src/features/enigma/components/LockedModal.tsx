@@ -17,7 +17,7 @@ export function LockedModal({ onClose }: { readonly onClose: () => void }): Reac
 
   return createPortal(
     <div
-      className="flex-color fixed inset-0 z-[100] flex items-center justify-center"
+      className="fixed inset-0 z-[100] flex flex-col items-center justify-center"
       style={{
         background: "radial-gradient(ellipse at 50% 40%, #1a1040ee, #07060ffa)",
         animation: isClosing ? "locked-modal-out 0.3s ease-in forwards" : "locked-modal-in 0.3s ease-out",

@@ -19,7 +19,7 @@ export function AudioWarningModal({
     <Modal
       isOpen={isOpen}
       zIndex={300}
-      className="border-accent/25 flex-color flex items-center px-6 py-8 text-center"
+      className="border-accent/25 flex flex-col items-center px-6 py-8 text-center"
       style={{
         background: "linear-gradient(155deg, #130f26, #0b0917)",
         boxShadow: "0 0 40px #9b6dff15, inset 0 1px 0 #ffffff08",

@@ -41,7 +41,7 @@ export function DoubtOverlay({
           </div>
         )}
 
-        <div className="flex-color relative flex items-center px-6 pt-6 pb-7 text-center">
+        <div className="relative flex flex-col items-center px-6 pt-6 pb-7 text-center">
           {/* Runes en orbite */}
           {visible && (
             <div className="pointer-events-none absolute top-1/2 left-1/2 h-[140px] w-[140px] -translate-x-1/2 -translate-y-1/2">
