@@ -71,3 +71,23 @@ cp .env.example .env  # configurer VITE_HA_URL et VITE_HA_TOKEN
 npm install
 npm run dev
 ```
+
+## Docker
+
+Prérequis : configurer `.env` avec `VITE_HA_URL` et `VITE_HA_TOKEN` (voir `.env.example`).
+
+### Développement (hot-reload)
+
+```bash
+docker compose --profile dev up
+```
+
+Le code source est monté en volume — les modifications sont reflétées en temps réel. L'app est accessible sur `http://localhost:5173`.
+
+### Production
+
+```bash
+docker compose --profile prod up --build
+```
+
+Construit une image multi-stage (deps → build → nginx) et sert l'app sur `http://localhost:8080`.
