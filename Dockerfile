@@ -7,6 +7,8 @@ RUN yarn install --frozen-lockfile
 # ---- Build ----
 FROM node:25-alpine AS build
 WORKDIR /app
+ARG VITE_HA_URL
+ARG VITE_HA_TOKEN
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 RUN yarn build
