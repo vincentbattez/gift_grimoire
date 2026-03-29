@@ -22,19 +22,24 @@ export function Starfield() {
     }
     let stars: Star[] = [];
 
+    const sCv = starCv;
+    const pCv = partCv;
+    const sCtx = starCtx;
+    const pCtx = partCtx;
+
     function resize() {
-      starCv.width = window.innerWidth;
-      starCv.height = window.innerHeight;
-      partCv.width = window.innerWidth;
-      partCv.height = window.innerHeight;
+      sCv.width = window.innerWidth;
+      sCv.height = window.innerHeight;
+      pCv.width = window.innerWidth;
+      pCv.height = window.innerHeight;
 
       stars = Array.from({ length: 180 }, () => {
         const angle = Math.random() * Math.PI * 2;
         const speed = Math.random() * 0.12 + 0.03;
 
         return {
-          x: Math.random() * starCv.width,
-          y: Math.random() * starCv.height,
+          x: Math.random() * sCv.width,
+          y: Math.random() * sCv.height,
           r: Math.random() * 1.6 + 0.3,
           phase: Math.random() * Math.PI * 2,
           spd: Math.random() * 0.02 + 0.008,
@@ -45,8 +50,8 @@ export function Starfield() {
     }
 
     function draw(t: number) {
-      starCtx.clearRect(0, 0, starCv.width, starCv.height);
-      partCtx.clearRect(0, 0, partCv.width, partCv.height);
+      sCtx.clearRect(0, 0, sCv.width, sCv.height);
+      pCtx.clearRect(0, 0, pCv.width, pCv.height);
 
       for (const s of stars) {
         // Déplacement avec wrap-around
@@ -54,14 +59,14 @@ export function Starfield() {
         s.y += s.vy;
 
         if (s.x < -2) {
-          s.x = starCv.width + 2;
-        } else if (s.x > starCv.width + 2) {
+          s.x = sCv.width + 2;
+        } else if (s.x > sCv.width + 2) {
           s.x = -2;
         }
 
         if (s.y < -2) {
-          s.y = starCv.height + 2;
-        } else if (s.y > starCv.height + 2) {
+          s.y = sCv.height + 2;
+        } else if (s.y > sCv.height + 2) {
           s.y = -2;
         }
 
@@ -71,16 +76,16 @@ export function Starfield() {
 
         // Glow subtil pour les grosses étoiles
         if (s.r > 1) {
-          starCtx.beginPath();
-          starCtx.arc(s.x, s.y, s.r * 3, 0, Math.PI * 2);
-          starCtx.fillStyle = `rgba(180,160,255,${String(a * 0.08)})`;
-          starCtx.fill();
+          sCtx.beginPath();
+          sCtx.arc(s.x, s.y, s.r * 3, 0, Math.PI * 2);
+          sCtx.fillStyle = `rgba(180,160,255,${String(a * 0.08)})`;
+          sCtx.fill();
         }
 
-        starCtx.beginPath();
-        starCtx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
-        starCtx.fillStyle = `rgba(210,190,255,${String(a)})`;
-        starCtx.fill();
+        sCtx.beginPath();
+        sCtx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
+        sCtx.fillStyle = `rgba(210,190,255,${String(a)})`;
+        sCtx.fill();
       }
 
       let i = particles.length;
@@ -98,10 +103,10 @@ export function Starfield() {
         const hex = Math.floor(p.life * 255)
           .toString(16)
           .padStart(2, "0");
-        partCtx.beginPath();
-        partCtx.arc(p.x, p.y, p.r * p.life, 0, Math.PI * 2);
-        partCtx.fillStyle = p.col + hex;
-        partCtx.fill();
+        pCtx.beginPath();
+        pCtx.arc(p.x, p.y, p.r * p.life, 0, Math.PI * 2);
+        pCtx.fillStyle = p.col + hex;
+        pCtx.fill();
       }
 
       requestAnimationFrame(draw);

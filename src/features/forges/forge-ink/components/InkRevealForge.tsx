@@ -96,7 +96,7 @@ export function InkRevealForge({ solved: propSolved, onSolve }: ForgeProps) {
               isMissed={isMissed}
               isAnimating={isAnimating}
               isAnimatingHit={isAnimating && engine.animating?.result === "hit"}
-              wordSolved={isRevealed && letterEntry.wordTexts.some((wt) => engine.wordStates[wt].solved)}
+              wordSolved={isRevealed && !!letterEntry?.wordTexts.some((wt) => engine.wordStates[wt].solved)}
               isNewlyRevealed={engine.newlyRevealedCells.has(key)}
               isAnimatingMiss={engine.animatingMissCells.has(key)}
               isHotLetter={isHotLetter}

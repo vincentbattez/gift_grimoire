@@ -394,7 +394,7 @@ function WaxSeal({ onComplete }: { onComplete: () => void }) {
   }, [onComplete]);
 
   function handleStart() {
-    if (sealed) {
+    if (isSealed) {
       return;
     }
     pressing.current = true;
@@ -446,7 +446,7 @@ function WaxSeal({ onComplete }: { onComplete: () => void }) {
             cy="32"
             r="28"
             fill="none"
-            stroke={sealed ? "#e8c96a" : "#c9a032"}
+            stroke={isSealed ? "#e8c96a" : "#c9a032"}
             strokeWidth="3"
             strokeLinecap="round"
             strokeDasharray={circumference}
@@ -479,7 +479,7 @@ function WaxSeal({ onComplete }: { onComplete: () => void }) {
 
               return "inset 0 -2px 6px #00000050, 0 2px 8px #00000030";
             })(),
-            transform: `scale(${String(sealed ? 0.92 : 1 - progress * 0.06)})`,
+            transform: `scale(${String(isSealed ? 0.92 : 1 - progress * 0.06)})`,
             transition: !isSealed && pressing.current ? undefined : "all 0.3s ease-out",
           }}
         >
@@ -495,12 +495,12 @@ function WaxSeal({ onComplete }: { onComplete: () => void }) {
               opacity: isSealed ? 1 : 0.7 + progress * 0.3,
             }}
           >
-            {sealed ? "♡" : "♡"}
+            {isSealed ? "♡" : "♡"}
           </span>
         </div>
 
         {/* Melting wax drips — appear during press */}
-        {progress > 0.3 && !sealed && (
+        {progress > 0.3 && !isSealed && (
           <>
             {[0, 1, 2].map((i) => (
               <div
@@ -530,7 +530,7 @@ function WaxSeal({ onComplete }: { onComplete: () => void }) {
           opacity: isSealed ? 1 : 0.6 + progress * 0.4,
         }}
       >
-        {sealed ? "✦ Scellé ✦" : "Maintenir pour sceller"}
+        {isSealed ? "✦ Scellé ✦" : "Maintenir pour sceller"}
       </span>
     </div>
   );

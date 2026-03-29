@@ -8,7 +8,7 @@ import unusedImports from "eslint-plugin-unused-imports";
 import eslintPluginUnicorn from "eslint-plugin-unicorn";
 
 export default tseslint.config(
-  { ignores: ["dist/", "node_modules/", "eslint.config.js"] },
+  { ignores: ["dist/", "node_modules/", "eslint.config.js", "commitlint.config.ts"] },
   tseslint.configs.strictTypeChecked,
   tseslint.configs.stylisticTypeChecked,
   eslintPluginUnicorn.configs["flat/all"],
