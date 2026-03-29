@@ -36,6 +36,13 @@ export function LockIcon({
   const isDone = unlock?.phase === "done";
   const proximity = unlock?.proximity ?? 0;
 
+  const openingClass = isUnlocking || isDone ? "is-opening" : "";
+  const shackleClass = unlock ? `unlock-shackle ${openingClass}` : "lock-shackle";
+
+  const reactingClass = isUnlocking ? "is-reacting" : "";
+  const dissolvingClass = isDone ? "is-dissolving" : "";
+  const bodyClass = unlock ? `unlock-body ${reactingClass} ${dissolvingClass}` : undefined;
+
   return (
     <div className="lock-icon-wrapper">
       {orbit && (
@@ -81,7 +88,7 @@ export function LockIcon({
 
         {/* Shackle */}
         <path
-          className={unlock ? `unlock-shackle ${isUnlocking || isDone ? "is-opening" : ""}` : "lock-shackle"}
+          className={shackleClass}
           d="M11 20 V14 A9 9 0 0 1 29 14 V20"
           stroke="#5a4f6a"
           strokeWidth="3"
@@ -91,9 +98,7 @@ export function LockIcon({
 
         {/* Body */}
         <rect
-          className={
-            unlock ? `unlock-body ${isUnlocking ? "is-reacting" : ""} ${isDone ? "is-dissolving" : ""}` : undefined
-          }
+          className={bodyClass}
           x="5"
           y="20"
           width="30"

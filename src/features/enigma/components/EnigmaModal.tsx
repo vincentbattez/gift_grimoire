@@ -1,3 +1,4 @@
+import type { CSSProperties } from "react";
 import React, { useEffect, useRef, useState } from "react";
 import { sndAnalysis, sndBad, sndClick, sndDoubt, sndLoveReveal, sndOk } from "@/audio";
 import { randomVisual } from "@/utils/random";
@@ -20,64 +21,93 @@ function normalize(s: string): string {
     .replaceAll(/[^\da-z]/g, "");
 }
 
-function ModalBody({
-  enigma,
-  isSolved,
-  attemptUsed,
-  isOpen,
-  lifecycle,
-}: Readonly<{
-  enigma: Enigma;
-  isSolved: boolean;
-  attemptUsed: boolean;
-  isOpen: boolean;
-  /** Événements lifecycle émis au parent orchestrateur */
-  lifecycle: EnigmaLifecycleEvents;
-}>): React.JSX.Element {
-  const lastAttempt = useCooldownStore((s) => s.lastAttempt);
-  const closeModal = useEnigmaStore((s) => s.closeModal);
-  const openLoveLetter = useEnigmaStore((s) => s.openLoveLetter);
-  const isLetterRead = useEnigmaStore((s) => s.readLetters[enigma.id]);
+function getInputState(feedback: "ok" | "err" | "suspense" | null): "success" | "danger" | "loading" | "default" {
+  if (feedback === "ok") {
+    return "success";
+  }
 
-  const [value, setValue] = useState("");
-  const [feedback, setFeedback] = useState<"ok" | "err" | "suspense" | null>(isSolved ? "ok" : null);
-  const [feedbackMsg, setFeedbackMsg] = useState(isSolved ? "✦ Le grimoire a déjà accepté ta réponse" : "");
-  const [isShaking, setIsShaking] = useState(false);
-  const [suspenseProgress, setSuspenseProgress] = useState(0);
-  const [isShowingDoubt, setIsShowingDoubt] = useState(false);
-  const suspenseRef = useRef<{
-    interval: ReturnType<typeof setInterval>;
-    timeout: ReturnType<typeof setTimeout>;
-    startTime: number;
-    elapsed: number;
-  } | null>(null);
-  const stopAnalysisRef = useRef<(() => void) | null>(null);
-  const inputRef = useRef<HTMLInputElement>(null);
-  const sheetRef = useRef<HTMLDivElement>(null);
+  if (feedback === "err") {
+    return "danger";
+  }
+
+  if (feedback === "suspense") {
+    return "loading";
+  }
+
+  return "default";
+}
+
+function getTranslateClass(hasEntered: boolean, isOpen: boolean, isDragging: boolean): string {
+  if (hasEntered && isOpen && !isDragging) {
+    return "translate-y-0";
+  }
+
+  if (isDragging) {
+    return "";
+  }
+
+  return "translate-y-full";
+}
+
+function getSubmitButtonText(attemptUsed: boolean, isSuspense: boolean): string {
+  if (attemptUsed) {
+    return "Essai épuisé";
+  }
+
+  if (isSuspense) {
+    return "Le grimoire réfléchit…";
+  }
+
+  return "Valider la Réponse ✦";
+}
+
+function getSheetClass(isSolved: boolean, isDragging: boolean, translateClass: string, isShaking: boolean): string {
+  const borderColor = isSolved ? "border-[#d4a94250]" : "border-[#3a2a5a]";
+  const transition = isDragging ? "" : "transition-transform duration-400";
+  const shake = isShaking ? "animate-[shake_0.42s_ease]" : "";
+
+  return `mx-auto w-full max-w-[430px] rounded-t-3xl border ${borderColor} relative overflow-hidden border-b-0 px-[22px] pt-7 pb-11 ${transition} ${translateClass} ${shake}`;
+}
+
+function getSheetStyle(isSolved: boolean, isDragging: boolean, dragOffset: number): CSSProperties {
+  return {
+    background: isSolved ? "linear-gradient(180deg, #1a1508, #100c04)" : "linear-gradient(180deg, #1c1438, #100d20)",
+    ...(isSolved && { boxShadow: "0 0 50px #e8c96a10" }),
+    ...(!isDragging && { transitionTimingFunction: "cubic-bezier(.34,1.56,.64,1)" }),
+    ...(isDragging && { transform: `translateY(${String(dragOffset)}px)` }),
+  };
+}
+
+function getHandleClass(isSolved: boolean): string {
+  return `h-[3.5px] w-[38px] rounded-sm ${isSolved ? "bg-[#c9a03240]" : "bg-[#3a2a5a]"}`;
+}
+
+function getCloseButtonClass(isSolved: boolean): string {
+  return `absolute top-[18px] right-4 z-10 flex h-[30px] w-[30px] cursor-pointer items-center justify-center rounded-full border text-[0.8rem] ${isSolved ? "border-[#c9a03230] bg-white/4 text-[#c9a032]/60" : "text-muted border-[#3a2a5a] bg-white/4"}`;
+}
+
+function getIconClass(isSolved: boolean): string {
+  return `mb-1.5 text-center text-[2.8rem] ${isSolved ? "drop-shadow-[0_0_14px_rgba(201,160,50,0.45)]" : "drop-shadow-[0_0_14px_rgba(155,109,255,0.5)]"}`;
+}
+
+function getQuestionClass(isSolved: boolean): string {
+  return `mb-5 rounded-[14px] border p-4 text-center text-[0.88rem] leading-relaxed whitespace-pre-line italic ${isSolved ? "text-text border-[#c9a03220] bg-[#e8c96a06]" : "text-text border-[#2e2248] bg-white/[0.03]"}`;
+}
+
+function useDragToClose(
+  sheetRef: React.RefObject<HTMLDivElement | null>,
+  closeModal: () => void,
+): {
+  dragOffset: number;
+  isDragging: boolean;
+  handleTouchStart: (e: React.TouchEvent) => void;
+  handleTouchMove: (e: React.TouchEvent) => void;
+  handleTouchEnd: () => void;
+  handleMouseDown: (e: React.MouseEvent) => void;
+} {
   const dragState = useRef<{ startY: number; startTime: number; currentY: number } | null>(null);
   const [dragOffset, setDragOffset] = useState(0);
   const [isDragging, setIsDragging] = useState(false);
-  const [hasEntered, setHasEntered] = useState(false);
-
-  useEffect(() => {
-    const raf = requestAnimationFrame(() => {
-      setHasEntered(true);
-    });
-
-    return () => {
-      cancelAnimationFrame(raf);
-    };
-  }, []);
-
-  useEffect(() => {
-    if (!isSolved) {
-      const timer = setTimeout(() => inputRef.current?.focus(), INPUT_FOCUS_DELAY_MS);
-
-      return () => {
-        clearTimeout(timer);
-      };
-    }
-  }, [isSolved]);
 
   function onDragStart(clientY: number): void {
     dragState.current = { startY: clientY, startTime: Date.now(), currentY: clientY };
@@ -129,6 +159,69 @@ function ModalBody({
     globalThis.addEventListener("mousemove", handleMove);
     globalThis.addEventListener("mouseup", handleUp);
   }
+
+  return { dragOffset, isDragging, handleTouchStart, handleTouchMove, handleTouchEnd, handleMouseDown };
+}
+
+function ModalBody({
+  enigma,
+  isSolved,
+  attemptUsed,
+  isOpen,
+  lifecycle,
+}: Readonly<{
+  enigma: Enigma;
+  isSolved: boolean;
+  attemptUsed: boolean;
+  isOpen: boolean;
+  /** Événements lifecycle émis au parent orchestrateur */
+  lifecycle: EnigmaLifecycleEvents;
+}>): React.JSX.Element {
+  const lastAttempt = useCooldownStore((s) => s.lastAttempt);
+  const closeModal = useEnigmaStore((s) => s.closeModal);
+  const openLoveLetter = useEnigmaStore((s) => s.openLoveLetter);
+  const isLetterRead = useEnigmaStore((s) => s.readLetters[enigma.id]);
+
+  const [value, setValue] = useState("");
+  const [feedback, setFeedback] = useState<"ok" | "err" | "suspense" | null>(isSolved ? "ok" : null);
+  const [feedbackMsg, setFeedbackMsg] = useState(isSolved ? "✦ Le grimoire a déjà accepté ta réponse" : "");
+  const [isShaking, setIsShaking] = useState(false);
+  const [suspenseProgress, setSuspenseProgress] = useState(0);
+  const [isShowingDoubt, setIsShowingDoubt] = useState(false);
+  const suspenseRef = useRef<{
+    interval: ReturnType<typeof setInterval>;
+    timeout: ReturnType<typeof setTimeout>;
+    startTime: number;
+    elapsed: number;
+  } | null>(null);
+  const stopAnalysisRef = useRef<(() => void) | null>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
+  const sheetRef = useRef<HTMLDivElement>(null);
+  const [hasEntered, setHasEntered] = useState(false);
+  const { dragOffset, isDragging, handleTouchStart, handleTouchMove, handleTouchEnd, handleMouseDown } = useDragToClose(
+    sheetRef,
+    closeModal,
+  );
+
+  useEffect(() => {
+    const raf = requestAnimationFrame(() => {
+      setHasEntered(true);
+    });
+
+    return () => {
+      cancelAnimationFrame(raf);
+    };
+  }, []);
+
+  useEffect(() => {
+    if (!isSolved) {
+      const timer = setTimeout(() => inputRef.current?.focus(), INPUT_FOCUS_DELAY_MS);
+
+      return () => {
+        clearTimeout(timer);
+      };
+    }
+  }, [isSolved]);
 
   function startSuspenseTimer(offsetMs: number, startTime: number): void {
     const startList = startTime - offsetMs;
@@ -228,46 +321,14 @@ function ModalBody({
   }
 
   const isSuspense = feedback === "suspense";
-  const inputState = (() => {
-    if (feedback === "ok") {
-      return "success" as const;
-    }
-
-    if (feedback === "err") {
-      return "danger" as const;
-    }
-
-    if (isSuspense) {
-      return "loading" as const;
-    }
-
-    return "default" as const;
-  })();
-
-  const translateClass = (() => {
-    if (hasEntered && isOpen && !isDragging) {
-      return "translate-y-0";
-    }
-
-    if (isDragging) {
-      return "";
-    }
-
-    return "translate-y-full";
-  })();
+  const inputState = getInputState(feedback);
+  const translateClass = getTranslateClass(hasEntered, isOpen, isDragging);
 
   return (
     <div
       ref={sheetRef}
-      className={`mx-auto w-full max-w-[430px] rounded-t-3xl border ${isSolved ? "border-[#d4a94250]" : "border-[#3a2a5a]"} relative overflow-hidden border-b-0 px-[22px] pt-7 pb-11 ${isDragging ? "" : "transition-transform duration-400"} ${translateClass} ${isShaking ? "animate-[shake_0.42s_ease]" : ""}`}
-      style={{
-        background: isSolved
-          ? "linear-gradient(180deg, #1a1508, #100c04)"
-          : "linear-gradient(180deg, #1c1438, #100d20)",
-        ...(isSolved && { boxShadow: "0 0 50px #e8c96a10" }),
-        ...(!isDragging && { transitionTimingFunction: "cubic-bezier(.34,1.56,.64,1)" }),
-        ...(isDragging && { transform: `translateY(${String(dragOffset)}px)` }),
-      }}
+      className={getSheetClass(isSolved, isDragging, translateClass, isShaking)}
+      style={getSheetStyle(isSolved, isDragging, dragOffset)}
     >
       {/* Drag handle */}
       <div
@@ -280,7 +341,7 @@ function ModalBody({
         tabIndex={0}
         aria-label="Faire glisser pour fermer"
       >
-        <div className={`h-[3.5px] w-[38px] rounded-sm ${isSolved ? "bg-[#c9a03240]" : "bg-[#3a2a5a]"}`} />
+        <div className={getHandleClass(isSolved)} />
       </div>
 
       {/* Bouton fermer */}
@@ -289,24 +350,16 @@ function ModalBody({
           sndClick();
           closeModal();
         }}
-        className={`absolute top-[18px] right-4 z-10 flex h-[30px] w-[30px] cursor-pointer items-center justify-center rounded-full border text-[0.8rem] ${isSolved ? "border-[#c9a03230] bg-white/4 text-[#c9a032]/60" : "text-muted border-[#3a2a5a] bg-white/4"}`}
+        className={getCloseButtonClass(isSolved)}
       >
         ✕
       </button>
 
-      <div
-        className={`mb-1.5 text-center text-[2.8rem] ${isSolved ? "drop-shadow-[0_0_14px_rgba(201,160,50,0.45)]" : "drop-shadow-[0_0_14px_rgba(155,109,255,0.5)]"}`}
-      >
-        {enigma.icon}
-      </div>
+      <div className={getIconClass(isSolved)}>{enigma.icon}</div>
       <h2 className="text-gold mb-5 text-center text-[1.05rem] font-[var(--font-cinzel-decorative)] drop-shadow-[0_0_20px_#e8c96a35]">
         {enigma.title}
       </h2>
-      <p
-        className={`mb-5 rounded-[14px] border p-4 text-center text-[0.88rem] leading-relaxed whitespace-pre-line italic ${isSolved ? "text-text border-[#c9a03220] bg-[#e8c96a06]" : "text-text border-[#2e2248] bg-white/[0.03]"}`}
-      >
-        {enigma.question}
-      </p>
+      <p className={getQuestionClass(isSolved)}>{enigma.question}</p>
 
       {!isSolved && !attemptUsed && (
         <>
@@ -432,17 +485,7 @@ function ModalBody({
           disabled={attemptUsed || isSuspense}
           className={`mt-3 w-full cursor-pointer rounded-[14px] border-none py-4 text-[0.85rem] font-[var(--font-cinzel)] font-semibold tracking-[0.12em] text-white uppercase transition-all duration-200 active:scale-[0.97] ${attemptUsed || isSuspense ? "cursor-not-allowed bg-gradient-to-br from-[#3a3a4a] to-[#2a2a3a] opacity-50" : "to-accent bg-gradient-to-br from-[#6b4a97] shadow-[0_4px_22px_#9b6dff28]"}`}
         >
-          {(() => {
-            if (attemptUsed) {
-              return "Essai épuisé";
-            }
-
-            if (isSuspense) {
-              return "Le grimoire réfléchit…";
-            }
-
-            return "Valider la Réponse ✦";
-          })()}
+          {getSubmitButtonText(attemptUsed, isSuspense)}
         </button>
       )}
 

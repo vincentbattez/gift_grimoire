@@ -1,3 +1,4 @@
+import type { CSSProperties } from "react";
 import { useEffect, useRef, useState } from "react";
 import { sndClick, sndForgeReveal } from "@/audio";
 import { spawnParticles } from "@/particles";
@@ -5,6 +6,21 @@ import { randomVisual } from "@/utils/random";
 import { LockIcon } from "@components/LockIcon";
 import { Button } from "@components/ui/Button";
 import type { ForgeModule } from "@features/forges/types";
+
+function staggerStyle(
+  active: boolean,
+  delay: string,
+  options?: { translateY?: string; transition?: string },
+): CSSProperties {
+  const ty = options?.translateY ?? "8px";
+
+  return {
+    opacity: active ? 1 : 0,
+    transform: active ? "translateY(0)" : `translateY(${ty})`,
+    transition: options?.transition ?? "opacity 0.5s ease-out, transform 0.5s ease-out",
+    transitionDelay: delay,
+  };
+}
 
 type ForgePhase = "locked" | "shaking" | "shattering" | "revealing" | "done";
 
@@ -49,17 +65,35 @@ function ForgeIntroModal({
     setTimeout(onClose, 450);
   }
 
+  const isActive = hasEntered && !isClosing;
+
+  const ornamentStyle = staggerStyle(isActive, "0.1s");
+  const headingStyle = staggerStyle(isActive, "0.3s", {
+    transition: "opacity 0.4s ease-out, transform 0.4s ease-out",
+  });
+  const separatorStyle: CSSProperties = {
+    width: isActive ? "40px" : "0px",
+    background: "linear-gradient(to right, transparent, #9b6dff4d, transparent)",
+    transition: "width 0.6s ease-out",
+    transitionDelay: "0.5s",
+  };
+  const descStyle = staggerStyle(isActive, "0.65s");
+  const btnStyle = staggerStyle(isActive, isActive ? "0.85s" : "0s", {
+    translateY: "10px",
+    transition: "opacity 0.4s ease-out, transform 0.4s ease-out",
+  });
+
   return (
     <div
       className={`fixed inset-0 z-[105] flex items-center justify-center bg-black/80 backdrop-blur-[6px] transition-opacity duration-400 ${
-        hasEntered && !isClosing ? "opacity-100" : "opacity-0"
+        isActive ? "opacity-100" : "opacity-0"
       }`}
       role="presentation"
       onClick={handleClose}
     >
       <div
         className={`border-accent/25 w-[85%] max-w-[340px] rounded-2xl border px-6 py-8 text-center transition-all duration-500 ${
-          hasEntered && !isClosing ? "scale-100 opacity-100" : "scale-90 opacity-0"
+          isActive ? "scale-100 opacity-100" : "scale-90 opacity-0"
         }`}
         style={{
           background: "linear-gradient(155deg, #1c1438, #0b0917)",
@@ -71,63 +105,37 @@ function ForgeIntroModal({
           e.stopPropagation();
         }}
       >
-        <div
-          className="mb-2 text-[1.4rem] opacity-60"
-          style={{
-            opacity: hasEntered && !isClosing ? 0.6 : 0,
-            transform: hasEntered && !isClosing ? "translateY(0)" : "translateY(8px)",
-            transition: "opacity 0.5s ease-out, transform 0.5s ease-out",
-            transitionDelay: "0.1s",
-          }}
-        >
+        <div className="mb-2 text-[1.4rem] opacity-60" style={{ ...ornamentStyle, opacity: isActive ? 0.6 : 0 }}>
           ✦
         </div>
         <h2
           className="text-accent mb-4 text-[0.95rem] font-[var(--font-cinzel-decorative)] drop-shadow-[0_0_16px_#9b6dff30]"
-          style={{
-            opacity: hasEntered && !isClosing ? 1 : 0,
-            transform: hasEntered && !isClosing ? "translateY(0)" : "translateY(8px)",
-            transition: "opacity 0.4s ease-out, transform 0.4s ease-out",
-            transitionDelay: "0.3s",
-          }}
+          style={headingStyle}
         >
           {title}
         </h2>
-        <div
-          className="mx-auto mb-4 h-px"
-          style={{
-            width: hasEntered && !isClosing ? "40px" : "0px",
-            background: "linear-gradient(to right, transparent, #9b6dff4d, transparent)",
-            transition: "width 0.6s ease-out",
-            transitionDelay: "0.5s",
-          }}
-        />
-        <p
-          className="text-text/60 mb-6 text-[0.72rem] leading-relaxed italic"
-          style={{
-            opacity: hasEntered && !isClosing ? 1 : 0,
-            transform: hasEntered && !isClosing ? "translateY(0)" : "translateY(8px)",
-            transition: "opacity 0.5s ease-out, transform 0.5s ease-out",
-            transitionDelay: "0.65s",
-          }}
-        >
+        <div className="mx-auto mb-4 h-px" style={separatorStyle} />
+        <p className="text-text/60 mb-6 text-[0.72rem] leading-relaxed italic" style={descStyle}>
           {text}
         </p>
         <button
           onClick={handleClose}
           className="to-accent cursor-pointer rounded-[14px] border-none bg-gradient-to-br from-[#3a2a6a] px-7 py-2.5 text-[0.75rem] font-[var(--font-cinzel)] font-semibold tracking-[0.12em] text-white uppercase shadow-[0_4px_22px_#9b6dff28] transition-all duration-200 active:scale-[0.97]"
-          style={{
-            opacity: hasEntered && !isClosing ? 1 : 0,
-            transform: hasEntered && !isClosing ? "translateY(0)" : "translateY(10px)",
-            transition: "opacity 0.4s ease-out, transform 0.4s ease-out",
-            transitionDelay: hasEntered && !isClosing ? "0.85s" : "0s",
-          }}
+          style={btnStyle}
         >
           Commencer
         </button>
       </div>
     </div>
   );
+}
+
+function getForgeContainerStyle(isSolved: boolean): CSSProperties {
+  return {
+    borderColor: isSolved ? "var(--color-solved-border)" : "var(--color-locked-border)",
+    background: isSolved ? "linear-gradient(155deg, #0d1a1a, #0b0917)" : "linear-gradient(155deg, #130f26, #0b0917)",
+    boxShadow: isSolved ? "0 0 20px #4ecca320, inset 0 0 30px #4ecca308" : undefined,
+  };
 }
 
 // ── ForgeSection ──────────────────────────────────────────────────────────
@@ -162,13 +170,7 @@ export function ForgeSection({ forge, isAdmin }: Readonly<ForgeSectionProps>): R
         <div
           data-forge-section={key}
           className="overflow-hidden rounded-[18px] border px-4 py-8 transition-colors duration-700"
-          style={{
-            borderColor: isSolved ? "var(--color-solved-border)" : "var(--color-locked-border)",
-            background: isSolved
-              ? "linear-gradient(155deg, #0d1a1a, #0b0917)"
-              : "linear-gradient(155deg, #130f26, #0b0917)",
-            boxShadow: isSolved ? "0 0 20px #4ecca320, inset 0 0 30px #4ecca308" : undefined,
-          }}
+          style={getForgeContainerStyle(isSolved)}
         >
           <div
             className={`mb-2 text-center text-[0.5rem] tracking-[0.25em] uppercase transition-colors duration-700 ${isSolved ? "text-success/60" : "text-muted/50"}`}

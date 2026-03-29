@@ -12,7 +12,7 @@ import tseslint from "typescript-eslint";
 
 
 export default tseslint.config(
-  { ignores: ["dist/", "node_modules/", "eslint.config.js", "commitlint.config.ts"] },
+  { ignores: ["dist/", "node_modules/", "coverage/", "eslint.config.js", "commitlint.config.ts"] },
   tseslint.configs.strictTypeChecked,
   tseslint.configs.stylisticTypeChecked,
   eslintPluginUnicorn.configs["flat/all"],
@@ -196,8 +196,6 @@ export default tseslint.config(
 
       // — SonarJS overrides
       "sonarjs/void-use": "off", // void promise() is a valid TS pattern
-      "sonarjs/cognitive-complexity": "off", // TODO: enable progressively (6 violations)
-      "sonarjs/no-nested-conditional": "off", // TODO: enable progressively (6 violations)
 
       // — Unicorn overrides (too strict for React)
       "unicorn/no-null": "off",

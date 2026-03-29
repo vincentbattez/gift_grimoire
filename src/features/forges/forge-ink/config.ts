@@ -79,6 +79,20 @@ export type WordState = { solved: boolean; guessesLeft: number };
 /** Map "row,col" → { letter, wordTextList[] } — pre-computed at module load */
 export const LETTER_MAP = buildLetterMap(INK_CONFIG);
 
+function findMinLetterDistance(r: number, c: number): number {
+  let minDist = Infinity;
+  for (const lk of LETTER_MAP.keys()) {
+    const [lr, lc] = lk.split(",").map(Number);
+    const dist = Math.abs(r - lr) + Math.abs(c - lc);
+
+    if (dist < minDist) {
+      minDist = dist;
+    }
+  }
+
+  return minDist;
+}
+
 function computeProximityMap(): Map<string, "hot" | "warm"> {
   const map = new Map<string, "hot" | "warm">();
   for (let r = 0; r < INK_CONFIG.gridRows; r++) {
@@ -88,15 +102,7 @@ function computeProximityMap(): Map<string, "hot" | "warm"> {
       if (LETTER_MAP.has(key)) {
         continue;
       }
-      let minDist = Infinity;
-      for (const lk of LETTER_MAP.keys()) {
-        const [lr, lc] = lk.split(",").map(Number);
-        const dist = Math.abs(r - lr) + Math.abs(c - lc);
-
-        if (dist < minDist) {
-          minDist = dist;
-        }
-      }
+      const minDist = findMinLetterDistance(r, c);
 
       if (minDist === 1) {
         map.set(key, "hot");

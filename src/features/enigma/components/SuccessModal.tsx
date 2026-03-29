@@ -1,8 +1,26 @@
+import type { CSSProperties } from "react";
 import { useEffect, useState } from "react";
 import { sndClick } from "@/audio";
 import { fireEvent } from "@/ha";
 import { ENIGMA_LIST } from "@features/enigma/config";
 import { useEnigmaStore } from "@features/enigma/store";
+
+function staggerStyle(
+  active: boolean,
+  delay: string,
+  options?: { translateY?: string; scale?: string; transition?: string },
+): CSSProperties {
+  const ty = options?.translateY ?? "8px";
+  const inactiveTransform = options?.scale ? `translateY(${ty}) scale(${options.scale})` : `translateY(${ty})`;
+  const activeTransform = options?.scale ? "translateY(0) scale(1)" : "translateY(0)";
+
+  return {
+    opacity: active ? 1 : 0,
+    transform: active ? activeTransform : inactiveTransform,
+    transition: options?.transition ?? "opacity 0.5s ease-out, transform 0.5s ease-out",
+    transitionDelay: delay,
+  };
+}
 
 export function SuccessModal(): React.JSX.Element {
   const boxNumber = useEnigmaStore((s) => s.successBoxNumber);
@@ -56,6 +74,29 @@ export function SuccessModal(): React.JSX.Element {
   const enigmaData = displayEnigmaId ? ENIGMA_LIST.find((e) => e.id === displayEnigmaId) : null;
   const flavorText = enigmaData?.successFlavor ?? null;
   const isVisible = boxNumber !== null || isClosing;
+  const isActive = hasEntered && !isClosing;
+
+  const runeStyle = staggerStyle(isActive, "0.1s");
+  const giftStyle = staggerStyle(isActive, "0.25s", {
+    translateY: "12px",
+    scale: "0.8",
+    transition: "opacity 0.5s ease-out, transform 0.6s cubic-bezier(.34,1.56,.64,1)",
+  });
+  const titleStyle = staggerStyle(isActive, "0.45s", {
+    transition: "opacity 0.4s ease-out, transform 0.4s ease-out",
+  });
+  const flavorStyle = staggerStyle(isActive, "0.65s");
+  const separatorStyle: CSSProperties = {
+    width: isActive ? "40px" : "0px",
+    background: "linear-gradient(to right, transparent, #4ecca34d, transparent)",
+    transition: "width 0.6s ease-out",
+    transitionDelay: "0.85s",
+  };
+  const boxRevealStyle = staggerStyle(isActive, "1s", { translateY: "12px" });
+  const buttonStyle = staggerStyle(isActive, isActive ? "1.2s" : "0s", {
+    translateY: "10px",
+    transition: "opacity 0.4s ease-out, transform 0.4s ease-out",
+  });
 
   return (
     <div
@@ -67,7 +108,7 @@ export function SuccessModal(): React.JSX.Element {
     >
       <div
         className={`border-success/30 w-[85%] max-w-[340px] rounded-2xl border px-6 py-8 text-center transition-all duration-500 ${
-          hasEntered && !isClosing ? "scale-100 opacity-100" : "scale-90 opacity-0"
+          isActive ? "scale-100 opacity-100" : "scale-90 opacity-0"
         }`}
         style={{
           background: "linear-gradient(155deg, #1c1438, #0f1a14)",
@@ -81,75 +122,31 @@ export function SuccessModal(): React.JSX.Element {
       >
         {/* Rune — stagger 0 */}
         {enigmaData && (
-          <div
-            className="text-success/30 mb-1 text-[1.6rem] tracking-[0.3em]"
-            style={{
-              opacity: hasEntered && !isClosing ? 1 : 0,
-              transform: hasEntered && !isClosing ? "translateY(0)" : "translateY(8px)",
-              transition: "opacity 0.5s ease-out, transform 0.5s ease-out",
-              transitionDelay: "0.1s",
-            }}
-          >
+          <div className="text-success/30 mb-1 text-[1.6rem] tracking-[0.3em]" style={runeStyle}>
             {enigmaData.rune}
           </div>
         )}
         {/* Gift — stagger 1 */}
-        <div
-          className="mb-2 text-[3rem]"
-          style={{
-            opacity: hasEntered && !isClosing ? 1 : 0,
-            transform: hasEntered && !isClosing ? "translateY(0) scale(1)" : "translateY(12px) scale(0.8)",
-            transition: "opacity 0.5s ease-out, transform 0.6s cubic-bezier(.34,1.56,.64,1)",
-            transitionDelay: "0.25s",
-          }}
-        >
+        <div className="mb-2 text-[3rem]" style={giftStyle}>
           🎁
         </div>
         {/* Title — stagger 2 */}
         <h2
           className="text-success mb-2 text-[1.1rem] font-[var(--font-cinzel-decorative)] drop-shadow-[0_0_20px_#4ecca340]"
-          style={{
-            opacity: hasEntered && !isClosing ? 1 : 0,
-            transform: hasEntered && !isClosing ? "translateY(0)" : "translateY(8px)",
-            transition: "opacity 0.4s ease-out, transform 0.4s ease-out",
-            transitionDelay: "0.45s",
-          }}
+          style={titleStyle}
         >
           Mystère percé
         </h2>
         {/* Flavor text — stagger 3 */}
         {flavorText && (
-          <p
-            className="text-text/70 mb-4 text-[1rem]"
-            style={{
-              opacity: hasEntered && !isClosing ? 1 : 0,
-              transform: hasEntered && !isClosing ? "translateY(0)" : "translateY(8px)",
-              transition: "opacity 0.5s ease-out, transform 0.5s ease-out",
-              transitionDelay: "0.65s",
-            }}
-          >
+          <p className="text-text/70 mb-4 text-[1rem]" style={flavorStyle}>
             {flavorText}
           </p>
         )}
         {/* Separator — stagger 4 */}
-        <div
-          className="mx-auto mb-4 h-px"
-          style={{
-            width: hasEntered && !isClosing ? "40px" : "0px",
-            background: "linear-gradient(to right, transparent, #4ecca34d, transparent)",
-            transition: "width 0.6s ease-out",
-            transitionDelay: "0.85s",
-          }}
-        />
+        <div className="mx-auto mb-4 h-px" style={separatorStyle} />
         {/* Box reveal — stagger 5 */}
-        <div
-          style={{
-            opacity: hasEntered && !isClosing ? 1 : 0,
-            transform: hasEntered && !isClosing ? "translateY(0)" : "translateY(12px)",
-            transition: "opacity 0.5s ease-out, transform 0.5s ease-out",
-            transitionDelay: "1s",
-          }}
-        >
+        <div style={boxRevealStyle}>
           <p className="text-success/70 mb-1 text-[0.8rem] leading-relaxed">
             Le sceau s'est brisé… <br /> Tu peux désormais ouvrir
           </p>
@@ -161,12 +158,7 @@ export function SuccessModal(): React.JSX.Element {
         <button
           onClick={handleClose}
           className="to-success mt-2 cursor-pointer rounded-[14px] border-none bg-gradient-to-br from-[#2a6a4a] px-8 py-3 text-[0.82rem] font-[var(--font-cinzel)] font-semibold tracking-[0.12em] text-white uppercase shadow-[0_4px_22px_#4ecca328] transition-all duration-200 active:scale-[0.97]"
-          style={{
-            opacity: hasEntered && !isClosing ? 1 : 0,
-            transform: hasEntered && !isClosing ? "translateY(0)" : "translateY(10px)",
-            transition: "opacity 0.4s ease-out, transform 0.4s ease-out",
-            transitionDelay: hasEntered && !isClosing ? "1.2s" : "0s",
-          }}
+          style={buttonStyle}
         >
           Ouvrir
         </button>

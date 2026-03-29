@@ -353,6 +353,34 @@ function SlideLove(): React.JSX.Element {
 
 const SEAL_HOLD_MS = 2000;
 
+function getSealBackground(isSealed: boolean, progress: number): string {
+  if (isSealed) {
+    return "radial-gradient(circle at 40% 35%, #e8c96a, #c9a032, #8a6a20)";
+  }
+  const c1 =
+    progress > 0
+      ? `hsl(${String(38 + progress * 5)}, ${String(70 + progress * 20)}%, ${String(50 + progress * 10)}%)`
+      : "#8a3030";
+  const c2 = progress > 0 ? "#c96a3a" : "#6b1a1a";
+  const c3 = progress > 0 ? "#8a4a20" : "#4a0e0e";
+
+  return `radial-gradient(circle at 40% 35%, ${c1}, ${c2}, ${c3})`;
+}
+
+function getSealBoxShadow(isSealed: boolean, progress: number): string {
+  if (isSealed) {
+    return "0 0 20px #e8c96a80, inset 0 -2px 6px #00000040";
+  }
+
+  if (progress > 0) {
+    return `0 0 ${String(8 + progress * 20)}px #e8c96a${Math.round(progress * 80)
+      .toString(16)
+      .padStart(2, "0")}, inset 0 -2px 6px #00000040`;
+  }
+
+  return "inset 0 -2px 6px #00000050, 0 2px 8px #00000030";
+}
+
 function WaxSeal({ onComplete }: Readonly<{ onComplete: () => void }>): React.JSX.Element {
   const [progress, setProgress] = useState(0);
   const [isSealed, setIsSealed] = useState(false);
@@ -469,26 +497,8 @@ function WaxSeal({ onComplete }: Readonly<{ onComplete: () => void }>): React.JS
         <div
           className="absolute inset-[6px] flex items-center justify-center rounded-full"
           style={{
-            background: isSealed
-              ? "radial-gradient(circle at 40% 35%, #e8c96a, #c9a032, #8a6a20)"
-              : `radial-gradient(circle at 40% 35%, ${
-                  progress > 0
-                    ? `hsl(${String(38 + progress * 5)}, ${String(70 + progress * 20)}%, ${String(50 + progress * 10)}%)`
-                    : "#8a3030"
-                }, ${progress > 0 ? "#c96a3a" : "#6b1a1a"}, ${progress > 0 ? "#8a4a20" : "#4a0e0e"})`,
-            boxShadow: (() => {
-              if (isSealed) {
-                return "0 0 20px #e8c96a80, inset 0 -2px 6px #00000040";
-              }
-
-              if (progress > 0) {
-                return `0 0 ${String(8 + progress * 20)}px #e8c96a${Math.round(progress * 80)
-                  .toString(16)
-                  .padStart(2, "0")}, inset 0 -2px 6px #00000040`;
-              }
-
-              return "inset 0 -2px 6px #00000050, 0 2px 8px #00000030";
-            })(),
+            background: getSealBackground(isSealed, progress),
+            boxShadow: getSealBoxShadow(isSealed, progress),
             transform: `scale(${String(isSealed ? 0.92 : 1 - progress * 0.06)})`,
             transition: !isSealed && pressing.current ? undefined : "all 0.3s ease-out",
           }}

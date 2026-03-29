@@ -10,6 +10,33 @@ import { CELEBRATION_DURATION_MS, CELEBRATION_SCROLL_SETTLE_MS } from "@features
 import { playUnlockCardEffect, triggerUnlockEffect } from "@features/enigma/unlock";
 import { LockedModal } from "./LockedModal";
 
+function getCardStyle(isNew: boolean, isSolved: boolean, isLetterRead: boolean): React.CSSProperties {
+  return {
+    background: "linear-gradient(155deg, #130f26, #0b0917)",
+    ...(isNew && {
+      background: "linear-gradient(155deg, rgb(11 9 23), rgb(42 28 122))",
+      animation: "newly-unlocked-pulse 2s ease-in-out infinite",
+      borderColor: "var(--color-accent)",
+    }),
+    ...(isSolved &&
+      !isLetterRead && {
+        boxShadow: "inset 0 0 30px #e8c96a20, inset 0 0 60px #e8c96a10, 0 0 22px #e8c96a15",
+      }),
+  };
+}
+
+function getCardStateClass(isSolved: boolean, isUnlocked: boolean): string {
+  if (isSolved) {
+    return "border-[#c9a03245] shadow-[0_0_22px_#e8c96a20] cursor-pointer";
+  }
+
+  if (isUnlocked) {
+    return "border-unlocked-border cursor-pointer active:scale-[0.94]";
+  }
+
+  return "border-locked-border grayscale brightness-[0.55]";
+}
+
 export function EnigmaCard({ enigma, isAdmin }: Readonly<{ enigma: Enigma; isAdmin: boolean }>): React.JSX.Element {
   const state = useEnigmaStore((s) => s.enigmas[enigma.id]);
   const openModal = useEnigmaStore((s) => s.openModal);
@@ -130,34 +157,13 @@ export function EnigmaCard({ enigma, isAdmin }: Readonly<{ enigma: Enigma; isAdm
   const base =
     "aspect-[2/3] rounded-[18px] border-[1.5px] relative overflow-hidden flex flex-col items-center justify-center p-3 px-2 select-none transition-all duration-700";
 
-  const stateClass = (() => {
-    if (isSolved) {
-      return "border-[#c9a03245] shadow-[0_0_22px_#e8c96a20] cursor-pointer";
-    }
-
-    if (state.unlocked) {
-      return "border-unlocked-border cursor-pointer active:scale-[0.94]";
-    }
-
-    return "border-locked-border grayscale brightness-[0.55]";
-  })();
+  const stateClass = getCardStateClass(isSolved, state.unlocked);
 
   return (
     <div
       ref={cardRef}
       className={`${base} ${stateClass}`}
-      style={{
-        background: "linear-gradient(155deg, #130f26, #0b0917)",
-        ...(isNew && {
-          background: "linear-gradient(155deg, rgb(11 9 23), rgb(42 28 122))",
-          animation: "newly-unlocked-pulse 2s ease-in-out infinite",
-          borderColor: "var(--color-accent)",
-        }),
-        ...(isSolved &&
-          !isLetterRead && {
-            boxShadow: "inset 0 0 30px #e8c96a20, inset 0 0 60px #e8c96a10, 0 0 22px #e8c96a15",
-          }),
-      }}
+      style={getCardStyle(isNew, isSolved, isLetterRead)}
       role="button"
       tabIndex={0}
       onClick={handleClick}
