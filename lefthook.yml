@@ -13,8 +13,8 @@ pre-commit:
       glob: "*.{ts,tsx}"
       stage_fixed: true
 
-    - name: typecheck
-      run: npx tsc -b --noEmit
+    - name: build
+      run: yarn build
 
 commit-msg:
   jobs:

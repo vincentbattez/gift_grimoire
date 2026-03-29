@@ -99,7 +99,7 @@ export function useInkGameEngine(
   const [missedCells, setMissedCells] = useState<Set<string>>(() => new Set(freshGame?.missedCells));
 
   // ── Ephemeral state ──
-  const [animatingMissCells, setAnimatingMissCells] = useState(new Set());
+  const [animatingMissCells, setAnimatingMissCells] = useState(new Set<string>());
   const [proximityCenter, setProximityCenter] = useState<string | null>(null);
   const [tapMessage, setTapMessage] = useState<string | null>(null);
   const [animating, setAnimating] = useState<{
@@ -109,7 +109,7 @@ export function useInkGameEngine(
   const [isShowingSolvedModal, setShowSolvedModal] = useState(false);
   const [isLocalSolved, setLocalSolved] = useState(false);
   const [isResetting, setIsResetting] = useState(false);
-  const [newlyRevealedCells, setNewlyRevealedCells] = useState(new Set());
+  const [newlyRevealedCells, setNewlyRevealedCells] = useState(new Set<string>());
   const prevPropSolvedRef = useRef(propSolved);
   const dropResetRef = useRef(dropResetCounter);
   const lastTapRef = useRef(0);
