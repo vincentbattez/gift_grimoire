@@ -15,6 +15,9 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
+      args:
+        VITE_HA_URL: ${VITE_HA_URL}
+        VITE_HA_TOKEN: ${VITE_HA_TOKEN}
     ports:
       - "8080:80"
     profiles:
