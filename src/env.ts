@@ -16,6 +16,7 @@ function validateEnv(): Env {
   if (!result.success) {
     const errors = result.error.issues.map((issue) => `  - ${issue.path.join(".")}: ${issue.message}`).join("\n");
 
+    // eslint-disable-next-line @typescript-eslint/only-throw-error -- Error object is thrown
     throw new Error(
       `\n❌ Variables d'environnement invalides:\n${errors}\n\nVérifie ton fichier .env à la racine du projet.\n`,
     );

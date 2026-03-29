@@ -8,9 +8,10 @@ import { useCooldown } from "@features/cooldown/useCooldown";
  * @param prefix - Texte avant le label (ex: "Reset dans")
  * @param className - Classes CSS du conteneur
  */
+// eslint-disable-next-line sonarjs/function-return-type -- React component with conditional rendering
 export function CooldownLabel({
   lastTriggeredAt,
-  durationMs = null,
+  durationMs,
   prefix,
   className,
 }: Readonly<{

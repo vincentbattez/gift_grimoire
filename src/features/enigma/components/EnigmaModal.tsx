@@ -13,6 +13,7 @@ import type { EnigmaLifecycleEvents } from "@features/enigma/types";
 import { DoubtOverlay } from "./DoubtOverlay";
 
 function normalize(s: string): string {
+  // eslint-disable-next-line sonarjs/null-dereference -- typed parameter
   return s
     .trim()
     .toLowerCase()

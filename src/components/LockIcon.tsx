@@ -9,7 +9,7 @@ type LockIconProps = {
   readonly height?: number;
   /** Show orbiting rune particleList — default true */
   readonly orbit?: boolean;
-  /** Allow burst/glow to render outside SVG bounds */
+  /** Allow burst/glow to render outside SVG bounds — default false */
   readonly overflow?: boolean;
   /** Ref on the SVG element */
   readonly svgRef?: Ref<SVGSVGElement>;
@@ -22,6 +22,7 @@ type LockIconProps = {
   };
 };
 
+/* eslint-disable @typescript-eslint/no-useless-default-assignment -- defaults required for optional props */
 export function LockIcon({
   id = "lock",
   width = 36,
@@ -32,6 +33,7 @@ export function LockIcon({
   keyholeRef,
   unlock,
 }: LockIconProps): React.JSX.Element {
+  /* eslint-enable @typescript-eslint/no-useless-default-assignment */
   const isUnlocking = unlock?.phase === "unlocking";
   const isDone = unlock?.phase === "done";
   const proximity = unlock?.proximity ?? 0;

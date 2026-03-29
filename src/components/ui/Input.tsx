@@ -15,6 +15,7 @@ const STATE_BORDERS: Record<InputState, string> = {
 };
 
 export const Input = forwardRef<HTMLInputElement, InputProps>(function Input(
+  // eslint-disable-next-line @typescript-eslint/no-useless-default-assignment -- defaults required for optional props
   { state = "default", onSubmit, className = "", onKeyDown, ...props },
   ref,
 ) {

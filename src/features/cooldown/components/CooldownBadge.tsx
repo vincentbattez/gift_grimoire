@@ -3,6 +3,7 @@ import { useCooldownStore } from "@features/cooldown/store";
 import { useCooldown } from "@features/cooldown/useCooldown";
 import { useEnigmaStore } from "@features/enigma/store";
 
+// eslint-disable-next-line sonarjs/function-return-type -- React component with conditional rendering
 export function CooldownBadge(): React.JSX.Element | null {
   const enigmas = useEnigmaStore((s) => s.enigmas);
   const hasUnlocked = Object.values(enigmas).some((e) => e.unlocked || e.solved);

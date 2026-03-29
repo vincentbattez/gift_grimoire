@@ -82,6 +82,7 @@ export const LETTER_MAP = buildLetterMap(INK_CONFIG);
 function findMinLetterDistance(r: number, c: number): number {
   let minDist = Infinity;
   for (const lk of LETTER_MAP.keys()) {
+    // eslint-disable-next-line sonarjs/null-dereference -- typed parameter
     const [lr, lc] = lk.split(",").map(Number);
     const dist = Math.abs(r - lr) + Math.abs(c - lc);
 

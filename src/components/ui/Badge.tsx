@@ -13,12 +13,14 @@ const COLOR_MAP: Record<string, { border: string; shadow: string }> = {
   accent: { border: "border-accent/30", shadow: "shadow-[0_0_20px_#9b6dff15]" },
 };
 
+/* eslint-disable @typescript-eslint/no-useless-default-assignment -- defaults required for optional props */
 export function Badge({
   children,
   color = "accent",
   position = "bottom",
   className = "",
 }: Readonly<BadgeProps>): React.JSX.Element {
+  /* eslint-enable @typescript-eslint/no-useless-default-assignment */
   const { border, shadow } = COLOR_MAP[color];
   const posClass = position === "bottom" ? "bottom-5" : "top-5";
 

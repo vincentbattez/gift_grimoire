@@ -14,6 +14,8 @@ type ModalProps = {
   backdropClassName?: string;
 };
 
+/* eslint-disable @typescript-eslint/no-useless-default-assignment -- defaults required for optional props */
+// eslint-disable-next-line sonarjs/function-return-type -- React component with conditional rendering
 export function Modal({
   children,
   isOpen,
@@ -26,6 +28,7 @@ export function Modal({
   duration = 300,
   backdropClassName = "bg-black/85 backdrop-blur-md",
 }: ModalProps): React.ReactPortal | null {
+  /* eslint-enable @typescript-eslint/no-useless-default-assignment */
   const [isVisible, setIsVisible] = useState(false);
   const [hasEntered, setHasEntered] = useState(false);
 

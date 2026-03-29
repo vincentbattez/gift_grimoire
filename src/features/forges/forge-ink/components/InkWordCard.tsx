@@ -140,6 +140,7 @@ export function InkWordCard({
             }}
             onSubmit={handleSubmit}
             placeholder="Deviner…"
+            // eslint-disable-next-line sonarjs/null-dereference -- typed parameter
             maxLength={wordText.length + 2}
             autoCapitalize="characters"
             className="placeholder:text-muted/25 text-text flex-1 rounded-lg bg-transparent px-2.5 py-1.5 text-[0.65rem] tracking-widest uppercase transition-colors duration-200"
