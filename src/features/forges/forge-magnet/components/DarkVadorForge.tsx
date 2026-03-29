@@ -19,7 +19,7 @@ import { WideWaveform } from "./WideWaveform";
  * Forge : La chaleur de l'Arc-en-ciel
  * Joue l'audio Dark Vador, puis détecte le signal Home Assistant de l'aimant.
  */
-export function DarkVadorForge({ solved, onSolve }: ForgeProps): React.JSX.Element {
+export function DarkVadorForge({ solved, onSolve }: Readonly<ForgeProps>): React.JSX.Element {
   const darkVadorPlayedAt = useMagnetStore((s) => s.darkVadorPlayedAt);
   const recordDarkVadorPlay = useMagnetStore((s) => s.recordDarkVadorPlay);
   const hasAudioWarningAcknowledged = useForgeStore((s) => s.audioWarningAcknowledged);
@@ -114,21 +114,21 @@ export function DarkVadorForge({ solved, onSolve }: ForgeProps): React.JSX.Eleme
     return (
       <div className="mt-6">
         <div
-          className="w-full relative overflow-hidden flex flex-color items-center gap-2 py-4 px-4 rounded-[14px] border-[1.5px] border-solved-border/50 shadow-[0_0_22px_#4ecca325]"
+          className="flex-color border-solved-border/50 relative flex w-full items-center gap-2 overflow-hidden rounded-[14px] border-[1.5px] px-4 py-4 shadow-[0_0_22px_#4ecca325]"
           style={{ background: "linear-gradient(155deg, #0a1f1a, #080f0c)" }}
         >
           <div
-            className="absolute inset-0 pointer-events-none"
+            className="pointer-events-none absolute inset-0"
             style={{ background: "radial-gradient(ellipse at 50% 50%, #4ecca318, transparent 65%)" }}
           />
           <CornerOrnaments color="border-solved-border/50" opacity="" />
-          <div className="absolute top-2.5 right-3 w-4 h-4 rounded-full bg-success flex items-center justify-center text-[0.5rem] shadow-[0_0_8px_var(--color-success)]">
+          <div className="bg-success absolute top-2.5 right-3 flex h-4 w-4 items-center justify-center rounded-full text-[0.5rem] shadow-[0_0_8px_var(--color-success)]">
             ✓
           </div>
           <div className="relative w-full px-1">
             <WideWaveform playing={false} color="var(--color-success)" />
           </div>
-          <span className="relative text-[0.58rem] font-semibold tracking-[0.22em] uppercase text-success">
+          <span className="text-success relative text-[0.58rem] font-semibold tracking-[0.22em] uppercase">
             Dark Vador a trouvé un nouvel ami
           </span>
         </div>
@@ -142,18 +142,18 @@ export function DarkVadorForge({ solved, onSolve }: ForgeProps): React.JSX.Eleme
       <div className="mt-6">
         <button
           onClick={handlePlay}
-          className="w-full relative overflow-hidden flex flex-color items-center gap-2 py-4 px-4 rounded-[14px] border-[1.5px] transition-all duration-300 select-none cursor-pointer border-accent/30 hover:border-accent/55 active:scale-[0.98]"
+          className="flex-color border-accent/30 hover:border-accent/55 relative flex w-full cursor-pointer items-center gap-2 overflow-hidden rounded-[14px] border-[1.5px] px-4 py-4 transition-all duration-300 select-none active:scale-[0.98]"
           style={{ background: "linear-gradient(155deg, #130f26, #0b0917)" }}
         >
           <div
-            className="absolute inset-0 pointer-events-none"
+            className="pointer-events-none absolute inset-0"
             style={{ background: "radial-gradient(ellipse at 50% 20%, #3a2a5a12, transparent 60%)" }}
           />
           <CornerOrnaments color="border-accent/30" opacity="opacity-50" />
           <div className="relative w-full px-1">
             <WideWaveform playing={false} color="#7a55cc" />
           </div>
-          <span className="relative text-[0.58rem] font-semibold tracking-[0.22em] uppercase text-accent/80">
+          <span className="text-accent/80 relative text-[0.58rem] font-semibold tracking-[0.22em] uppercase">
             Écouter le secret
           </span>
           <PlayCountDot total={1} remaining={1} />
@@ -182,18 +182,18 @@ export function DarkVadorForge({ solved, onSolve }: ForgeProps): React.JSX.Eleme
       <div className="mt-6">
         <button
           disabled
-          className="w-full relative overflow-hidden flex flex-color items-center gap-2 py-4 px-4 rounded-[14px] border-[1.5px] transition-all duration-300 select-none cursor-not-allowed border-accent/60 shadow-[0_0_28px_#9b6dff35]"
+          className="flex-color border-accent/60 relative flex w-full cursor-not-allowed items-center gap-2 overflow-hidden rounded-[14px] border-[1.5px] px-4 py-4 shadow-[0_0_28px_#9b6dff35] transition-all duration-300 select-none"
           style={{ background: "linear-gradient(155deg, #130f26, #0b0917)" }}
         >
           <div
-            className="absolute inset-0 pointer-events-none"
+            className="pointer-events-none absolute inset-0"
             style={{ background: "radial-gradient(ellipse at 50% 50%, #9b6dff22, transparent 65%)" }}
           />
           <CornerOrnaments color="border-accent/50" opacity="opacity-60" />
           <div className="relative w-full px-1">
             <WideWaveform playing={true} color="var(--color-accent)" />
           </div>
-          <span className="relative text-[0.58rem] font-semibold tracking-[0.22em] uppercase text-accent">
+          <span className="text-accent relative text-[0.58rem] font-semibold tracking-[0.22em] uppercase">
             Lecture en cours…
           </span>
         </button>
@@ -270,7 +270,7 @@ export function DarkVadorForge({ solved, onSolve }: ForgeProps): React.JSX.Eleme
           void handleCheck();
         }}
         disabled={isChecking || isShowingPicker}
-        className={`w-full relative overflow-hidden flex flex-color items-center gap-2 py-4 px-4 rounded-[14px] border-[1.5px] transition-all duration-300 select-none cursor-pointer ${borderClass}`}
+        className={`flex-color relative flex w-full cursor-pointer items-center gap-2 overflow-hidden rounded-[14px] border-[1.5px] px-4 py-4 transition-all duration-300 select-none ${borderClass}`}
         style={{
           background: (() => {
             if (isShowingPicker) {
@@ -285,9 +285,9 @@ export function DarkVadorForge({ solved, onSolve }: ForgeProps): React.JSX.Eleme
           })(),
         }}
       >
-        <div className="absolute inset-0 pointer-events-none" style={{ background: bgStyle }} />
+        <div className="pointer-events-none absolute inset-0" style={{ background: bgStyle }} />
         {isShowingPicker && (
-          <div className="absolute top-2.5 right-3 w-4 h-4 rounded-full bg-success flex items-center justify-center text-[0.5rem] shadow-[0_0_8px_var(--color-success)]">
+          <div className="bg-success absolute top-2.5 right-3 flex h-4 w-4 items-center justify-center rounded-full text-[0.5rem] shadow-[0_0_8px_var(--color-success)]">
             ✓
           </div>
         )}
@@ -300,7 +300,7 @@ export function DarkVadorForge({ solved, onSolve }: ForgeProps): React.JSX.Eleme
         <div className="relative flex items-center gap-2">
           {isChecking && (
             <span
-              className="w-2.5 h-2.5 rounded-full border-[1.5px] border-gold/30 animate-spin"
+              className="border-gold/30 h-2.5 w-2.5 animate-spin rounded-full border-[1.5px]"
               style={{ borderTopColor: "var(--color-gold)" }}
             />
           )}
@@ -342,7 +342,7 @@ export function DarkVadorForge({ solved, onSolve }: ForgeProps): React.JSX.Eleme
           <CooldownLabel
             lastTriggeredAt={darkVadorPlayedAt}
             prefix="Répéter l'énigme dans"
-            className="relative text-[0.5rem] tracking-[0.15em] text-accent/25 font-mono"
+            className="text-accent/25 relative font-mono text-[0.5rem] tracking-[0.15em]"
           />
         )}
       </button>

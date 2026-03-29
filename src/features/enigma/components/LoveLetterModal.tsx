@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { sndHeartPop, sndLoveClose } from "@/audio";
+import { randomVisual } from "@/utils/random";
 import { CornerOrnaments } from "@components/ui/CornerOrnaments";
 import { OrnamentDivider } from "@components/ui/OrnamentDivider";
 import { ENIGMA_LIST } from "@features/enigma/config";
@@ -17,11 +18,11 @@ function buildBurst(
   for (let i = 0; i < BURST_COUNT; i++) {
     itemList.push({
       emoji: emojis[i % emojis.length],
-      left: 10 + Math.random() * 80,
+      left: 10 + randomVisual() * 80,
       delay: cumDelay,
-      size: 1.75 + Math.random() * 0.55,
-      rot: -20 + Math.random() * 40,
-      pitch: -300 + Math.random() * 600,
+      size: 1.75 + randomVisual() * 0.55,
+      rot: -20 + randomVisual() * 40,
+      pitch: -300 + randomVisual() * 600,
     });
     cumDelay += gap;
     gap *= 0.97;
@@ -77,7 +78,6 @@ export function LoveLetterModal(): React.JSX.Element {
       ),
     );
 
-    // eslint-disable-next-line consistent-return
     return () => {
       cancelAnimationFrame(raf);
       clearTimeout(showTimer);
@@ -107,14 +107,15 @@ export function LoveLetterModal(): React.JSX.Element {
 
   return (
     <div
-      className={`fixed inset-0 z-[120] flex itemList-center justify-center p-4 transition-opacity duration-500 ${
-        isOpen ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"
+      className={`itemList-center fixed inset-0 z-[120] flex justify-center p-4 transition-opacity duration-500 ${
+        isOpen ? "pointer-events-auto opacity-100" : "pointer-events-none opacity-0"
       }`}
       style={{
         background: "radial-gradient(ellipse at 50% 40%, #e8c96a18, #00000090)",
         backdropFilter: "blur(8px)",
         WebkitBackdropFilter: "blur(8px)",
       }}
+      role="presentation"
       onClick={handleClose}
     >
       {/* Heart burst */}
@@ -123,7 +124,7 @@ export function LoveLetterModal(): React.JSX.Element {
         burstDataList.map((h, i) => (
           <div
             key={i}
-            className="absolute pointer-events-none z-10"
+            className="pointer-events-none absolute z-10"
             style={{
               left: `${String(h.left)}%`,
               bottom: "20%",
@@ -138,8 +139,8 @@ export function LoveLetterModal(): React.JSX.Element {
 
       {enigma && (
         <div
-          className={`relative max-w-[380px] w-full rounded-[22px] overflow-hidden transition-all duration-700 ${
-            hasEntered ? "opacity-100 scale-100 translate-y-0" : "opacity-0 scale-[0.82] translate-y-5"
+          className={`relative w-full max-w-[380px] overflow-hidden rounded-[22px] transition-all duration-700 ${
+            hasEntered ? "translate-y-0 scale-100 opacity-100" : "translate-y-5 scale-[0.82] opacity-0"
           }`}
           style={{
             background: "linear-gradient(165deg, #fdf8ec, #f5e6c8, #ede0c0)",
@@ -148,6 +149,7 @@ export function LoveLetterModal(): React.JSX.Element {
             animation: "love-glow-shine 4s ease-in-out infinite",
             transitionTimingFunction: "cubic-bezier(.22,1,.36,1)",
           }}
+          role="presentation"
           onClick={(e) => {
             e.stopPropagation();
           }}
@@ -156,7 +158,7 @@ export function LoveLetterModal(): React.JSX.Element {
           {GOLD_PARTICLE_LIST.map((p, i) => (
             <div
               key={i}
-              className="absolute rounded-full pointer-events-none"
+              className="pointer-events-none absolute rounded-full"
               style={{
                 left: p.left,
                 top: p.top,
@@ -180,7 +182,7 @@ export function LoveLetterModal(): React.JSX.Element {
           {/* Close button */}
           <button
             onClick={handleClose}
-            className="absolute top-3 right-3 w-[28px] h-[28px] rounded-full flex itemList-center justify-center cursor-pointer text-[0.75rem] z-20 border border-[#c9a03230] bg-[#f5e6c8] text-[#8a7040] hover:bg-[#ede0c0] transition-colors"
+            className="itemList-center absolute top-3 right-3 z-20 flex h-[28px] w-[28px] cursor-pointer justify-center rounded-full border border-[#c9a03230] bg-[#f5e6c8] text-[0.75rem] text-[#8a7040] transition-colors hover:bg-[#ede0c0]"
           >
             ✕
           </button>
@@ -188,7 +190,7 @@ export function LoveLetterModal(): React.JSX.Element {
           <div className="relative z-10 px-7 pt-8 pb-9">
             {/* Character icon */}
             <div
-              className="text-[2.8rem] text-center mb-2 leading-none"
+              className="mb-2 text-center text-[2.8rem] leading-none"
               style={{
                 filter: "drop-shadow(0 0 12px #c9a03240)",
               }}
@@ -198,7 +200,7 @@ export function LoveLetterModal(): React.JSX.Element {
 
             {/* Title */}
             <h2
-              className="text-center text-[1rem] font-semibold mb-1 tracking-[0.06em]"
+              className="mb-1 text-center text-[1rem] font-semibold tracking-[0.06em]"
               style={{
                 fontFamily: "var(--font-cinzel-decorative)",
                 color: "#8a6a20",
@@ -208,7 +210,7 @@ export function LoveLetterModal(): React.JSX.Element {
               Une lettre pour toi
             </h2>
 
-            <p className="text-center text-[0.68rem] tracking-[0.15em] uppercase mb-5" style={{ color: "#a08a50" }}>
+            <p className="mb-5 text-center text-[0.68rem] tracking-[0.15em] uppercase" style={{ color: "#a08a50" }}>
               {enigma.title}
             </p>
 
@@ -217,7 +219,7 @@ export function LoveLetterModal(): React.JSX.Element {
 
             {/* Message */}
             <div
-              className="text-[0.84rem] leading-[1.75] text-center whitespace-pre-line mb-6"
+              className="mb-6 text-center text-[0.84rem] leading-[1.75] whitespace-pre-line"
               style={{
                 fontFamily: "var(--font-cinzel)",
                 color: "#4a3a20",
@@ -231,7 +233,7 @@ export function LoveLetterModal(): React.JSX.Element {
 
             {/* Signature */}
             <p
-              className="text-center text-[0.76rem] italic tracking-wide"
+              className="text-center text-[0.76rem] tracking-wide italic"
               style={{
                 fontFamily: "var(--font-cinzel)",
                 color: "#8a6a20",
@@ -239,7 +241,7 @@ export function LoveLetterModal(): React.JSX.Element {
             >
               — {enigma.loveLetter.signature} —
             </p>
-            <p className="text-center text-[0.65rem] mt-2 tracking-[0.12em]" style={{ color: "#b09a60" }}>
+            <p className="mt-2 text-center text-[0.65rem] tracking-[0.12em]" style={{ color: "#b09a60" }}>
               Avec tout mon amour ♡
             </p>
           </div>

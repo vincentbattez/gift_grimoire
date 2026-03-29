@@ -13,12 +13,12 @@ export function CooldownLabel({
   durationMs = null,
   prefix,
   className,
-}: {
+}: Readonly<{
   lastTriggeredAt: number | null;
   durationMs?: number | null;
   prefix?: string;
   className?: string;
-}): React.JSX.Element | null {
+}>): React.JSX.Element | null {
   const { active: isActive, label } = useCooldown(lastTriggeredAt, durationMs);
 
   if (!isActive) {

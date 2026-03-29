@@ -8,7 +8,7 @@ export function OrnamentDivider({
   color = "#c9a032",
   className = "",
   lineWidth = "flex",
-}: OrnamentDividerProps): React.JSX.Element {
+}: Readonly<OrnamentDividerProps>): React.JSX.Element {
   const lineClass = lineWidth === "flex" ? "flex-1" : "w-10";
   const fadeColor = `${color}40`;
 
@@ -19,7 +19,7 @@ export function OrnamentDivider({
         style={{ backgroundImage: `linear-gradient(to right, transparent, ${fadeColor})` }}
       />
       <div
-        className="w-1.5 h-1.5 rounded-full"
+        className="h-1.5 w-1.5 rounded-full"
         style={{ background: `radial-gradient(circle, ${color}, ${fadeColor})` }}
       />
       <div

@@ -66,16 +66,18 @@ export function Modal({
     <div
       className={`fixed inset-0 flex items-center justify-center transition-opacity ${backdropClassName} ${hasEntered ? "opacity-100" : "opacity-0"}`}
       style={{ zIndex, transitionDuration: `${String(duration)}ms` }}
+      role="presentation"
       onClick={handleBackdropClick}
     >
       <div
-        className={`w-full mx-4 rounded-[18px] border transition-all ${hasEntered ? "scale-100 opacity-100" : "scale-95 opacity-0"} ${className}`}
+        className={`mx-4 w-full rounded-[18px] border transition-all ${hasEntered ? "scale-100 opacity-100" : "scale-95 opacity-0"} ${className}`}
         style={{
           maxWidth,
           transitionDuration: `${String(duration)}ms`,
           transitionTimingFunction: "cubic-bezier(.34,1.56,.64,1)",
           ...style,
         }}
+        role="presentation"
         onClick={(e) => {
           e.stopPropagation();
         }}

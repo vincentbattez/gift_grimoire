@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
 import { sndAnalysis, sndBad, sndClick, sndDoubt, sndLoveReveal, sndOk } from "@/audio";
+import { randomVisual } from "@/utils/random";
 import { Input } from "@components/ui/Input";
 import { CooldownLabel } from "@features/cooldown/components/CooldownLabel";
 import { isAttemptUsedToday, useCooldownStore } from "@features/cooldown/store";
@@ -25,14 +26,14 @@ function ModalBody({
   attemptUsed,
   isOpen,
   lifecycle,
-}: {
+}: Readonly<{
   enigma: Enigma;
   isSolved: boolean;
   attemptUsed: boolean;
   isOpen: boolean;
   /** Événements lifecycle émis au parent orchestrateur */
   lifecycle: EnigmaLifecycleEvents;
-}): React.JSX.Element {
+}>): React.JSX.Element {
   const lastAttempt = useCooldownStore((s) => s.lastAttempt);
   const closeModal = useEnigmaStore((s) => s.closeModal);
   const openLoveLetter = useEnigmaStore((s) => s.openLoveLetter);
@@ -76,9 +77,6 @@ function ModalBody({
         clearTimeout(timer);
       };
     }
-
-    // eslint-disable-next-line consistent-return
-    return;
   }, [isSolved]);
 
   function onDragStart(clientY: number): void {
@@ -261,7 +259,7 @@ function ModalBody({
   return (
     <div
       ref={sheetRef}
-      className={`w-full max-w-[430px] mx-auto rounded-t-3xl border ${isSolved ? "border-[#d4a94250]" : "border-[#3a2a5a]"} border-b-0 px-[22px] pt-7 pb-11 relative overflow-hidden ${isDragging ? "" : "transition-transform duration-400"} ${translateClass} ${isShaking ? "animate-[shake_0.42s_ease]" : ""}`}
+      className={`mx-auto w-full max-w-[430px] rounded-t-3xl border ${isSolved ? "border-[#d4a94250]" : "border-[#3a2a5a]"} relative overflow-hidden border-b-0 px-[22px] pt-7 pb-11 ${isDragging ? "" : "transition-transform duration-400"} ${translateClass} ${isShaking ? "animate-[shake_0.42s_ease]" : ""}`}
       style={{
         background: isSolved
           ? "linear-gradient(180deg, #1a1508, #100c04)"
@@ -273,7 +271,7 @@ function ModalBody({
     >
       {/* Drag handle */}
       <div
-        className="absolute top-0 left-0 right-0 h-10 cursor-grab active:cursor-grabbing touch-none flex items-startList justify-center pt-2.5"
+        className="items-startList absolute top-0 right-0 left-0 flex h-10 cursor-grab touch-none justify-center pt-2.5 active:cursor-grabbing"
         onTouchStart={handleTouchStart}
         onTouchMove={handleTouchMove}
         onTouchEnd={handleTouchEnd}
@@ -282,7 +280,7 @@ function ModalBody({
         tabIndex={0}
         aria-label="Faire glisser pour fermer"
       >
-        <div className={`w-[38px] h-[3.5px] rounded-sm ${isSolved ? "bg-[#c9a03240]" : "bg-[#3a2a5a]"}`} />
+        <div className={`h-[3.5px] w-[38px] rounded-sm ${isSolved ? "bg-[#c9a03240]" : "bg-[#3a2a5a]"}`} />
       </div>
 
       {/* Bouton fermer */}
@@ -291,21 +289,21 @@ function ModalBody({
           sndClick();
           closeModal();
         }}
-        className={`absolute top-[18px] right-4 w-[30px] h-[30px] rounded-full flex items-center justify-center cursor-pointer text-[0.8rem] z-10 border ${isSolved ? "bg-white/4 border-[#c9a03230] text-[#c9a032]/60" : "bg-white/4 border-[#3a2a5a] text-muted"}`}
+        className={`absolute top-[18px] right-4 z-10 flex h-[30px] w-[30px] cursor-pointer items-center justify-center rounded-full border text-[0.8rem] ${isSolved ? "border-[#c9a03230] bg-white/4 text-[#c9a032]/60" : "text-muted border-[#3a2a5a] bg-white/4"}`}
       >
         ✕
       </button>
 
       <div
-        className={`text-[2.8rem] text-center mb-1.5 ${isSolved ? "drop-shadow-[0_0_14px_rgba(201,160,50,0.45)]" : "drop-shadow-[0_0_14px_rgba(155,109,255,0.5)]"}`}
+        className={`mb-1.5 text-center text-[2.8rem] ${isSolved ? "drop-shadow-[0_0_14px_rgba(201,160,50,0.45)]" : "drop-shadow-[0_0_14px_rgba(155,109,255,0.5)]"}`}
       >
         {enigma.icon}
       </div>
-      <h2 className="font-[var(--font-cinzel-decorative)] text-[1.05rem] text-center mb-5 text-gold drop-shadow-[0_0_20px_#e8c96a35]">
+      <h2 className="text-gold mb-5 text-center text-[1.05rem] font-[var(--font-cinzel-decorative)] drop-shadow-[0_0_20px_#e8c96a35]">
         {enigma.title}
       </h2>
       <p
-        className={`text-[0.88rem] leading-relaxed text-center mb-5 p-4 rounded-[14px] whitespace-pre-line border italic ${isSolved ? "text-text bg-[#e8c96a06] border-[#c9a03220]" : "text-text bg-white/[0.03] border-[#2e2248]"}`}
+        className={`mb-5 rounded-[14px] border p-4 text-center text-[0.88rem] leading-relaxed whitespace-pre-line italic ${isSolved ? "text-text border-[#c9a03220] bg-[#e8c96a06]" : "text-text border-[#2e2248] bg-white/[0.03]"}`}
       >
         {enigma.question}
       </p>
@@ -322,15 +320,15 @@ function ModalBody({
               setValue(e.target.value);
             }}
             onSubmit={() => {
-              submit(Date.now(), Math.random(), Math.random());
+              submit(Date.now(), randomVisual(), randomVisual());
             }}
-            className="w-full bg-[#0d0a1a] border-[1.5px] rounded-[14px] py-3.5 px-4 text-base text-text text-center tracking-[0.1em]"
+            className="text-text w-full rounded-[14px] border-[1.5px] bg-[#0d0a1a] px-4 py-3.5 text-center text-base tracking-[0.1em]"
           />
 
           {isSuspense ? (
             <div className="mt-4 mb-2">
-              <p className="text-center text-[0.72rem] text-accent mb-3 animate-pulse">{feedbackMsg}</p>
-              <div className="w-full h-[3px] rounded-full bg-[#2e2248] overflow-hidden">
+              <p className="text-accent mb-3 animate-pulse text-center text-[0.72rem]">{feedbackMsg}</p>
+              <div className="h-[3px] w-full overflow-hidden rounded-full bg-[#2e2248]">
                 <div
                   className="h-full rounded-full transition-[width] duration-100 ease-linear"
                   style={{
@@ -340,11 +338,11 @@ function ModalBody({
                   }}
                 />
               </div>
-              <div className="flex justify-center gap-3 mt-3">
+              <div className="mt-3 flex justify-center gap-3">
                 {["✦", "◆", "✧", "◇", "✦"].map((rune, i) => (
                   <span
                     key={i}
-                    className="text-[0.7rem] text-accent"
+                    className="text-accent text-[0.7rem]"
                     style={{ animation: `pulse 1.2s ease-in-out ${String(i * 0.2)}s infinite`, opacity: 0.3 }}
                   >
                     {rune}
@@ -355,13 +353,13 @@ function ModalBody({
           ) : (
             <>
               <p
-                className={`text-center text-[0.72rem] mt-2 h-3.5 transition-colors duration-300 ${feedback === "ok" ? "text-success" : ""} ${feedback === "err" ? "text-danger" : ""}`}
+                className={`mt-2 h-3.5 text-center text-[0.72rem] transition-colors duration-300 ${feedback === "ok" ? "text-success" : ""} ${feedback === "err" ? "text-danger" : ""}`}
               >
                 {feedbackMsg}
               </p>
-              <div className="flex items-center justify-center gap-2 mt-2 mb-1 py-1.5 px-3 rounded-full bg-success/10 border border-success/20 w-fit mx-auto">
-                <span className="w-1.5 h-1.5 rounded-full bg-success animate-pulse" />
-                <span className="text-[0.72rem] text-success font-semibold tracking-wide">
+              <div className="bg-success/10 border-success/20 mx-auto mt-2 mb-1 flex w-fit items-center justify-center gap-2 rounded-full border px-3 py-1.5">
+                <span className="bg-success h-1.5 w-1.5 animate-pulse rounded-full" />
+                <span className="text-success text-[0.72rem] font-semibold tracking-wide">
                   Le grimoire attend ta réponse
                 </span>
               </div>
@@ -371,13 +369,13 @@ function ModalBody({
       )}
 
       {!isSolved && attemptUsed && (
-        <div className="text-center py-5">
-          <div className="flex items-center justify-center gap-2 py-1.5 px-3 rounded-full bg-danger/10 border border-danger/20 w-fit mx-auto mb-3">
-            <span className="w-1.5 h-1.5 rounded-full bg-danger" />
-            <span className="text-[0.72rem] text-danger font-semibold tracking-wide">Le grimoire se repose…</span>
+        <div className="py-5 text-center">
+          <div className="bg-danger/10 border-danger/20 mx-auto mb-3 flex w-fit items-center justify-center gap-2 rounded-full border px-3 py-1.5">
+            <span className="bg-danger h-1.5 w-1.5 rounded-full" />
+            <span className="text-danger text-[0.72rem] font-semibold tracking-wide">Le grimoire se repose…</span>
           </div>
-          <p className="text-[0.72rem] text-muted">Prochaine tentative dans</p>
-          <p className="text-[1.4rem] font-[var(--font-cinzel)] text-accent tracking-[0.15em] mt-1.5">
+          <p className="text-muted text-[0.72rem]">Prochaine tentative dans</p>
+          <p className="text-accent mt-1.5 text-[1.4rem] font-[var(--font-cinzel)] tracking-[0.15em]">
             <CooldownLabel lastTriggeredAt={lastAttempt} />
           </p>
         </div>
@@ -385,16 +383,16 @@ function ModalBody({
 
       {isSolved ? (
         <>
-          <div className="flex items-center justify-center gap-2 mt-2 mb-1 py-1.5 px-3 rounded-full bg-[#c9a03212] border border-[#c9a03225] w-fit mx-auto">
-            <span className="w-1.5 h-1.5 rounded-full bg-[#c9a032]" />
-            <span className="text-[0.72rem] text-[#8a6a20] font-semibold tracking-wide">Le grimoire t'a souri</span>
+          <div className="mx-auto mt-2 mb-1 flex w-fit items-center justify-center gap-2 rounded-full border border-[#c9a03225] bg-[#c9a03212] px-3 py-1.5">
+            <span className="h-1.5 w-1.5 rounded-full bg-[#c9a032]" />
+            <span className="text-[0.72rem] font-semibold tracking-wide text-[#8a6a20]">Le grimoire t'a souri</span>
           </div>
           <button
             onClick={() => {
               sndLoveReveal();
               openLoveLetter(enigma.id);
             }}
-            className={`w-full mt-3 py-4 rounded-[14px] font-[var(--font-cinzel)] text-[0.85rem] font-semibold tracking-[0.12em] uppercase cursor-pointer relative overflow-hidden ${isLetterRead ? "border" : "border-none text-[#3a2a1a]"}`}
+            className={`relative mt-3 w-full cursor-pointer overflow-hidden rounded-[14px] py-4 text-[0.85rem] font-[var(--font-cinzel)] font-semibold tracking-[0.12em] uppercase ${isLetterRead ? "border" : "border-none text-[#3a2a1a]"}`}
             style={
               isLetterRead
                 ? {
@@ -412,7 +410,7 @@ function ModalBody({
           >
             {!isLetterRead && (
               <div
-                className="absolute inset-0 pointer-events-none"
+                className="pointer-events-none absolute inset-0"
                 style={{
                   background: "linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.4) 50%, transparent 100%)",
                   backgroundSize: "200% 100%",
@@ -429,10 +427,10 @@ function ModalBody({
       ) : (
         <button
           onClick={() => {
-            submit(Date.now(), Math.random(), Math.random());
+            submit(Date.now(), randomVisual(), randomVisual());
           }}
           disabled={attemptUsed || isSuspense}
-          className={`w-full mt-3 py-4 border-none rounded-[14px] text-white font-[var(--font-cinzel)] text-[0.85rem] font-semibold tracking-[0.12em] uppercase cursor-pointer transition-all duration-200 active:scale-[0.97] ${attemptUsed || isSuspense ? "bg-gradient-to-br from-[#3a3a4a] to-[#2a2a3a] opacity-50 cursor-not-allowed" : "bg-gradient-to-br from-[#6b4a97] to-accent shadow-[0_4px_22px_#9b6dff28]"}`}
+          className={`mt-3 w-full cursor-pointer rounded-[14px] border-none py-4 text-[0.85rem] font-[var(--font-cinzel)] font-semibold tracking-[0.12em] text-white uppercase transition-all duration-200 active:scale-[0.97] ${attemptUsed || isSuspense ? "cursor-not-allowed bg-gradient-to-br from-[#3a3a4a] to-[#2a2a3a] opacity-50" : "to-accent bg-gradient-to-br from-[#6b4a97] shadow-[0_4px_22px_#9b6dff28]"}`}
         >
           {(() => {
             if (attemptUsed) {
@@ -475,7 +473,8 @@ export function EnigmaModal(): React.JSX.Element {
 
   return (
     <div
-      className={`fixed inset-0 z-100 bg-black/82 backdrop-blur-[5px] flex items-end transition-opacity duration-300 ${isOpen ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"}`}
+      className={`fixed inset-0 z-100 flex items-end bg-black/82 backdrop-blur-[5px] transition-opacity duration-300 ${isOpen ? "pointer-events-auto opacity-100" : "pointer-events-none opacity-0"}`}
+      role="presentation"
       onClick={(e) => {
         if (e.target === e.currentTarget) {
           closeModal();

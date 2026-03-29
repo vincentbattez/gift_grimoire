@@ -15,7 +15,7 @@ export function CooldownBadge(): React.JSX.Element | null {
 
   return (
     <Badge color={isActive ? "danger" : "success"}>
-      <span className={`w-2 h-2 rounded-full ${isActive ? "bg-danger" : "bg-success animate-pulse"}`} />
+      <span className={`h-2 w-2 rounded-full ${isActive ? "bg-danger" : "bg-success animate-pulse"}`} />
       <span className={`text-[0.7rem] font-semibold tracking-wide ${isActive ? "text-danger" : "text-success"}`}>
         {isActive ? label : "1 essai disponible"}
       </span>

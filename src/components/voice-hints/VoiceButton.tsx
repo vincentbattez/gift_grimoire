@@ -9,7 +9,7 @@ import { useForgeStore } from "@features/forges/store";
 import { MAX_PLAYS, type VoiceHint } from "./constants";
 import { WaveformIcon } from "./WaveformIcon";
 
-export function VoiceButton({ hint }: { hint: VoiceHint }): React.JSX.Element {
+export function VoiceButton({ hint }: Readonly<{ hint: VoiceHint }>): React.JSX.Element {
   const count = useCooldownStore((s) => s.audioPlayCounts[hint.key] ?? 0);
   const incrementAudioPlay = useCooldownStore((s) => s.incrementAudioPlay);
   const hasAudioWarningAcknowledged = useForgeStore((s) => s.audioWarningAcknowledged);
@@ -99,7 +99,7 @@ export function VoiceButton({ hint }: { hint: VoiceHint }): React.JSX.Element {
       <button
         onClick={handlePlay}
         disabled={isExhausted}
-        className={`flex-1 relative overflow-hidden flex flex-color items-center gap-2 py-3.5 px-3 rounded-[14px] border-[1.5px] transition-all duration-300 select-none cursor-pointer ${borderClass}`}
+        className={`flex-color relative flex flex-1 cursor-pointer items-center gap-2 overflow-hidden rounded-[14px] border-[1.5px] px-3 py-3.5 transition-all duration-300 select-none ${borderClass}`}
         style={{
           background: isSuccess
             ? "linear-gradient(155deg, #0a1f1a, #080f0c)"
@@ -108,7 +108,7 @@ export function VoiceButton({ hint }: { hint: VoiceHint }): React.JSX.Element {
       >
         {/* radial glow */}
         <div
-          className="absolute inset-0 pointer-events-none"
+          className="pointer-events-none absolute inset-0"
           style={{
             background: isSuccess
               ? "radial-gradient(ellipse at 50% 50%, #4ecca318, transparent 65%)"
@@ -121,7 +121,7 @@ export function VoiceButton({ hint }: { hint: VoiceHint }): React.JSX.Element {
 
         {/* success badge */}
         {isSuccess && (
-          <div className="absolute top-1.5 right-1.5 w-4 h-4 rounded-full bg-success flex items-center justify-center text-[0.5rem] shadow-[0_0_8px_var(--color-success)]">
+          <div className="bg-success absolute top-1.5 right-1.5 flex h-4 w-4 items-center justify-center rounded-full text-[0.5rem] shadow-[0_0_8px_var(--color-success)]">
             ✓
           </div>
         )}

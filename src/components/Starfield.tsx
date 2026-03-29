@@ -1,5 +1,6 @@
 import { useEffect, useRef } from "react";
 import { particleList } from "@/particles";
+import { randomVisual } from "@/utils/random";
 
 type Star = {
   positionX: number;
@@ -42,15 +43,15 @@ export function Starfield(): React.JSX.Element {
       particleCanvasElement.height = window.innerHeight;
 
       starList = Array.from({ length: 180 }, () => {
-        const angle = Math.random() * Math.PI * 2;
-        const speed = Math.random() * 0.12 + 0.03;
+        const angle = randomVisual() * Math.PI * 2;
+        const speed = randomVisual() * 0.12 + 0.03;
 
         return {
-          positionX: Math.random() * starCanvasElement.width,
-          positionY: Math.random() * starCanvasElement.height,
-          radius: Math.random() * 1.6 + 0.3,
-          phase: Math.random() * Math.PI * 2,
-          speed: Math.random() * 0.02 + 0.008,
+          positionX: randomVisual() * starCanvasElement.width,
+          positionY: randomVisual() * starCanvasElement.height,
+          radius: randomVisual() * 1.6 + 0.3,
+          phase: randomVisual() * Math.PI * 2,
+          speed: randomVisual() * 0.02 + 0.008,
           velocityX: Math.cos(angle) * speed,
           velocityY: Math.sin(angle) * speed,
         };
@@ -124,7 +125,6 @@ export function Starfield(): React.JSX.Element {
     window.addEventListener("resize", resize);
     requestAnimationFrame(draw);
 
-    // eslint-disable-next-line consistent-return
     return () => {
       window.removeEventListener("resize", resize);
     };
@@ -132,8 +132,8 @@ export function Starfield(): React.JSX.Element {
 
   return (
     <>
-      <canvas ref={starRef} className="fixed inset-0 z-0 pointer-events-none" />
-      <canvas ref={particleRef} className="fixed inset-0 z-999 pointer-events-none" />
+      <canvas ref={starRef} className="pointer-events-none fixed inset-0 z-0" />
+      <canvas ref={particleRef} className="pointer-events-none fixed inset-0 z-999" />
     </>
   );
 }

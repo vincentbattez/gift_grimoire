@@ -116,7 +116,7 @@ function CartoucheFrame(): React.JSX.Element {
   );
 }
 
-function BottomMedallion({ numeral }: { numeral: string }): React.JSX.Element {
+function BottomMedallion({ numeral }: Readonly<{ numeral: string }>): React.JSX.Element {
   return (
     <div className="tarot-bottom-medallion">
       <svg className="bottom-wing" viewBox="0 0 30 12">
@@ -134,7 +134,7 @@ function BottomMedallion({ numeral }: { numeral: string }): React.JSX.Element {
   );
 }
 
-function SideRail({ side }: { side: "left" | "right" }): React.JSX.Element {
+function SideRail({ side }: Readonly<{ side: "left" | "right" }>): React.JSX.Element {
   return (
     <svg className={`side-rail side-rail-${side}`} viewBox="0 0 6 100" preserveAspectRatio="none">
       <line x1="3" y1="0" x2="3" y2="100" stroke="currentColor" strokeWidth="0.3" />
@@ -151,7 +151,7 @@ function SideRail({ side }: { side: "left" | "right" }): React.JSX.Element {
   );
 }
 
-function Starfield({ seed }: { seed: number }): React.JSX.Element {
+function Starfield({ seed }: Readonly<{ seed: number }>): React.JSX.Element {
   const starList = useMemo(() => {
     const rng = seededRandom(seed);
 
@@ -180,7 +180,7 @@ async function downloadCard(cardElement: HTMLElement, enigma: EnigmaData): Promi
   link.click();
 }
 
-export function EnigmaSheet({ enigma, index }: { enigma: EnigmaData; index: number }): React.JSX.Element {
+export function EnigmaSheet({ enigma, index }: Readonly<{ enigma: EnigmaData; index: number }>): React.JSX.Element {
   const cardRef = useRef<HTMLDivElement>(null);
 
   return (

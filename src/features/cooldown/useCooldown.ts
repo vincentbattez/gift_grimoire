@@ -67,7 +67,6 @@ export function useCooldown(lastTriggeredAt: number | null, durationMs: number |
       tick((n) => n + 1);
     }, 1_000);
 
-    // eslint-disable-next-line consistent-return
     return () => {
       clearInterval(id);
     };

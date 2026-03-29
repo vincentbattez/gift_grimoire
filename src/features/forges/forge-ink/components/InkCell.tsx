@@ -34,7 +34,7 @@ export function InkCell({
   proximityCenter,
   disabled,
   onTap,
-}: InkCellProps): React.JSX.Element {
+}: Readonly<InkCellProps>): React.JSX.Element {
   const cellBorderClass = (() => {
     if (isRevealed) {
       if (wordSolved) {
@@ -114,8 +114,8 @@ export function InkCell({
       className={[
         "relative flex items-center justify-center",
         "aspect-square min-h-[44px] rounded-[5px]",
-        "text-xs font-cinzel font-bold",
-        "select-none outline-none",
+        "font-cinzel text-xs font-bold",
+        "outline-none select-none",
         "transition-all duration-300",
         cellBorderClass,
       ].join(" ")}
@@ -126,7 +126,7 @@ export function InkCell({
       {/* Revealed letter */}
       {isRevealed && letter && (
         <span
-          className="text-gold leading-none z-10"
+          className="text-gold z-10 leading-none"
           style={{
             textShadow: wordSolved ? "0 0 12px #e8c96a90" : "0 0 6px #e8c96a50",
             fontSize: "0.7rem",
@@ -141,7 +141,7 @@ export function InkCell({
       {isHotLetter && (
         <span
           key={proximityCenter}
-          className="absolute inset-0 pointer-events-none overflow-hidden rounded-[4px] z-[8]"
+          className="pointer-events-none absolute inset-0 z-[8] overflow-hidden rounded-[4px]"
         >
           <span
             className="absolute"
@@ -191,7 +191,7 @@ export function InkCell({
       {/* Drop animation */}
       {isAnimating && (
         <span
-          className="absolute inset-0 flex items-center justify-center pointer-events-none z-20"
+          className="pointer-events-none absolute inset-0 z-20 flex items-center justify-center"
           style={{ animation: "ink-drop-fall 0.42s ease-in both" }}
         >
           <span
@@ -209,7 +209,7 @@ export function InkCell({
 
       {/* Hit ripple — ink bleed */}
       {isAnimatingHit && (
-        <span className="absolute inset-0 pointer-events-none z-[15]">
+        <span className="pointer-events-none absolute inset-0 z-[15]">
           <span
             className="absolute inset-0 flex items-center justify-center"
             style={{ animation: "ink-spread-ripple 0.42s ease-out both" }}
@@ -261,7 +261,7 @@ export function InkCell({
 
       {/* Miss splash (ephemeral) */}
       {isAnimatingMiss && (
-        <span className="absolute inset-0 flex items-center justify-center pointer-events-none z-[12]">
+        <span className="pointer-events-none absolute inset-0 z-[12] flex items-center justify-center">
           <span
             className="absolute rounded-full"
             style={{
@@ -287,7 +287,7 @@ export function InkCell({
 
       {/* Miss stain (permanent) */}
       {isMissed && !isAnimatingMiss && (
-        <span className="absolute inset-0 flex items-center justify-center pointer-events-none">
+        <span className="pointer-events-none absolute inset-0 flex items-center justify-center">
           <span
             className="absolute rounded-full"
             style={{
@@ -297,7 +297,7 @@ export function InkCell({
               opacity: 0.6,
             }}
           />
-          <span className="absolute text-muted/18 z-10" style={{ fontSize: "0.32rem" }}>
+          <span className="text-muted/18 absolute z-10" style={{ fontSize: "0.32rem" }}>
             ✕
           </span>
         </span>

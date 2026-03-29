@@ -176,7 +176,7 @@ const SYMBOLS: Record<ArcaneSymbol, React.ReactNode> = {
   ),
 };
 
-export function ArcaneSymbolSvg({ symbol }: { symbol: ArcaneSymbol }): React.JSX.Element {
+export function ArcaneSymbolSvg({ symbol }: Readonly<{ symbol: ArcaneSymbol }>): React.JSX.Element {
   return (
     <svg viewBox="0 0 100 100" className="arcane-symbol">
       {SYMBOLS[symbol]}

@@ -14,7 +14,7 @@ export function CornerOrnaments({
   opacity = "opacity-35",
   className = "",
   cornerList = ["tl", "tr", "bl", "br"],
-}: CornerOrnamentsProps): React.JSX.Element {
+}: Readonly<CornerOrnamentsProps>): React.JSX.Element {
   const base = `absolute ${size} ${opacity} ${color} ${className}`;
 
   return (
@@ -29,7 +29,7 @@ export function CornerOrnaments({
         <div className={`${base} border-b border-l`} style={{ bottom: offset, left: offset }} />
       )}
       {cornerList.includes("br") && (
-        <div className={`${base} border-b border-r`} style={{ bottom: offset, right: offset }} />
+        <div className={`${base} border-r border-b`} style={{ bottom: offset, right: offset }} />
       )}
     </>
   );

@@ -7,7 +7,7 @@ import type { ForgeProps } from "@features/forges/types";
 
 type Phase = "idle" | "listening" | "detected" | "failed";
 
-function SoundWaveIcon({ color, size = 28 }: { color: string; size?: number }): React.JSX.Element {
+function SoundWaveIcon({ color, size = 28 }: Readonly<{ color: string; size?: number }>): React.JSX.Element {
   return (
     <svg
       width={size}
@@ -28,7 +28,7 @@ function SoundWaveIcon({ color, size = 28 }: { color: string; size?: number }): 
 }
 
 /** Forge : Le Murmure Invisible — détecte une vibration via Home Assistant */
-export function VibrationForge({ solved, onSolve }: ForgeProps): React.JSX.Element {
+export function VibrationForge({ solved, onSolve }: Readonly<ForgeProps>): React.JSX.Element {
   const [phase, setPhase] = useState<Phase>("idle");
   const [progress, setProgress] = useState(0);
   const [isShowingPicker, setIsShowingPicker] = useState(false);
@@ -92,7 +92,7 @@ export function VibrationForge({ solved, onSolve }: ForgeProps): React.JSX.Eleme
 
   if (solved) {
     return (
-      <div className="flex flex-color items-center gap-3">
+      <div className="flex-color flex items-center gap-3">
         <div className="relative" style={{ width: SIZE, height: SIZE }}>
           <svg className="absolute inset-0 -rotate-90" width={SIZE} height={SIZE}>
             <circle
@@ -108,13 +108,13 @@ export function VibrationForge({ solved, onSolve }: ForgeProps): React.JSX.Eleme
             />
           </svg>
           <div
-            className="absolute inset-[8px] rounded-full flex items-center justify-center border border-solved-border/50 shadow-[0_0_22px_#4ecca325]"
+            className="border-solved-border/50 absolute inset-[8px] flex items-center justify-center rounded-full border shadow-[0_0_22px_#4ecca325]"
             style={{ background: "radial-gradient(circle at 45% 40%, #0a1f1a, #080f0c)" }}
           >
             <span className="text-success text-lg font-bold">✓</span>
           </div>
         </div>
-        <p className="text-[0.6rem] tracking-[0.18em] uppercase font-semibold text-success">Vibration détectée</p>
+        <p className="text-success text-[0.6rem] font-semibold tracking-[0.18em] uppercase">Vibration détectée</p>
       </div>
     );
   }
@@ -180,28 +180,28 @@ export function VibrationForge({ solved, onSolve }: ForgeProps): React.JSX.Eleme
   })();
 
   return (
-    <div className="flex flex-color items-center gap-3">
+    <div className="flex-color flex items-center gap-3">
       <button
         ref={btnRef}
         onClick={() => {
           void handleClick();
         }}
         disabled={phase === "listening" || phase === "detected"}
-        className="relative select-none cursor-pointer bg-transparent border-none p-0"
+        className="relative cursor-pointer border-none bg-transparent p-0 select-none"
         style={{ width: SIZE, height: SIZE }}
       >
         {phase === "listening" && (
           <>
             <span
-              className="absolute inset-0 rounded-full border border-accent/25"
+              className="border-accent/25 absolute inset-0 rounded-full border"
               style={{ animation: "ping 2.5s cubic-bezier(0,0,0.2,1) infinite" }}
             />
             <span
-              className="absolute inset-0 rounded-full border border-accent/15"
+              className="border-accent/15 absolute inset-0 rounded-full border"
               style={{ animation: "ping 2.5s cubic-bezier(0,0,0.2,1) infinite", animationDelay: "0.8s" }}
             />
             <span
-              className="absolute inset-0 rounded-full border border-accent/10"
+              className="border-accent/10 absolute inset-0 rounded-full border"
               style={{ animation: "ping 2.5s cubic-bezier(0,0,0.2,1) infinite", animationDelay: "1.6s" }}
             />
           </>
@@ -257,20 +257,20 @@ export function VibrationForge({ solved, onSolve }: ForgeProps): React.JSX.Eleme
         </svg>
 
         <div
-          className={`absolute inset-[8px] rounded-full flex items-center justify-center transition-all duration-500 ${(() => {
+          className={`absolute inset-[8px] flex items-center justify-center rounded-full transition-all duration-500 ${(() => {
             if (phase === "detected") {
-              return "border border-solved-border/50 shadow-[0_0_22px_#4ecca325]";
+              return "border-solved-border/50 border shadow-[0_0_22px_#4ecca325]";
             }
 
             if (phase === "failed") {
-              return "border border-danger/30";
+              return "border-danger/30 border";
             }
 
             if (phase === "listening") {
-              return "border border-accent/30 shadow-[0_0_20px_#9b6dff18]";
+              return "border-accent/30 border shadow-[0_0_20px_#9b6dff18]";
             }
 
-            return "border border-[#2e2248] hover:border-accent/35";
+            return "hover:border-accent/35 border border-[#2e2248]";
           })()}`}
           style={{
             background: (() => {
@@ -295,7 +295,7 @@ export function VibrationForge({ solved, onSolve }: ForgeProps): React.JSX.Eleme
       </button>
 
       <p
-        className={`text-[0.6rem] tracking-[0.18em] uppercase font-semibold transition-colors duration-300 ${labelColor}`}
+        className={`text-[0.6rem] font-semibold tracking-[0.18em] uppercase transition-colors duration-300 ${labelColor}`}
       >
         {label}
       </p>

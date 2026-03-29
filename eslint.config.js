@@ -3,6 +3,8 @@ import eslintPluginImport from "eslint-plugin-import";
 import eslintPluginPrettier from "eslint-plugin-prettier";
 import reactHooks from "eslint-plugin-react-hooks";
 import reactRefresh from "eslint-plugin-react-refresh";
+import eslintPluginJsxA11y from "eslint-plugin-jsx-a11y";
+import eslintPluginSonarjs from "eslint-plugin-sonarjs";
 import eslintPluginUnicorn from "eslint-plugin-unicorn";
 import unusedImports from "eslint-plugin-unused-imports";
 import globals from "globals";
@@ -14,6 +16,8 @@ export default tseslint.config(
   tseslint.configs.strictTypeChecked,
   tseslint.configs.stylisticTypeChecked,
   eslintPluginUnicorn.configs["flat/all"],
+  eslintPluginJsxA11y.flatConfigs.recommended,
+  eslintPluginSonarjs.configs.recommended,
   reactHooks.configs.flat.recommended,
   reactRefresh.configs.vite,
   prettierConfig,
@@ -159,7 +163,7 @@ export default tseslint.config(
       ],
 
       // — Code style
-      "consistent-return": "warn",
+      "consistent-return": "off", // TypeScript handles this; conflicts with unicorn/no-useless-undefined + sonarjs/no-redundant-jump
       "no-else-return": "error",
       "prefer-template": "error",
       curly: ["error", "all"],
@@ -189,6 +193,11 @@ export default tseslint.config(
         { blankLine: "always", prev: "*", next: "if" },
         { blankLine: "always", prev: "*", next: "export" },
       ],
+
+      // — SonarJS overrides
+      "sonarjs/void-use": "off", // void promise() is a valid TS pattern
+      "sonarjs/cognitive-complexity": "off", // TODO: enable progressively (6 violations)
+      "sonarjs/no-nested-conditional": "off", // TODO: enable progressively (6 violations)
 
       // — Unicorn overrides (too strict for React)
       "unicorn/no-null": "off",

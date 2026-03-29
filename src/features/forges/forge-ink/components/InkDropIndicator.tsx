@@ -4,11 +4,11 @@ type InkDropIndicatorProps = {
   dropsLeft: number;
 };
 
-export function InkDropIndicator({ dropsLeft }: InkDropIndicatorProps): React.JSX.Element {
+export function InkDropIndicator({ dropsLeft }: Readonly<InkDropIndicatorProps>): React.JSX.Element {
   return (
     <>
-      <div className="text-center text-[0.4rem] tracking-[0.2em] text-muted/30 uppercase mb-2">Gouttes restantes</div>
-      <div className="flex justify-center gap-3 mb-5">
+      <div className="text-muted/30 mb-2 text-center text-[0.4rem] tracking-[0.2em] uppercase">Gouttes restantes</div>
+      <div className="mb-5 flex justify-center gap-3">
         {Array.from({ length: INK_CONFIG.maxDrops }, (_, i) => (
           <div
             key={i}

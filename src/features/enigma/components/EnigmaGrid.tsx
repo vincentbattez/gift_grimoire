@@ -7,8 +7,8 @@ import { ForgeSection } from "@features/forges/components/ForgeSection";
 import { FORGE_LIST } from "@features/forges/forges.config";
 import { EnigmaCard } from "./EnigmaCard";
 
-function SectionLabel({ children }: { children: React.ReactNode }): React.JSX.Element {
-  return <div className="text-center text-[0.6rem] tracking-[0.35em] text-muted my-4 uppercase">{children}</div>;
+function SectionLabel({ children }: Readonly<{ children: React.ReactNode }>): React.JSX.Element {
+  return <div className="text-muted my-4 text-center text-[0.6rem] tracking-[0.35em] uppercase">{children}</div>;
 }
 
 function FinaleButton(): React.JSX.Element | null {
@@ -34,7 +34,7 @@ function FinaleButton(): React.JSX.Element | null {
     >
       <button
         onClick={startNarrative}
-        className="relative px-8 py-4 rounded-[16px] cursor-pointer border-none"
+        className="relative cursor-pointer rounded-[16px] border-none px-8 py-4"
         style={{
           background: "linear-gradient(135deg, #1a1430, #2a1840, #1a1430)",
           border: "1.5px solid #e8c96a50",
@@ -53,7 +53,7 @@ function FinaleButton(): React.JSX.Element | null {
   );
 }
 
-function EnigmaSection({ isAdmin }: { isAdmin: boolean }): React.JSX.Element {
+function EnigmaSection({ isAdmin }: Readonly<{ isAdmin: boolean }>): React.JSX.Element {
   const enigmas = useEnigmaStore((s) => s.enigmas);
   const solvedCount = Object.values(enigmas).filter((e) => e.solved).length;
 
@@ -70,7 +70,7 @@ function EnigmaSection({ isAdmin }: { isAdmin: boolean }): React.JSX.Element {
         ))}
       </div>
       {solvedCount > 0 && (
-        <div className="text-center text-[0.55rem] tracking-[0.2em] text-gold/60 mt-3">
+        <div className="text-gold/60 mt-3 text-center text-[0.55rem] tracking-[0.2em]">
           ✨ {solvedCount}/6 mystères percés
         </div>
       )}
@@ -78,14 +78,14 @@ function EnigmaSection({ isAdmin }: { isAdmin: boolean }): React.JSX.Element {
   );
 }
 
-function ForgeList({ isAdmin }: { isAdmin: boolean }): React.JSX.Element {
+function ForgeList({ isAdmin }: Readonly<{ isAdmin: boolean }>): React.JSX.Element {
   return (
     <>
       <SectionLabel>— La Forge des Clés —</SectionLabel>
-      <p className="text-center text-[0.5rem] text-muted/40 -mt-2 mb-5 tracking-wide">
+      <p className="text-muted/40 -mt-2 mb-5 text-center text-[0.5rem] tracking-wide">
         Résolvez les épreuves pour forger de nouvelles clés
       </p>
-      <div className="flex flex-color gap-10">
+      <div className="flex-color flex gap-10">
         {FORGE_LIST.map((forge) => (
           <ForgeSection key={forge.key} forge={forge} isAdmin={isAdmin} />
         ))}
@@ -94,7 +94,7 @@ function ForgeList({ isAdmin }: { isAdmin: boolean }): React.JSX.Element {
   );
 }
 
-export function EnigmaGrid({ isAdmin }: { isAdmin: boolean }): React.JSX.Element {
+export function EnigmaGrid({ isAdmin }: Readonly<{ isAdmin: boolean }>): React.JSX.Element {
   const enigmas = useEnigmaStore((s) => s.enigmas);
   const isPrologueCompleted = Object.values(enigmas).some((e) => e.unlocked || e.solved);
 

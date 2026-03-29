@@ -1,3 +1,5 @@
+import { randomVisual } from "@/utils/random";
+
 let audioContext: AudioContext | null = null;
 
 function getAudioContext(): AudioContext {
@@ -601,7 +603,7 @@ export const sndWaxMelt = (): (() => void) => {
   const noiseBuffer = context.createBuffer(1, context.sampleRate * 3, context.sampleRate);
   const data = noiseBuffer.getChannelData(0);
   for (let i = 0; i < data.length; i++) {
-    data[i] = (Math.random() * 2 - 1) * (Math.random() > 0.92 ? 0.6 : 0.08);
+    data[i] = (randomVisual() * 2 - 1) * (randomVisual() > 0.92 ? 0.6 : 0.08);
   }
   noise.buffer = noiseBuffer;
   noise.loop = true;
@@ -822,8 +824,8 @@ export const sndCrackle = (intensity = 1): void => {
   // Crackle debris — lower-pitched pops spread over longer tail
   const count = Math.round(10 + intensity * 14);
   for (let i = 0; i < count; i++) {
-    const delay = 0.04 + Math.random() * 0.4 * intensity;
-    const frequency = 400 + Math.random() * 1800;
+    const delay = 0.04 + randomVisual() * 0.4 * intensity;
+    const frequency = 400 + randomVisual() * 1800;
     const oscillator = context.createOscillator();
     const gainNode = context.createGain();
     oscillator.connect(gainNode);
@@ -831,10 +833,10 @@ export const sndCrackle = (intensity = 1): void => {
     oscillator.type = i % 3 === 0 ? "sawtooth" : "square";
     oscillator.frequency.setValueAtTime(frequency, currentTime + delay);
     oscillator.frequency.exponentialRampToValueAtTime(frequency * 0.15, currentTime + delay + 0.06);
-    const volume = (0.04 + Math.random() * 0.06) * intensity;
+    const volume = (0.04 + randomVisual() * 0.06) * intensity;
     gainNode.gain.setValueAtTime(0, currentTime + delay);
     gainNode.gain.linearRampToValueAtTime(volume, currentTime + delay + 0.004);
-    gainNode.gain.exponentialRampToValueAtTime(0.0001, currentTime + delay + 0.05 + Math.random() * 0.05);
+    gainNode.gain.exponentialRampToValueAtTime(0.0001, currentTime + delay + 0.05 + randomVisual() * 0.05);
     oscillator.start(currentTime + delay);
     oscillator.stop(currentTime + delay + 0.12);
   }

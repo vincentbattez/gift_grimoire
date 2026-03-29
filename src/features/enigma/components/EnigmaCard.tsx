@@ -10,7 +10,7 @@ import { CELEBRATION_DURATION_MS, CELEBRATION_SCROLL_SETTLE_MS } from "@features
 import { playUnlockCardEffect, triggerUnlockEffect } from "@features/enigma/unlock";
 import { LockedModal } from "./LockedModal";
 
-export function EnigmaCard({ enigma, isAdmin }: { enigma: Enigma; isAdmin: boolean }): React.JSX.Element {
+export function EnigmaCard({ enigma, isAdmin }: Readonly<{ enigma: Enigma; isAdmin: boolean }>): React.JSX.Element {
   const state = useEnigmaStore((s) => s.enigmas[enigma.id]);
   const openModal = useEnigmaStore((s) => s.openModal);
   const acknowledgeUnlock = useEnigmaStore((s) => s.acknowledgeUnlock);
@@ -54,9 +54,6 @@ export function EnigmaCard({ enigma, isAdmin }: { enigma: Enigma; isAdmin: boole
         clearTimeout(timer);
       };
     }
-
-    // eslint-disable-next-line consistent-return
-    return;
   }, [unlockingId, enigma.id, enigma.title]);
 
   useEffect(() => {
@@ -100,7 +97,6 @@ export function EnigmaCard({ enigma, isAdmin }: { enigma: Enigma; isAdmin: boole
       }, CELEBRATION_DURATION_MS);
     }, CELEBRATION_SCROLL_SETTLE_MS);
 
-    // eslint-disable-next-line consistent-return
     return () => {
       clearTimeout(timer);
       clearTimeout(clearTimer);
@@ -162,22 +158,29 @@ export function EnigmaCard({ enigma, isAdmin }: { enigma: Enigma; isAdmin: boole
             boxShadow: "inset 0 0 30px #e8c96a20, inset 0 0 60px #e8c96a10, 0 0 22px #e8c96a15",
           }),
       }}
+      role="button"
+      tabIndex={0}
       onClick={handleClick}
+      onKeyDown={(e) => {
+        if (e.key === "Enter" || e.key === " ") {
+          handleClick();
+        }
+      }}
     >
       {/* Gold background overlay — fades in on solve */}
       <div
-        className={`absolute inset-0 pointer-events-none transition-opacity duration-[1200ms] ease-in-out ${isSolved ? "opacity-100" : "opacity-0"}`}
+        className={`pointer-events-none absolute inset-0 transition-opacity duration-[1200ms] ease-in-out ${isSolved ? "opacity-100" : "opacity-0"}`}
         style={{ background: "linear-gradient(155deg, #1a1508, #100c04)" }}
       />
 
       {/* Purple radial glow — fades out on solve */}
       <div
-        className={`absolute inset-0 pointer-events-none transition-opacity duration-[1200ms] ${isSolved ? "opacity-0" : "opacity-100"}`}
+        className={`pointer-events-none absolute inset-0 transition-opacity duration-[1200ms] ${isSolved ? "opacity-0" : "opacity-100"}`}
         style={{ background: "radial-gradient(ellipse at 50% 10%, #3a2a5a18, transparent 65%)" }}
       />
       {/* Gold radial glow — fades in on solve */}
       <div
-        className={`absolute inset-0 pointer-events-none transition-opacity duration-[1200ms] ${isSolved ? "opacity-100" : "opacity-0"}`}
+        className={`pointer-events-none absolute inset-0 transition-opacity duration-[1200ms] ${isSolved ? "opacity-100" : "opacity-0"}`}
         style={{ background: "radial-gradient(ellipse at 50% 50%, #e8c96a18, transparent 65%)" }}
       />
 
@@ -196,20 +199,20 @@ export function EnigmaCard({ enigma, isAdmin }: { enigma: Enigma; isAdmin: boole
       {isLocked ? (
         <>
           <LockIcon />
-          <div className="text-[0.6rem] tracking-[0.2em] text-muted uppercase">Énigme {enigma.id}</div>
+          <div className="text-muted text-[0.6rem] tracking-[0.2em] uppercase">Énigme {enigma.id}</div>
         </>
       ) : (
-        <div className="relative z-[1] flex flex-color items-center">
-          <div className={`text-[0.6rem] tracking-[0.2em] ${isSolved ? "text-gold/50" : "text-muted"} uppercase mb-2`}>
+        <div className="flex-color relative z-[1] flex items-center">
+          <div className={`text-[0.6rem] tracking-[0.2em] ${isSolved ? "text-gold/50" : "text-muted"} mb-2 uppercase`}>
             Énigme {enigma.id}
           </div>
           <div
-            className={`text-[2.3rem] mb-2 leading-none transition-[filter] duration-700 ${isSolved ? "drop-shadow-[0_0_10px_rgba(201,160,50,0.6)]" : "drop-shadow-[0_0_10px_rgba(155,109,255,0.6)]"}`}
+            className={`mb-2 text-[2.3rem] leading-none transition-[filter] duration-700 ${isSolved ? "drop-shadow-[0_0_10px_rgba(201,160,50,0.6)]" : "drop-shadow-[0_0_10px_rgba(155,109,255,0.6)]"}`}
           >
             {enigma.icon}
           </div>
           <div
-            className={`text-[0.68rem] text-center tracking-wide leading-[1.45] transition-colors duration-700 ${isSolved ? "text-gold" : "text-text"}`}
+            className={`text-center text-[0.68rem] leading-[1.45] tracking-wide transition-colors duration-700 ${isSolved ? "text-gold" : "text-text"}`}
           >
             {enigma.title}
           </div>
@@ -227,8 +230,8 @@ export function EnigmaCard({ enigma, isAdmin }: { enigma: Enigma; isAdmin: boole
               openModal(enigma.id);
             }
           }}
-          className={`absolute w-80/100 bottom-4 p-2 mt-2 border-none rounded-[10px] text-[#3a2a1a] font-[var(--font-cinzel)] text-[0.6rem] font-semibold tracking-[0.1em] uppercase cursor-pointer overflow-hidden z-[2] transition-all duration-700 ease-out ${
-            isSolved ? "opacity-100 translate-y-0 scale-100" : "opacity-0 translate-y-2 scale-95 pointer-events-none"
+          className={`absolute bottom-4 z-[2] mt-2 w-80/100 cursor-pointer overflow-hidden rounded-[10px] border-none p-2 text-[0.6rem] font-[var(--font-cinzel)] font-semibold tracking-[0.1em] text-[#3a2a1a] uppercase transition-all duration-700 ease-out ${
+            isSolved ? "translate-y-0 scale-100 opacity-100" : "pointer-events-none translate-y-2 scale-95 opacity-0"
           }`}
           style={{
             background: "linear-gradient(135deg, #f5d87a, #e8c96a, #c9a032)",
@@ -237,7 +240,7 @@ export function EnigmaCard({ enigma, isAdmin }: { enigma: Enigma; isAdmin: boole
           }}
         >
           <div
-            className="absolute inset-0 pointer-events-none"
+            className="pointer-events-none absolute inset-0"
             style={{
               background: "linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.4) 50%, transparent 100%)",
               backgroundSize: "200% 100%",
@@ -264,7 +267,7 @@ export function EnigmaCard({ enigma, isAdmin }: { enigma: Enigma; isAdmin: boole
 
       {/* Rune */}
       {!isSolved && (
-        <div className={`absolute bottom-2.5 text-[0.65rem] opacity-20 tracking-[0.1em] text-accent`}>
+        <div className={`text-accent absolute bottom-2.5 text-[0.65rem] tracking-[0.1em] opacity-20`}>
           {enigma.rune}
         </div>
       )}

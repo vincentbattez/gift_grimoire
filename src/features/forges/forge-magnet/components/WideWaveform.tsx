@@ -6,7 +6,7 @@ const BAR_HEIGHT_LIST: number[] = Array.from({ length: BAR_COUNT }, (_, i) => {
   return Math.max(0.12, Math.min(1, envelope + jitter));
 });
 
-export function WideWaveform({ playing, color }: { playing: boolean; color: string }): React.JSX.Element {
+export function WideWaveform({ playing, color }: Readonly<{ playing: boolean; color: string }>): React.JSX.Element {
   const VB_W = BAR_COUNT * 9;
   const VB_H = 36;
 

@@ -14,6 +14,7 @@ import {
   sndWaxStamp,
 } from "@/audio";
 import { spawnCelebration, spawnParticles } from "@/particles";
+import { randomVisual } from "@/utils/random";
 import { OrnamentDivider } from "@components/ui/OrnamentDivider";
 import { ENIGMA_LIST } from "@features/enigma/config";
 import { useEnigmaStore } from "@features/enigma/store";
@@ -36,6 +37,14 @@ type Rocket = {
   exploded: boolean;
 };
 
+function markRocketExploded(id: number): (prev: Rocket[]) => Rocket[] {
+  return (prev) => prev.map((r) => (r.id === id ? { ...r, exploded: true } : r));
+}
+
+function removeRocketById(id: number): (prev: Rocket[]) => Rocket[] {
+  return (prev) => prev.filter((r) => r.id !== id);
+}
+
 const FINALE_EMOJI_LIST = ["✨", "💛", "🌟", "💫", "⭐", "🦋", "💃", "🖼️", "🎭", "💓", "🌅", "❤️"];
 
 const GOLD_PARTICLE_LIST = Array.from({ length: 24 }, (_, i) => ({
@@ -47,10 +56,10 @@ const GOLD_PARTICLE_LIST = Array.from({ length: 24 }, (_, i) => ({
 
 function buildStars(): { left: number; delay: number; duration: number; size: number; emoji: string }[] {
   return Array.from({ length: STAR_COUNT }, (_, i) => ({
-    left: 5 + Math.random() * 90,
-    delay: Math.random() * 3,
-    duration: 2.5 + Math.random() * 2,
-    size: 0.8 + Math.random() * 1.2,
+    left: 5 + randomVisual() * 90,
+    delay: randomVisual() * 3,
+    duration: 2.5 + randomVisual() * 2,
+    size: 0.8 + randomVisual() * 1.2,
     emoji: ["✨", "⭐", "🌟", "💫"][i % 4],
   }));
 }
@@ -62,11 +71,11 @@ function buildEmojiBurst(): { emoji: string; left: number; delay: number; size: 
   for (let i = 0; i < EMOJI_BURST_COUNT; i++) {
     itemList.push({
       emoji: FINALE_EMOJI_LIST[i % FINALE_EMOJI_LIST.length],
-      left: 5 + Math.random() * 90,
+      left: 5 + randomVisual() * 90,
       delay: cumDelay,
-      size: 1.4 + Math.random() * 0.8,
-      rot: -30 + Math.random() * 60,
-      pitch: -400 + Math.random() * 800,
+      size: 1.4 + randomVisual() * 0.8,
+      rot: -30 + randomVisual() * 60,
+      pitch: -400 + randomVisual() * 800,
     });
     cumDelay += gap;
     gap *= 0.97;
@@ -80,11 +89,11 @@ function buildEmojiBurst(): { emoji: string; left: number; delay: number; size: 
 function SlideContext(): React.JSX.Element {
   return (
     <div className="text-center">
-      <div className="text-[2.5rem] mb-3 leading-none" style={{ filter: "drop-shadow(0 0 14px #c9a03250)" }}>
+      <div className="mb-3 text-[2.5rem] leading-none" style={{ filter: "drop-shadow(0 0 14px #c9a03250)" }}>
         📜
       </div>
       <h3
-        className="text-[0.95rem] font-semibold mb-3 tracking-[0.06em]"
+        className="mb-3 text-[0.95rem] font-semibold tracking-[0.06em]"
         style={{ fontFamily: "var(--font-cinzel-decorative)", color: "#8a6a20", textShadow: "0 0 20px #e8c96a30" }}
       >
         Le Dernier Sortilège
@@ -93,7 +102,7 @@ function SlideContext(): React.JSX.Element {
       <OrnamentDivider className="mb-4" />
 
       <p
-        className="text-[0.8rem] leading-[1.8] whitespace-pre-line mb-4"
+        className="mb-4 text-[0.8rem] leading-[1.8] whitespace-pre-line"
         style={{ fontFamily: "var(--font-cinzel)", color: "#4a3a20" }}
       >
         {`Tu as percé les six mystères,
@@ -106,7 +115,7 @@ Ce grimoire n'était pas un jeu.
 C'était ma façon de te dire ce que les mots seuls n'auraient pas suffi à exprimer...`}
       </p>
 
-      <p className="text-[0.7rem] italic tracking-wide" style={{ fontFamily: "var(--font-cinzel)", color: "#a08a50" }}>
+      <p className="text-[0.7rem] tracking-wide italic" style={{ fontFamily: "var(--font-cinzel)", color: "#a08a50" }}>
         Chaque énigme portait un morceau de ce que tu représentes pour moi.
       </p>
     </div>
@@ -128,11 +137,11 @@ function SlideStats(): React.JSX.Element {
 
   return (
     <div className="text-center">
-      <div className="text-[2.5rem] mb-3 leading-none" style={{ filter: "drop-shadow(0 0 14px #c9a03250)" }}>
+      <div className="mb-3 text-[2.5rem] leading-none" style={{ filter: "drop-shadow(0 0 14px #c9a03250)" }}>
         📊
       </div>
       <h3
-        className="text-[0.95rem] font-semibold mb-4 tracking-[0.06em]"
+        className="mb-4 text-[0.95rem] font-semibold tracking-[0.06em]"
         style={{ fontFamily: "var(--font-cinzel-decorative)", color: "#8a6a20", textShadow: "0 0 20px #e8c96a30" }}
       >
         Ton aventure
@@ -140,24 +149,24 @@ function SlideStats(): React.JSX.Element {
 
       <OrnamentDivider className="mb-5" />
 
-      <div className="grid grid-cols-2 gap-3 mb-5">
+      <div className="mb-5 grid grid-cols-2 gap-3">
         {statList.map((s) => (
           <div
             key={s.label}
-            className="rounded-[12px] py-3 px-2"
+            className="rounded-[12px] px-2 py-3"
             style={{
               background: "linear-gradient(145deg, #f5e6c820, #ede0c010)",
               border: "1px solid #d4a94225",
             }}
           >
-            <div className="text-[1.3rem] mb-1">{s.icon}</div>
+            <div className="mb-1 text-[1.3rem]">{s.icon}</div>
             <div
               className="text-[1.1rem] font-bold"
               style={{ fontFamily: "var(--font-cinzel-decorative)", color: "#8a6a20" }}
             >
               {s.value}
             </div>
-            <div className="text-[0.55rem] tracking-[0.1em] uppercase mt-0.5" style={{ color: "#a08a50" }}>
+            <div className="mt-0.5 text-[0.55rem] tracking-[0.1em] uppercase" style={{ color: "#a08a50" }}>
               {s.label}
             </div>
           </div>
@@ -165,7 +174,7 @@ function SlideStats(): React.JSX.Element {
       </div>
 
       {/* Character parade */}
-      <div className="flex justify-center gap-2 mt-3">
+      <div className="mt-3 flex justify-center gap-2">
         {ENIGMA_LIST.map((e) => (
           <div
             key={e.id}
@@ -177,7 +186,7 @@ function SlideStats(): React.JSX.Element {
           </div>
         ))}
       </div>
-      <p className="text-[0.5rem] tracking-[0.15em] uppercase mt-1.5" style={{ color: "#b09a60" }}>
+      <p className="mt-1.5 text-[0.5rem] tracking-[0.15em] uppercase" style={{ color: "#b09a60" }}>
         Les gardiens du grimoire
       </p>
     </div>
@@ -217,26 +226,27 @@ function TypewriterLine({
   useEffect(() => {
     const timerList: ReturnType<typeof setTimeout>[] = [];
 
-    const startTimer = setTimeout(() => {
-      wordList.forEach((_, i) => {
-        const wordDelay = i * (golden ? 140 : 100);
+    function revealWord(i: number): void {
+      setVisibleWords(i + 1);
+      sndQuillTap(randomVisual() * 2 - 1);
 
-        timerList.push(
-          setTimeout(() => {
-            setVisibleWords(i + 1);
-            sndQuillTap(Math.random() * 2 - 1);
+      if (i === wordList.length - 1) {
+        if (golden) {
+          sndGoldenWord();
+        }
+        onDone?.();
+      }
+    }
 
-            if (i === wordList.length - 1) {
-              if (golden) {
-                sndGoldenWord();
-              }
-              onDone?.();
-            }
-          }, wordDelay),
-        );
-      });
-    }, delay);
-    timerList.push(startTimer);
+    wordList.forEach((_, i) => {
+      const wordDelay = delay + i * (golden ? 140 : 100);
+
+      timerList.push(
+        setTimeout(() => {
+          revealWord(i);
+        }, wordDelay),
+      );
+    });
 
     return () => {
       timerList.forEach((t) => {
@@ -286,11 +296,11 @@ function SlideLove(): React.JSX.Element {
 
   return (
     <div className="text-center">
-      <div className="text-[2.5rem] mb-3 leading-none" style={{ filter: "drop-shadow(0 0 14px #c9a03250)" }}>
+      <div className="mb-3 text-[2.5rem] leading-none" style={{ filter: "drop-shadow(0 0 14px #c9a03250)" }}>
         💛
       </div>
       <h3
-        className="text-[0.95rem] font-semibold mb-3 tracking-[0.06em]"
+        className="mb-3 text-[0.95rem] font-semibold tracking-[0.06em]"
         style={{ fontFamily: "var(--font-cinzel-decorative)", color: "#8a6a20", textShadow: "0 0 20px #e8c96a30" }}
       >
         Mon Léamour
@@ -298,7 +308,7 @@ function SlideLove(): React.JSX.Element {
 
       <OrnamentDivider className="mb-4" />
 
-      <div className="text-[0.8rem] leading-[1.85] mb-5 min-h-[180px]" style={{ fontFamily: "var(--font-cinzel)" }}>
+      <div className="mb-5 min-h-[180px] text-[0.8rem] leading-[1.85]" style={{ fontFamily: "var(--font-cinzel)" }}>
         {LOVE_LINE_LIST.map((line, i) => (
           <div key={i}>
             <TypewriterLine
@@ -328,12 +338,12 @@ function SlideLove(): React.JSX.Element {
         <OrnamentDivider className="mb-4" />
 
         <p
-          className="text-[0.76rem] italic tracking-wide"
+          className="text-[0.76rem] tracking-wide italic"
           style={{ fontFamily: "var(--font-cinzel)", color: "#8a6a20" }}
         >
           — Pour toujours, ton Vincent —
         </p>
-        <p className="text-[0.65rem] mt-2 tracking-[0.12em]" style={{ color: "#b09a60" }}>
+        <p className="mt-2 text-[0.65rem] tracking-[0.12em]" style={{ color: "#b09a60" }}>
           Avec tout mon amour, infiniment ♡
         </p>
       </div>
@@ -343,7 +353,7 @@ function SlideLove(): React.JSX.Element {
 
 const SEAL_HOLD_MS = 2000;
 
-function WaxSeal({ onComplete }: { onComplete: () => void }): React.JSX.Element {
+function WaxSeal({ onComplete }: Readonly<{ onComplete: () => void }>): React.JSX.Element {
   const [progress, setProgress] = useState(0);
   const [isSealed, setIsSealed] = useState(false);
   const pressing = useRef(false);
@@ -426,10 +436,10 @@ function WaxSeal({ onComplete }: { onComplete: () => void }): React.JSX.Element 
   const dashOffset = circumference * (1 - progress);
 
   return (
-    <div className="flex flex-color itemList-center gap-2">
+    <div className="flex-color itemList-center flex gap-2">
       <div
         id="wax-seal"
-        className="relative w-[68px] h-[68px] cursor-pointer select-none"
+        className="relative h-[68px] w-[68px] cursor-pointer select-none"
         onPointerDown={handleStart}
         onPointerUp={handleEnd}
         onPointerLeave={handleEnd}
@@ -437,7 +447,7 @@ function WaxSeal({ onComplete }: { onComplete: () => void }): React.JSX.Element 
         style={{ touchAction: "none" }}
       >
         {/* Progress ring */}
-        <svg className="absolute inset-0 w-full h-full -rotate-90" viewBox="0 0 64 64">
+        <svg className="absolute inset-0 h-full w-full -rotate-90" viewBox="0 0 64 64">
           {/* Track */}
           <circle cx="32" cy="32" r="28" fill="none" stroke="#c9a03225" strokeWidth="3" />
           {/* Progress */}
@@ -457,7 +467,7 @@ function WaxSeal({ onComplete }: { onComplete: () => void }): React.JSX.Element 
 
         {/* Wax seal body */}
         <div
-          className="absolute inset-[6px] rounded-full flex itemList-center justify-center"
+          className="itemList-center absolute inset-[6px] flex justify-center rounded-full"
           style={{
             background: isSealed
               ? "radial-gradient(circle at 40% 35%, #e8c96a, #c9a032, #8a6a20)"
@@ -495,7 +505,7 @@ function WaxSeal({ onComplete }: { onComplete: () => void }): React.JSX.Element 
               opacity: isSealed ? 1 : 0.7 + progress * 0.3,
             }}
           >
-            {isSealed ? "♡" : "♡"}
+            {"♡"}
           </span>
         </div>
 
@@ -587,24 +597,32 @@ function NarrativeSequence(): React.JSX.Element | null {
     // t=6100-8500 — Cards flip one by one (startList after overlay has faded ~500ms)
     const flipStart = flipFadeStart + 500;
 
+    function spawnCardParticles(el: Element): void {
+      const r = el.getBoundingClientRect();
+      spawnParticles(r.left + r.width / 2, r.top + r.height / 2, 12, "#e8c96a");
+    }
+
+    function flipCard(i: number): void {
+      setFlipIndex(i);
+      sndCardFlip(i);
+      navigator.vibrate(20);
+
+      const el = document.querySelector(`[data-card-id="${ENIGMA_LIST[i].id}"]`);
+
+      if (el) {
+        el.scrollIntoView({ behavior: "smooth", block: "center" });
+
+        setTimeout(() => {
+          spawnCardParticles(el);
+        }, 100);
+      }
+    }
+
     ENIGMA_LIST.forEach((_, i) => {
       timerList.current.push(
         setTimeout(
           () => {
-            setFlipIndex(i);
-            sndCardFlip(i);
-            navigator.vibrate(20);
-
-            const el = document.querySelector(`[data-card-id="${ENIGMA_LIST[i].id}"]`);
-
-            if (el) {
-              el.scrollIntoView({ behavior: "smooth", block: "center" });
-
-              setTimeout(() => {
-                const r = el.getBoundingClientRect();
-                spawnParticles(r.left + r.width / 2, r.top + r.height / 2, 12, "#e8c96a");
-              }, 100);
-            }
+            flipCard(i);
           },
           flipStart + i * 400,
         ),
@@ -731,7 +749,7 @@ function NarrativeSequence(): React.JSX.Element | null {
     <>
       {/* Darkening overlay */}
       <div
-        className="fixed inset-0 z-[190] pointer-events-none transition-all duration-700"
+        className="pointer-events-none fixed inset-0 z-[190] transition-all duration-700"
         style={{
           background: "#07060f",
           opacity: (() => {
@@ -758,17 +776,17 @@ function NarrativeSequence(): React.JSX.Element | null {
 
       {/* Narrative text */}
       {textIndex >= 0 && (
-        <div className="fixed inset-x-0 top-[12%] z-[195] flex flex-color itemList-center pointer-events-none px-6">
+        <div className="flex-color itemList-center pointer-events-none fixed inset-x-0 top-[12%] z-[195] flex px-6">
           <div
             key={textIndex}
-            className="rounded-2xl px-8 py-5 flex flex-color itemList-center"
+            className="flex-color itemList-center flex rounded-2xl px-8 py-5"
             style={{
               background: "radial-gradient(ellipse at 50% 50%, #07060fE0, #07060fA0, transparent 80%)",
               animation: "narrative-text-fade 5s ease-in-out both",
             }}
           >
             <p
-              className="text-[1.1rem] tracking-[0.18em] text-center leading-relaxed"
+              className="text-center text-[1.1rem] leading-relaxed tracking-[0.18em]"
               style={{
                 fontFamily: "var(--font-cinzel-decorative)",
                 color: "#e8c96a",
@@ -835,7 +853,7 @@ export function FinaleModal(): React.JSX.Element {
         exploded: false,
       };
 
-      sndFireworkLaunch(0.8 + Math.random() * 0.4);
+      sndFireworkLaunch(0.8 + randomVisual() * 0.4);
       setRockets((prev) => [...prev, rocket]);
 
       // Explode after rise completes
@@ -847,11 +865,11 @@ export function FinaleModal(): React.JSX.Element {
         }
         sndCrackle(intensity);
         navigator.vibrate([30 + intensity * 40]);
-        setRockets((prev) => prev.map((r) => (r.id === id ? { ...r, exploded: true } : r)));
+        setRockets(markRocketExploded(id));
 
         // Cleanup rocket from state after explosion fades
         setTimeout(() => {
-          setRockets((prev) => prev.filter((r) => r.id !== id));
+          setRockets(removeRocketById(id));
         }, 500);
       }, riseDuration * 0.85);
 
@@ -927,24 +945,28 @@ export function FinaleModal(): React.JSX.Element {
     );
 
     // Phase 5: Grand finale — rapid fire rocketList
-    // eslint-disable-next-line unicorn/prefer-single-call
-    celebTimers.current.push(
-      setTimeout(() => {
-        const colorList = ["#e8c96a", "#9b6dff", "#4ecca3", "#ff6b8a", "#e8c96a"];
+    function launchRandomRocket(color: string, i: number): void {
+      const x = 15 + randomVisual() * 70;
+      const tx = cx + (randomVisual() - 0.5) * 200;
+      const ty = cy * (0.3 + randomVisual() * 0.4);
+      launchRocket(x, tx, ty, color, 600 + randomVisual() * 200, 0.9, i % 2 === 0);
+    }
 
-        colorList.forEach((color, i) => {
-          setTimeout(() => {
-            const x = 15 + Math.random() * 70;
-            const tx = cx + (Math.random() - 0.5) * 200;
-            const ty = cy * (0.3 + Math.random() * 0.4);
-            launchRocket(x, tx, ty, color, 600 + Math.random() * 200, 0.9, i % 2 === 0);
-          }, i * 250);
-        });
-      }, 6500),
-    );
+    const finaleColorList = ["#e8c96a", "#9b6dff", "#4ecca3", "#ff6b8a", "#e8c96a"];
+
+    finaleColorList.forEach((color, i) => {
+      celebTimers.current.push(
+        setTimeout(
+          () => {
+            launchRandomRocket(color, i);
+          },
+          6500 + i * 250,
+        ),
+      );
+    });
 
     // Phase 6: Golden nova
-    // eslint-disable-next-line unicorn/prefer-single-call
+
     celebTimers.current.push(
       setTimeout(() => {
         setCelebrationPhase("nova");
@@ -1059,7 +1081,7 @@ export function FinaleModal(): React.JSX.Element {
 
       {/* ── Celebration overlay ── */}
       <div
-        className="fixed inset-0 z-[200] pointer-events-none transition-opacity duration-1000"
+        className="pointer-events-none fixed inset-0 z-[200] transition-opacity duration-1000"
         style={{
           background: "radial-gradient(ellipse at 50% 50%, #07060fDD, #07060fF8)",
           opacity: isFinaleActive && !isFinaleModalOpen && celebrationPhase !== "done" ? 1 : 0,
@@ -1071,7 +1093,7 @@ export function FinaleModal(): React.JSX.Element {
             {rocketList.map((r) => (
               <div
                 key={r.id}
-                className="absolute pointer-events-none"
+                className="pointer-events-none absolute"
                 style={{
                   left: `${String(r.startX)}%`,
                   bottom: 0,
@@ -1084,7 +1106,7 @@ export function FinaleModal(): React.JSX.Element {
               >
                 {/* Rocket head */}
                 <div
-                  className="w-[6px] h-[6px] rounded-full"
+                  className="h-[6px] w-[6px] rounded-full"
                   style={{
                     background: r.color,
                     boxShadow: `0 0 8px ${r.color}, 0 0 16px ${r.color}`,
@@ -1093,7 +1115,7 @@ export function FinaleModal(): React.JSX.Element {
                 />
                 {/* Trail */}
                 <div
-                  className="w-[2px] mx-auto"
+                  className="mx-auto w-[2px]"
                   style={{
                     background: `linear-gradient(to bottom, ${r.color}CC, ${r.color}40, transparent)`,
                     animation: `finale-rocket-trail ${String(r.duration)}ms ease-out forwards`,
@@ -1119,7 +1141,7 @@ export function FinaleModal(): React.JSX.Element {
               {[0, 1, 2].map((i) => (
                 <div
                   key={i}
-                  className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-20 h-20 rounded-full"
+                  className="absolute top-1/2 left-1/2 h-20 w-20 -translate-x-1/2 -translate-y-1/2 rounded-full"
                   style={{
                     background: `radial-gradient(circle, ${["#e8c96a60", "#9b6dff50", "#4ecca350"][i]}, transparent 70%)`,
                     animation: `finale-radial-burst ${String(1.2 + i * 0.3)}s ease-out ${String(i * 0.5)}s infinite`,
@@ -1139,7 +1161,7 @@ export function FinaleModal(): React.JSX.Element {
               {starsRef.current.map((s, i) => (
                 <div
                   key={i}
-                  className="absolute pointer-events-none"
+                  className="pointer-events-none absolute"
                   style={{
                     left: `${String(s.left)}%`,
                     top: 0,
@@ -1163,7 +1185,7 @@ export function FinaleModal(): React.JSX.Element {
               {burstRef.current.map((h, i) => (
                 <div
                   key={i}
-                  className="absolute pointer-events-none"
+                  className="pointer-events-none absolute"
                   style={{
                     left: `${String(h.left)}%`,
                     bottom: "10%",
@@ -1187,7 +1209,7 @@ export function FinaleModal(): React.JSX.Element {
               {FINALE_EMOJI_LIST.slice(0, 8).map((emoji, i) => (
                 <div
                   key={i}
-                  className="absolute left-1/2 top-1/2 pointer-events-none"
+                  className="pointer-events-none absolute top-1/2 left-1/2"
                   style={{
                     ["--fx" as string]: `${String(Math.cos(((Math.PI * 2) / 8) * i) * 200)}px`,
                     ["--fy" as string]: `${String(Math.sin(((Math.PI * 2) / 8) * i) * 200)}px`,
@@ -1202,13 +1224,13 @@ export function FinaleModal(): React.JSX.Element {
 
             {/* Golden nova — fades in at nova phase */}
             <div
-              className="absolute inset-0 flex itemList-center justify-center transition-opacity duration-500"
+              className="itemList-center absolute inset-0 flex justify-center transition-opacity duration-500"
               style={{
                 opacity: celebrationPhase === "nova" ? 1 : 0,
               }}
             >
               <div
-                className="w-32 h-32 rounded-full"
+                className="h-32 w-32 rounded-full"
                 style={{
                   background: "radial-gradient(circle, #e8c96aCC, #e8c96a60, #e8c96a00 70%)",
                   animation: celebrationPhase === "nova" ? "finale-golden-nova 1.5s ease-out forwards" : undefined,
@@ -1222,8 +1244,8 @@ export function FinaleModal(): React.JSX.Element {
       {/* ── Modal ── */}
       {(isFinaleModalOpen || isClosing) && (
         <div
-          className={`fixed inset-0 z-[210] flex itemList-center justify-center p-4 transition-opacity duration-600 ${
-            isModalOpen ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"
+          className={`itemList-center fixed inset-0 z-[210] flex justify-center p-4 transition-opacity duration-600 ${
+            isModalOpen ? "pointer-events-auto opacity-100" : "pointer-events-none opacity-0"
           }`}
           style={{
             background: "radial-gradient(ellipse at 50% 40%, #e8c96a22, #07060fF0)",
@@ -1236,7 +1258,7 @@ export function FinaleModal(): React.JSX.Element {
           {burstRef.current.slice(0, 25).map((h, i) => (
             <div
               key={i}
-              className="absolute pointer-events-none z-10"
+              className="pointer-events-none absolute z-10"
               style={{
                 left: `${String(h.left)}%`,
                 bottom: "15%",
@@ -1251,8 +1273,8 @@ export function FinaleModal(): React.JSX.Element {
 
           {/* Modal card */}
           <div
-            className={`relative max-w-[400px] w-full rounded-[22px] overflow-hidden transition-all duration-800 ${
-              hasModalEntered ? "opacity-100 scale-100 translate-y-0" : "opacity-0 scale-[0.7] translate-y-8"
+            className={`relative w-full max-w-[400px] overflow-hidden rounded-[22px] transition-all duration-800 ${
+              hasModalEntered ? "translate-y-0 scale-100 opacity-100" : "translate-y-8 scale-[0.7] opacity-0"
             }`}
             style={{
               background: "linear-gradient(165deg, #fdf8ec, #f5e6c8, #ede0c0)",
@@ -1261,6 +1283,7 @@ export function FinaleModal(): React.JSX.Element {
               animation: hasModalEntered ? "love-glow-shine 4s ease-in-out infinite" : undefined,
               transitionTimingFunction: "cubic-bezier(.22,1,.36,1)",
             }}
+            role="presentation"
             onClick={(e) => {
               e.stopPropagation();
             }}
@@ -1269,7 +1292,7 @@ export function FinaleModal(): React.JSX.Element {
             {GOLD_PARTICLE_LIST.map((p, i) => (
               <div
                 key={i}
-                className="absolute rounded-full pointer-events-none"
+                className="pointer-events-none absolute rounded-full"
                 style={{
                   left: p.left,
                   top: p.top,
@@ -1282,10 +1305,10 @@ export function FinaleModal(): React.JSX.Element {
             ))}
 
             {/* Corner decorations */}
-            <div className="absolute top-[10px] left-[10px] w-3 h-3 border-t border-l border-[#c9a03260] opacity-60" />
-            <div className="absolute top-[10px] right-[10px] w-3 h-3 border-t border-r border-[#c9a03260] opacity-60" />
-            <div className="absolute bottom-[10px] left-[10px] w-3 h-3 border-b border-l border-[#c9a03260] opacity-60" />
-            <div className="absolute bottom-[10px] right-[10px] w-3 h-3 border-b border-r border-[#c9a03260] opacity-60" />
+            <div className="absolute top-[10px] left-[10px] h-3 w-3 border-t border-l border-[#c9a03260] opacity-60" />
+            <div className="absolute top-[10px] right-[10px] h-3 w-3 border-t border-r border-[#c9a03260] opacity-60" />
+            <div className="absolute bottom-[10px] left-[10px] h-3 w-3 border-b border-l border-[#c9a03260] opacity-60" />
+            <div className="absolute right-[10px] bottom-[10px] h-3 w-3 border-r border-b border-[#c9a03260] opacity-60" />
 
             {/* Slide content */}
             <div className="relative z-10 px-7 pt-7 pb-6">
@@ -1300,12 +1323,12 @@ export function FinaleModal(): React.JSX.Element {
               </div>
 
               {/* Navigation */}
-              <div className="flex itemList-center justify-between mt-6">
+              <div className="itemList-center mt-6 flex justify-between">
                 {/* Prev */}
                 <button
                   onClick={prevSlide}
                   disabled={slideIndex === 0}
-                  className="w-[32px] h-[32px] rounded-full flex itemList-center justify-center text-[0.7rem] border transition-all duration-200 cursor-pointer disabled:opacity-20 disabled:cursor-default"
+                  className="itemList-center flex h-[32px] w-[32px] cursor-pointer justify-center rounded-full border text-[0.7rem] transition-all duration-200 disabled:cursor-default disabled:opacity-20"
                   style={{
                     borderColor: "#c9a03240",
                     background: "#f5e6c8",
@@ -1316,7 +1339,7 @@ export function FinaleModal(): React.JSX.Element {
                 </button>
 
                 {/* Dots */}
-                <div className="flex itemList-center gap-2">
+                <div className="itemList-center flex gap-2">
                   {SLIDE_LIST.map((_, i) => (
                     <div
                       key={i}
@@ -1335,7 +1358,7 @@ export function FinaleModal(): React.JSX.Element {
                 {slideIndex < SLIDE_LIST.length - 1 ? (
                   <button
                     onClick={nextSlide}
-                    className="w-[32px] h-[32px] rounded-full flex itemList-center justify-center text-[0.7rem] border transition-all duration-200 cursor-pointer"
+                    className="itemList-center flex h-[32px] w-[32px] cursor-pointer justify-center rounded-full border text-[0.7rem] transition-all duration-200"
                     style={{
                       borderColor: "#c9a03240",
                       background: "#f5e6c8",

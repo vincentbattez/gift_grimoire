@@ -1,7 +1,8 @@
 {
   "plugins": [
     "prettier-plugin-multiline-arrays",
-    "@ianvs/prettier-plugin-sort-imports"
+    "@ianvs/prettier-plugin-sort-imports",
+    "prettier-plugin-tailwindcss"
   ],
   "tabWidth": 2,
   "printWidth": 120,

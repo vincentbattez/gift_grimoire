@@ -62,7 +62,7 @@ function todayStamp(): string {
 
 // ── Public interface ──────────────────────────────────────────────────────
 
-export type InkGameEngine = {
+type InkGameEngine = {
   revealedCellList: Set<string>;
   missedCellList: Set<string>;
   wordStates: Record<string, WordState>;
@@ -284,7 +284,33 @@ export function useInkGameEngine(
       setDropsLeft((prev) => Math.max(0, prev - 1));
       setAnimating({ key, result });
 
-      setTimeout(() => {
+      const clearNewlyRevealed = (cellKey: string): void => {
+        setNewlyRevealedCells((prev) => {
+          const next = new Set(prev);
+          next.delete(cellKey);
+
+          return next;
+        });
+      };
+
+      const isWordFullyRevealed = (word: (typeof INK_CONFIG.wordList)[number], revealed: Set<string>): boolean => {
+        if (wordStates[word.text].solved) {
+          return false;
+        }
+
+        return getWordCells(word).every(([r, c]) => revealed.has(`${String(r)},${String(c)}`));
+      };
+
+      const clearMissAnimation = (cellKey: string): void => {
+        setAnimatingMissCells((prev) => {
+          const next = new Set(prev);
+          next.delete(cellKey);
+
+          return next;
+        });
+      };
+
+      const onAnimationEnd = (): void => {
         setAnimating(null);
 
         if (result === "hit") {
@@ -294,24 +320,13 @@ export function useInkGameEngine(
           setNewlyRevealedCells((prev) => new Set([...prev, key]));
 
           setTimeout(() => {
-            setNewlyRevealedCells((prev) => {
-              const next = new Set(prev);
-              next.delete(key);
-
-              return next;
-            });
+            clearNewlyRevealed(key);
           }, 1100);
 
           playHitParticles(gridRef, key);
 
           // Auto-solve fully-revealed wordList
-          const autoSolvedList = INK_CONFIG.wordList.filter((word) => {
-            if (wordStates[word.text].solved) {
-              return false;
-            }
-
-            return getWordCells(word).every(([r, c]) => newRevealed.has(`${String(r)},${String(c)}`));
-          });
+          const autoSolvedList = INK_CONFIG.wordList.filter((word) => isWordFullyRevealed(word, newRevealed));
 
           if (autoSolvedList.length > 0) {
             setWordStates((prev) => {
@@ -333,15 +348,12 @@ export function useInkGameEngine(
           setAnimatingMissCells((prev) => new Set([...prev, key]));
 
           setTimeout(() => {
-            setAnimatingMissCells((prev) => {
-              const next = new Set(prev);
-              next.delete(key);
-
-              return next;
-            });
+            clearMissAnimation(key);
           }, 1500);
         }
-      }, 420);
+      };
+
+      setTimeout(onAnimationEnd, 420);
     },
     [revealedCellList, missedCellList, animating, dropsLeft, wordStates, gridRef],
   );

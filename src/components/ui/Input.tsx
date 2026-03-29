@@ -36,7 +36,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(function Input(
           onSubmit?.();
         }
       }}
-      className={`outline-none transition-all duration-300 font-[var(--font-cinzel)] ${STATE_BORDERS[state]} ${className}`}
+      className={`font-[var(--font-cinzel)] transition-all duration-300 outline-none ${STATE_BORDERS[state]} ${className}`}
       {...props}
     />
   );

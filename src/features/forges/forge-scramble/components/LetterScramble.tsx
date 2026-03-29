@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
 import { sndLetterSwap, sndScrambleSolved } from "@/audio";
+import { randomVisual } from "@/utils/random";
 import { EnigmaPicker } from "@features/enigma/components/EnigmaPicker";
 import { INITIAL_LETTER_LIST, SOLUTION, type Letter } from "@features/forges/forge-scramble/config";
 import type { ForgeProps } from "@features/forges/types";
@@ -7,16 +8,28 @@ import type { ForgeProps } from "@features/forges/types";
 function shuffle<T>(sourceArray: T[]): T[] {
   const shuffledList = [...sourceArray];
   for (let i = shuffledList.length - 1; i > 0; i--) {
-    const randomIndex = Math.floor(Math.random() * (i + 1));
+    const randomIndex = Math.floor(randomVisual() * (i + 1));
     [shuffledList[i], shuffledList[randomIndex]] = [shuffledList[randomIndex], shuffledList[i]];
   }
 
   return shuffledList;
 }
 
+function toChar(l: Letter): string {
+  return l.char;
+}
+
+function matchesId(targetId: number): (l: Letter) => boolean {
+  return (l) => l.id === targetId;
+}
+
+function isMatchingSolution(letterList: Letter[]): boolean {
+  return letterList.map((l) => toChar(l)).join("") === SOLUTION;
+}
+
 function makeShuffled(): Letter[] {
   let shuffledList = shuffle(INITIAL_LETTER_LIST);
-  while (shuffledList.map((l) => l.char).join("") === SOLUTION) {
+  while (isMatchingSolution(shuffledList)) {
     shuffledList = shuffle(INITIAL_LETTER_LIST);
   }
 
@@ -24,7 +37,7 @@ function makeShuffled(): Letter[] {
 }
 
 /** Forge : Le Maillon des Égarés — glisser-déposer de lettres pour reconstituer le mot */
-export function LetterScramble({ solved, onSolve }: ForgeProps): React.JSX.Element {
+export function LetterScramble({ solved, onSolve }: Readonly<ForgeProps>): React.JSX.Element {
   const [letterList, setLetters] = useState<Letter[]>(() =>
     solved ? Array.from(SOLUTION, (char, i) => ({ id: i + 1, char })) : makeShuffled(),
   );
@@ -140,6 +153,44 @@ export function LetterScramble({ solved, onSolve }: ForgeProps): React.JSX.Eleme
         setTargetIdx(closestDist < 55 ? closest : null);
       };
 
+      function reorderLetters(prev: Letter[]): Letter[] {
+        const fromIdx = prev.findIndex(matchesId(letter.id));
+        const rectList = getCardRects();
+
+        if (!ghost) {
+          return prev;
+        }
+        const gx = Number.parseFloat(ghost.style.left);
+        const gy = Number.parseFloat(ghost.style.top);
+        let closest = -1;
+        let closestDist = Infinity;
+        for (const { idx, rect } of rectList) {
+          const dist = Math.hypot(gx - (rect.left + rect.width / 2), gy - (rect.top + rect.height / 2));
+
+          if (dist < closestDist) {
+            closest = idx;
+            closestDist = dist;
+          }
+        }
+
+        if (closestDist < 55 && closest !== -1 && closest !== fromIdx) {
+          const arrList = [...prev];
+          const [item] = arrList.splice(fromIdx, 1);
+          arrList.splice(closest, 0, item);
+          sndLetterSwap();
+
+          if (isMatchingSolution(arrList)) {
+            setIsLocalSolved(true);
+            sndScrambleSolved();
+            setIsShowingPicker(true);
+          }
+
+          return arrList;
+        }
+
+        return prev;
+      }
+
       const onUp = (): void => {
         document.removeEventListener("pointermove", onMove);
         document.removeEventListener("pointerup", onUp);
@@ -161,43 +212,7 @@ export function LetterScramble({ solved, onSolve }: ForgeProps): React.JSX.Eleme
           flipSnapshotRef.current = snapshot;
         }
 
-        setLetters((prev) => {
-          const fromIdx = prev.findIndex((l) => l.id === letter.id);
-          const rectList = getCardRects();
-
-          if (!ghost) {
-            return prev;
-          }
-          const gx = Number.parseFloat(ghost.style.left);
-          const gy = Number.parseFloat(ghost.style.top);
-          let closest = -1;
-          let closestDist = Infinity;
-          for (const { idx, rect } of rectList) {
-            const dist = Math.hypot(gx - (rect.left + rect.width / 2), gy - (rect.top + rect.height / 2));
-
-            if (dist < closestDist) {
-              closest = idx;
-              closestDist = dist;
-            }
-          }
-
-          if (closestDist < 55 && closest !== -1 && closest !== fromIdx) {
-            const arrList = [...prev];
-            const [item] = arrList.splice(fromIdx, 1);
-            arrList.splice(closest, 0, item);
-            sndLetterSwap();
-
-            if (arrList.map((l) => l.char).join("") === SOLUTION) {
-              setIsLocalSolved(true);
-              sndScrambleSolved();
-              setIsShowingPicker(true);
-            }
-
-            return arrList;
-          }
-
-          return prev;
-        });
+        setLetters(reorderLetters);
       };
 
       document.addEventListener("pointermove", onMove);
@@ -217,15 +232,7 @@ export function LetterScramble({ solved, onSolve }: ForgeProps): React.JSX.Eleme
             onPointerDown={(e) => {
               handlePointerDown(e, l);
             }}
-            className={`
-              w-8 h-10 flex items-center justify-center
-              rounded-lg border text-sm font-cinzel font-bold
-              select-none touch-none cursor-grab transition-all duration-150
-              ${draggingId === l.id ? "opacity-25 scale-90" : ""}
-              ${targetIdx === i && draggingId !== l.id ? "border-gold scale-110 shadow-[0_0_12px_#e8c96a40]" : "border-locked-border"}
-              ${isSolved ? "border-solved-border/50 shadow-[0_0_22px_#4ecca325] bg-gradient-to-br from-[#0a1f1a] to-[#080f0c]" : "bg-gradient-to-br from-[#130f26] to-[#0b0917]"}
-              text-text
-            `}
+            className={`font-cinzel flex h-10 w-8 cursor-grab touch-none items-center justify-center rounded-lg border text-sm font-bold transition-all duration-150 select-none ${draggingId === l.id ? "scale-90 opacity-25" : ""} ${targetIdx === i && draggingId !== l.id ? "border-gold scale-110 shadow-[0_0_12px_#e8c96a40]" : "border-locked-border"} ${isSolved ? "border-solved-border/50 bg-gradient-to-br from-[#0a1f1a] to-[#080f0c] shadow-[0_0_22px_#4ecca325]" : "bg-gradient-to-br from-[#130f26] to-[#0b0917]"} text-text`}
           >
             {l.char}
           </div>
@@ -243,7 +250,7 @@ export function LetterScramble({ solved, onSolve }: ForgeProps): React.JSX.Eleme
 
       <div
         ref={ghostRef}
-        className="fixed z-[1000] w-8 h-10 -translate-x-1/2 -translate-y-1/2 flex items-center justify-center rounded-lg border border-gold text-sm font-cinzel font-bold bg-gradient-to-br from-[#1c1438] to-[#130f26] text-gold pointer-events-none shadow-[0_0_20px_#e8c96a40]"
+        className="border-gold font-cinzel text-gold pointer-events-none fixed z-[1000] flex h-10 w-8 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-lg border bg-gradient-to-br from-[#1c1438] to-[#130f26] text-sm font-bold shadow-[0_0_20px_#e8c96a40]"
         style={{ display: "none" }}
       />
     </div>

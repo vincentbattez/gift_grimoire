@@ -4,43 +4,42 @@ import { ENIGMA_LIST } from "./config";
 import { MODAL_CLOSE_MS } from "./timings";
 import type { EnigmaPersistedStatus } from "./types";
 
-type EnigmaId = string;
 type EnigmaState = { unlocked: boolean; solved: boolean };
 
 type EnigmaStore = {
-  enigmas: Record<EnigmaId, EnigmaState>;
-  readLetters: Record<EnigmaId, boolean>;
+  enigmas: Record<string, EnigmaState>;
+  readLetters: Record<string, boolean>;
 
   // UI éphémère
-  newlyUnlocked: Set<EnigmaId>;
-  modalEnigmaId: EnigmaId | null;
-  modalClosingId: EnigmaId | null;
-  celebrateCardId: EnigmaId | null;
-  unlockingCardId: EnigmaId | null;
+  newlyUnlocked: Set<string>;
+  modalEnigmaId: string | null;
+  modalClosingId: string | null;
+  celebrateCardId: string | null;
+  unlockingCardId: string | null;
   unlockingTitle: string | null;
   successBoxNumber: number | null;
   successHaEvent: string | null;
-  successEnigmaId: EnigmaId | null;
-  loveLetterEnigmaId: EnigmaId | null;
+  successEnigmaId: string | null;
+  loveLetterEnigmaId: string | null;
 
-  unlock: (id: EnigmaId) => void;
-  solve: (id: EnigmaId) => void;
-  relock: (id: EnigmaId) => void;
-  setEnigmaStatus: (id: EnigmaId, status: EnigmaPersistedStatus) => void;
-  acknowledgeUnlock: (id: EnigmaId) => void;
-  openModal: (id: EnigmaId) => void;
+  unlock: (id: string) => void;
+  solve: (id: string) => void;
+  relock: (id: string) => void;
+  setEnigmaStatus: (id: string, status: EnigmaPersistedStatus) => void;
+  acknowledgeUnlock: (id: string) => void;
+  openModal: (id: string) => void;
   closeModal: () => void;
-  celebrate: (id: EnigmaId) => void;
+  celebrate: (id: string) => void;
   clearCelebrate: () => void;
-  startUnlocking: (id: EnigmaId, title: string) => void;
+  startUnlocking: (id: string, title: string) => void;
   clearUnlocking: () => void;
-  showSuccessBox: (boxNumber: number, haEvent: string, enigmaId: EnigmaId) => void;
+  showSuccessBox: (boxNumber: number, haEvent: string, enigmaId: string) => void;
   hideSuccessBox: () => void;
-  openLoveLetter: (id: EnigmaId) => void;
+  openLoveLetter: (id: string) => void;
   closeLoveLetter: () => void;
 };
 
-const initialEnigmas: Record<EnigmaId, EnigmaState> = {};
+const initialEnigmas: Record<string, EnigmaState> = {};
 
 ENIGMA_LIST.forEach((e) => {
   initialEnigmas[e.id] = { unlocked: false, solved: false };

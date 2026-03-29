@@ -1,7 +1,7 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 
-export type InkGameState = {
+type InkGameState = {
   revealedCellList: string[];
   missedCellList: string[];
   wordStates: Record<string, { solved: boolean; guessesLeft: number }>;

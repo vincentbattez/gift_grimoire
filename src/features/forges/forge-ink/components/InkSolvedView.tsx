@@ -4,7 +4,7 @@ export function InkSolvedView(): React.JSX.Element {
   return (
     <div className="mt-4">
       <div
-        className="grid gap-[2px] mx-auto"
+        className="mx-auto grid gap-[2px]"
         style={{
           gridTemplateColumns: `repeat(${String(INK_CONFIG.gridCols)}, 1fr)`,
           maxWidth: "min(100%, 280px)",
@@ -18,7 +18,7 @@ export function InkSolvedView(): React.JSX.Element {
           return (
             <div
               key={idx}
-              className="flex items-center justify-center aspect-square rounded-[3px]"
+              className="flex aspect-square items-center justify-center rounded-[3px]"
               style={{
                 background: entry ? "linear-gradient(135deg, #1c1a0a, #0f0e07)" : "transparent",
                 border: entry ? "1px solid rgba(232,201,106,0.3)" : "none",

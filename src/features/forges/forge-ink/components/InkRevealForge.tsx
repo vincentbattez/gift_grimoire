@@ -10,7 +10,7 @@ import { InkSolvedView } from "./InkSolvedView";
 import { InkVictoryModal } from "./InkVictoryModal";
 import { InkWordCard } from "./InkWordCard";
 
-export function InkRevealForge({ solved: propSolved, onSolve }: ForgeProps): React.JSX.Element {
+export function InkRevealForge({ solved: propSolved, onSolve }: Readonly<ForgeProps>): React.JSX.Element {
   const isAdmin = useAdmin();
   const gridRef = useRef<HTMLDivElement>(null);
   const engine = useInkGameEngine(gridRef, propSolved, onSolve);
@@ -24,14 +24,14 @@ export function InkRevealForge({ solved: propSolved, onSolve }: ForgeProps): Rea
     <div className="mt-4">
       <InkDropIndicator dropsLeft={engine.dropsLeft} />
 
-      <div className="text-center text-[0.45rem] tracking-[0.15em] text-muted/30 font-mono mb-4">
+      <div className="text-muted/30 mb-4 text-center font-mono text-[0.45rem] tracking-[0.15em]">
         <CooldownLabel lastTriggeredAt={mountedAt} prefix="Reset dans" />
       </div>
 
       {engine.tapMessage && (
         <div
           key={engine.tapMessage}
-          className="text-center text-[0.55rem] text-gold/80 italic tracking-wide mb-3 px-4"
+          className="text-gold/80 mb-3 px-4 text-center text-[0.55rem] tracking-wide italic"
           style={{ animation: "forge-unblur 0.3s ease-out both" }}
         >
           {engine.tapMessage}
@@ -39,7 +39,7 @@ export function InkRevealForge({ solved: propSolved, onSolve }: ForgeProps): Rea
       )}
 
       {engine.revealedCellList.size === 0 && engine.missedCellList.size === 0 && !engine.isSolved && (
-        <div className="text-center text-[0.45rem] text-muted/40 italic tracking-wide mb-3">
+        <div className="text-muted/40 mb-3 text-center text-[0.45rem] tracking-wide italic">
           Touche une case pour y verser de l'encre
         </div>
       )}
@@ -47,7 +47,7 @@ export function InkRevealForge({ solved: propSolved, onSolve }: ForgeProps): Rea
       {/* Grid */}
       <div
         ref={gridRef}
-        className="grid gap-[3px] mx-auto"
+        className="mx-auto grid gap-[3px]"
         style={{
           gridTemplateColumns: `repeat(${String(INK_CONFIG.gridCols)}, 1fr)`,
           maxWidth: "min(100%, 358px)",
@@ -111,8 +111,8 @@ export function InkRevealForge({ solved: propSolved, onSolve }: ForgeProps): Rea
 
       {/* Words */}
       {engine.activeWordList.length > 0 && (
-        <div className="mt-5 flex flex-color gap-3">
-          <div className="text-center text-[0.45rem] tracking-[0.25em] text-muted/40 uppercase">— Mots à révéler —</div>
+        <div className="flex-color mt-5 flex gap-3">
+          <div className="text-muted/40 text-center text-[0.45rem] tracking-[0.25em] uppercase">— Mots à révéler —</div>
           {engine.activeWordList.map((wordText) => {
             const state = engine.wordStates[wordText];
             const word = INK_CONFIG.wordList.find((w) => w.text === wordText);
@@ -136,10 +136,7 @@ export function InkRevealForge({ solved: propSolved, onSolve }: ForgeProps): Rea
         <div className="mt-5 flex justify-center">
           <button
             onClick={engine.resetAll}
-            className="px-3 py-1 rounded-md text-[0.55rem] tracking-[0.15em] uppercase
-              border border-danger/30 text-danger/50 bg-danger/5
-              hover:border-danger/60 hover:text-danger/80 hover:bg-danger/10
-              transition-all duration-150 active:scale-95"
+            className="border-danger/30 text-danger/50 bg-danger/5 hover:border-danger/60 hover:text-danger/80 hover:bg-danger/10 rounded-md border px-3 py-1 text-[0.55rem] tracking-[0.15em] uppercase transition-all duration-150 active:scale-95"
           >
             ↺ Reset jeu
           </button>

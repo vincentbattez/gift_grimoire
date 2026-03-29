@@ -1,11 +1,3 @@
-/** Configuration d'un cooldown */
-export type CooldownConfig = {
-  /** Identifiant unique du cooldown */
-  key: string;
-  /** Durée du cooldown en ms (null = jusqu'à minuit) */
-  durationMs: number | null;
-};
-
 /** État d'un cooldown */
 export type CooldownState = {
   /** Le cooldown est-il actif ? */

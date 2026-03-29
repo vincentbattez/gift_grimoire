@@ -18,14 +18,14 @@ export function Badge({
   color = "accent",
   position = "bottom",
   className = "",
-}: BadgeProps): React.JSX.Element {
+}: Readonly<BadgeProps>): React.JSX.Element {
   const { border, shadow } = COLOR_MAP[color];
   const posClass = position === "bottom" ? "bottom-5" : "top-5";
 
   return (
-    <div className={`fixed ${posClass} left-1/2 -translate-x-1/2 z-50 ${className}`}>
+    <div className={`fixed ${posClass} left-1/2 z-50 -translate-x-1/2 ${className}`}>
       <div
-        className={`flex items-center gap-2 py-2 px-4 rounded-full bg-[#1c1438]/90 border ${border} backdrop-blur-md ${shadow}`}
+        className={`flex items-center gap-2 rounded-full border bg-[#1c1438]/90 px-4 py-2 ${border} backdrop-blur-md ${shadow}`}
       >
         {children}
       </div>

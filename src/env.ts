@@ -5,9 +5,9 @@ const envSchema = z.object({
   HA_TOKEN: z.string().min(1, "HA_TOKEN est requis"),
 });
 
-export type Env = z.infer<typeof envSchema>;
+type Env = z.infer<typeof envSchema>;
 
-export function validateEnv(): Env {
+function validateEnv(): Env {
   const result = envSchema.safeParse({
     HA_URL: import.meta.env.VITE_HA_URL as unknown,
     HA_TOKEN: import.meta.env.VITE_HA_TOKEN as unknown,

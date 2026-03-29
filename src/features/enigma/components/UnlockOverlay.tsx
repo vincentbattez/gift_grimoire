@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { sndAmbientTension, sndClick, sndKeyInsert, sndLockOpen, sndUnlock } from "@/audio";
 import { spawnParticles } from "@/particles";
+import { randomVisual } from "@/utils/random";
 import { LockIcon } from "@components/LockIcon";
 import { ENIGMA_LIST } from "@features/enigma/config";
 import { useEnigmaStore } from "@features/enigma/store";
@@ -8,7 +9,7 @@ import { triggerUnlockReveal } from "@features/enigma/unlock";
 
 /** Distance (px) at which the key snaps into the keyhole */
 const SNAP_THRESHOLD = 60;
-const FRAG_DISTANCE_LIST = Array.from({ length: 8 }, () => 80 + Math.random() * 40);
+const FRAG_DISTANCE_LIST = Array.from({ length: 8 }, () => 80 + randomVisual() * 40);
 
 type Phase = "drag" | "unlocking" | "done";
 
@@ -57,7 +58,6 @@ export function UnlockOverlay(): React.JSX.Element | null {
     }
     stopAmbientRef.current = sndAmbientTension();
 
-    // eslint-disable-next-line consistent-return
     return () => {
       stopAmbientRef.current?.();
       stopAmbientRef.current = null;
@@ -338,6 +338,7 @@ export function UnlockOverlay(): React.JSX.Element | null {
       {/* Draggable key */}
       {!isDone && (
         <div
+          role="presentation"
           className={`unlock-key-draggable ${isDragging ? "is-dragging" : ""} ${isUnlocking ? "is-inserted" : ""}`}
           style={{
             left: currentX,

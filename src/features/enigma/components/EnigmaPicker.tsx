@@ -5,7 +5,7 @@ import { triggerUnlockEffect } from "@features/enigma/unlock";
 
 const EXCLUDED_IDS = new Set(["Y", "F"]);
 
-export function EnigmaPicker({ onClose }: { onClose?: () => void }): React.JSX.Element {
+export function EnigmaPicker({ onClose }: Readonly<{ onClose?: () => void }>): React.JSX.Element {
   const enigmaStates = useEnigmaStore((s) => s.enigmas);
 
   const pickableList = ENIGMA_LIST.filter(
@@ -27,15 +27,15 @@ export function EnigmaPicker({ onClose }: { onClose?: () => void }): React.JSX.E
 
   if (pickableList.length === 0) {
     return (
-      <div className="mt-4 text-center text-xs text-muted tracking-wide">
+      <div className="text-muted mt-4 text-center text-xs tracking-wide">
         Toutes les énigmes éligibles sont déjà déverrouillées.
       </div>
     );
   }
 
   return (
-    <div className="mt-4 flex flex-color items-center gap-3">
-      <div className="text-[0.6rem] tracking-[0.25em] text-gold uppercase">Choisissez une énigme à déverrouiller</div>
+    <div className="flex-color mt-4 flex items-center gap-3">
+      <div className="text-gold text-[0.6rem] tracking-[0.25em] uppercase">Choisissez une énigme à déverrouiller</div>
       <div className="flex flex-wrap justify-center gap-2">
         {pickableList.map((e) => (
           <button
@@ -43,10 +43,7 @@ export function EnigmaPicker({ onClose }: { onClose?: () => void }): React.JSX.E
             onClick={() => {
               handlePick(e.id);
             }}
-            className="flex flex-color items-center gap-1.5 px-3 py-2.5 rounded-xl
-              border border-accent/40 bg-gradient-to-br from-[#1c1438] to-[#130f26]
-              active:scale-95 transition-all duration-150
-              hover:border-accent hover:shadow-[0_0_16px_#9b6dff30]"
+            className="flex-color border-accent/40 hover:border-accent flex items-center gap-1.5 rounded-xl border bg-gradient-to-br from-[#1c1438] to-[#130f26] px-3 py-2.5 transition-all duration-150 hover:shadow-[0_0_16px_#9b6dff30] active:scale-95"
           >
             <svg
               viewBox="0 0 40 120"
@@ -62,7 +59,7 @@ export function EnigmaPicker({ onClose }: { onClose?: () => void }): React.JSX.E
               <line x1="20" y1="90" x2="28" y2="90" stroke="#e8c96a" strokeWidth="3" strokeLinecap="round" />
               <line x1="20" y1="100" x2="26" y2="100" stroke="#e8c96a" strokeWidth="3" strokeLinecap="round" />
             </svg>
-            <span className="text-[0.6rem] text-text tracking-wide">Énigme {e.id}</span>
+            <span className="text-text text-[0.6rem] tracking-wide">Énigme {e.id}</span>
           </button>
         ))}
       </div>

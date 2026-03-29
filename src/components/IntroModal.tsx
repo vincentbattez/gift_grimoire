@@ -32,7 +32,7 @@ const SLIDE_LIST = [
 const SWIPE_THRESHOLD = 50;
 const VELOCITY_THRESHOLD = 0.3;
 
-export function IntroModal({ onClose }: { onClose: () => void }): React.JSX.Element {
+export function IntroModal({ onClose }: Readonly<{ onClose: () => void }>): React.JSX.Element {
   const [current, setCurrent] = useState(0);
   const [hasEntered, setHasEntered] = useState(false);
   const [isExiting, setIsExiting] = useState(false);
@@ -135,15 +135,16 @@ export function IntroModal({ onClose }: { onClose: () => void }): React.JSX.Elem
 
   return (
     <div
-      className={`fixed inset-0 z-[300] bg-black/90 backdrop-blur-md flex items-center justify-center transition-opacity duration-400 ${
+      className={`fixed inset-0 z-[300] flex items-center justify-center bg-black/90 backdrop-blur-md transition-opacity duration-400 ${
         hasEntered && !isExiting ? "opacity-100" : "opacity-0"
       }`}
     >
-      <div className="w-full max-w-[400px] mx-4 flex flex-color items-center">
+      <div className="flex-color mx-4 flex w-full max-w-[400px] items-center">
         {/* Slides track */}
         <div
           ref={containerRef}
-          className="w-full overflow-hidden touch-pan-y"
+          className="w-full touch-pan-y overflow-hidden"
+          role="presentation"
           onTouchStart={handleTouchStart}
           onTouchMove={handleTouchMove}
           onTouchEnd={handleTouchEnd}
@@ -159,10 +160,10 @@ export function IntroModal({ onClose }: { onClose: () => void }): React.JSX.Elem
           >
             {SLIDE_LIST.map((slide, i) => (
               <div key={i} className="flex-shrink-0 px-2" style={{ width: `${String(100 / SLIDE_LIST.length)}%` }}>
-                <div className="flex flex-color items-center text-center py-8 px-4">
+                <div className="flex-color flex items-center px-4 py-8 text-center">
                   <span
-                    className={`text-[3rem] mb-5 block transition-all duration-500 ${
-                      i === current ? "opacity-100 scale-100" : "opacity-30 scale-75"
+                    className={`mb-5 block text-[3rem] transition-all duration-500 ${
+                      i === current ? "scale-100 opacity-100" : "scale-75 opacity-30"
                     }`}
                     style={{
                       filter: i === current ? "drop-shadow(0 0 16px #9b6dff80)" : "none",
@@ -170,10 +171,10 @@ export function IntroModal({ onClose }: { onClose: () => void }): React.JSX.Elem
                   >
                     {slide.icon}
                   </span>
-                  <h2 className="font-[var(--font-cinzel-decorative)] text-[1.1rem] text-gold mb-4 tracking-wide drop-shadow-[0_0_20px_#e8c96a40]">
+                  <h2 className="text-gold mb-4 text-[1.1rem] font-[var(--font-cinzel-decorative)] tracking-wide drop-shadow-[0_0_20px_#e8c96a40]">
                     {slide.title}
                   </h2>
-                  <p className="text-[0.85rem] leading-relaxed text-text/85 whitespace-pre-line max-w-[320px]">
+                  <p className="text-text/85 max-w-[320px] text-[0.85rem] leading-relaxed whitespace-pre-line">
                     {slide.text}
                   </p>
                 </div>
@@ -183,14 +184,14 @@ export function IntroModal({ onClose }: { onClose: () => void }): React.JSX.Elem
         </div>
 
         {/* Dots indicator */}
-        <div className="flex gap-2.5 mt-4 mb-6">
+        <div className="mt-4 mb-6 flex gap-2.5">
           {SLIDE_LIST.map((_, i) => (
             <button
               key={i}
               onClick={() => {
                 goTo(i);
               }}
-              className={`w-2 h-2 rounded-full transition-all duration-300 ${
+              className={`h-2 w-2 rounded-full transition-all duration-300 ${
                 i === current ? "bg-accent scale-125 shadow-[0_0_8px_#9b6dff]" : "bg-muted/40"
               }`}
             />
@@ -206,7 +207,7 @@ export function IntroModal({ onClose }: { onClose: () => void }): React.JSX.Elem
                   goTo(current + 1);
                 }
           }
-          className="py-3.5 px-10 rounded-full border border-accent/40 bg-accent/10 text-accent text-[0.8rem] font-[var(--font-cinzel)] tracking-[0.15em] uppercase transition-all duration-300 hover:bg-accent/20 active:scale-95"
+          className="border-accent/40 bg-accent/10 text-accent hover:bg-accent/20 rounded-full border px-10 py-3.5 text-[0.8rem] font-[var(--font-cinzel)] tracking-[0.15em] uppercase transition-all duration-300 active:scale-95"
         >
           {isLast ? "Ouvrir le Grimoire ✦" : "Suivant"}
         </button>
@@ -215,7 +216,7 @@ export function IntroModal({ onClose }: { onClose: () => void }): React.JSX.Elem
         {!isLast && (
           <button
             onClick={handleClose}
-            className="mt-3 text-[0.68rem] text-muted/50 tracking-[0.1em] uppercase bg-transparent border-none cursor-pointer"
+            className="text-muted/50 mt-3 cursor-pointer border-none bg-transparent text-[0.68rem] tracking-[0.1em] uppercase"
           >
             Passer l'introduction
           </button>

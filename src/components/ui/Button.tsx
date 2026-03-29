@@ -68,7 +68,7 @@ export function Button({
 
     return (
       <button
-        className={`px-3 py-1 rounded-md text-[0.55rem] tracking-[0.15em] uppercase border ${colorStyles.border} ${colorStyles.text} ${colorStyles.bg} ${colorStyles.hoverBorder} ${colorStyles.hoverText} ${colorStyles.hoverBg} transition-all duration-150 active:scale-95 ${className}`}
+        className={`rounded-md border px-3 py-1 text-[0.55rem] tracking-[0.15em] uppercase ${colorStyles.border} ${colorStyles.text} ${colorStyles.bg} ${colorStyles.hoverBorder} ${colorStyles.hoverText} ${colorStyles.hoverBg} transition-all duration-150 active:scale-95 ${className}`}
         {...props}
       />
     );
@@ -90,7 +90,7 @@ export function Button({
 
     return (
       <button
-        className={`rounded-full border font-[var(--font-cinzel)] tracking-[0.15em] uppercase transition-all duration-300 active:scale-95 cursor-pointer ${colorClasses[color]} ${sizeClasses[size]} ${className}`}
+        className={`cursor-pointer rounded-full border font-[var(--font-cinzel)] tracking-[0.15em] uppercase transition-all duration-300 active:scale-95 ${colorClasses[color]} ${sizeClasses[size]} ${className}`}
         {...props}
       />
     );
@@ -99,7 +99,7 @@ export function Button({
   if (variant === "ghost") {
     return (
       <button
-        className={`bg-transparent border-none text-muted/50 tracking-[0.1em] uppercase cursor-pointer ${className}`}
+        className={`text-muted/50 cursor-pointer border-none bg-transparent tracking-[0.1em] uppercase ${className}`}
         {...props}
       />
     );
@@ -108,7 +108,7 @@ export function Button({
   if (variant === "icon") {
     return (
       <button
-        className={`w-[30px] h-[30px] rounded-full flex items-center justify-center cursor-pointer border bg-white/4 transition-colors ${className}`}
+        className={`flex h-[30px] w-[30px] cursor-pointer items-center justify-center rounded-full border bg-white/4 transition-colors ${className}`}
         {...props}
       />
     );
@@ -130,7 +130,7 @@ export function Button({
 
   return (
     <button
-      className={`border-none rounded-[14px] text-white font-[var(--font-cinzel)] font-semibold tracking-[0.12em] uppercase cursor-pointer transition-all duration-200 active:scale-[0.97] ${gradientColors[color]} ${gradientSizeClasses[size]} ${className}`}
+      className={`cursor-pointer rounded-[14px] border-none font-[var(--font-cinzel)] font-semibold tracking-[0.12em] text-white uppercase transition-all duration-200 active:scale-[0.97] ${gradientColors[color]} ${gradientSizeClasses[size]} ${className}`}
       {...props}
     />
   );

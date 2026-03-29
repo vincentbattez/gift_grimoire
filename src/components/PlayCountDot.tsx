@@ -17,7 +17,7 @@ export function PlayCountDot({
   inactiveClass = "bg-white/8",
   solvedClass = "bg-success/50",
   solved = false,
-}: Props): React.JSX.Element {
+}: Readonly<Props>): React.JSX.Element {
   const getDotClass = (i: number): string => {
     if (solved) {
       return solvedClass;
@@ -33,7 +33,7 @@ export function PlayCountDot({
   return (
     <div className="relative flex gap-1.5">
       {Array.from({ length: total }, (_, i) => (
-        <span key={i} className={`w-1.5 h-1.5 rounded-full transition-colors duration-300 ${getDotClass(i)}`} />
+        <span key={i} className={`h-1.5 w-1.5 rounded-full transition-colors duration-300 ${getDotClass(i)}`} />
       ))}
     </div>
   );

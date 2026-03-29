@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { sndClick, sndForgeReveal } from "@/audio";
 import { spawnParticles } from "@/particles";
+import { randomVisual } from "@/utils/random";
 import { LockIcon } from "@components/LockIcon";
 import { Button } from "@components/ui/Button";
 import type { ForgeModule } from "@features/forges/types";
@@ -11,8 +12,8 @@ const RUNE_GLYPH_LIST = ["ᚠ", "ᚢ", "ᚦ", "ᚨ", "ᚱ", "ᚲ", "ᚷ", "ᚹ"]
 
 const RUNE_DATA_LIST = RUNE_GLYPH_LIST.map((_, i) => ({
   angle: ((Math.PI * 2) / RUNE_GLYPH_LIST.length) * i,
-  dist: 60 + Math.random() * 40,
-  rot: Math.random() * 360,
+  dist: 60 + randomVisual() * 40,
+  rot: randomVisual() * 360,
 }));
 
 // ── Forge Intro Modal ─────────────────────────────────────────────────────
@@ -20,11 +21,11 @@ function ForgeIntroModal({
   title,
   text,
   onClose,
-}: {
+}: Readonly<{
   title: string;
   text: string;
   onClose: () => void;
-}): React.JSX.Element {
+}>): React.JSX.Element {
   const [hasEntered, setHasEntered] = useState(false);
   const [isClosing, setIsClosing] = useState(false);
 
@@ -50,13 +51,14 @@ function ForgeIntroModal({
 
   return (
     <div
-      className={`fixed inset-0 z-[105] bg-black/80 backdrop-blur-[6px] flex items-center justify-center transition-opacity duration-400 ${
+      className={`fixed inset-0 z-[105] flex items-center justify-center bg-black/80 backdrop-blur-[6px] transition-opacity duration-400 ${
         hasEntered && !isClosing ? "opacity-100" : "opacity-0"
       }`}
+      role="presentation"
       onClick={handleClose}
     >
       <div
-        className={`max-w-[340px] w-[85%] rounded-2xl border border-accent/25 px-6 py-8 text-center transition-all duration-500 ${
+        className={`border-accent/25 w-[85%] max-w-[340px] rounded-2xl border px-6 py-8 text-center transition-all duration-500 ${
           hasEntered && !isClosing ? "scale-100 opacity-100" : "scale-90 opacity-0"
         }`}
         style={{
@@ -64,12 +66,13 @@ function ForgeIntroModal({
           boxShadow: "0 0 40px #9b6dff18, 0 0 80px #9b6dff08",
           transitionTimingFunction: "cubic-bezier(.34,1.56,.64,1)",
         }}
+        role="presentation"
         onClick={(e) => {
           e.stopPropagation();
         }}
       >
         <div
-          className="text-[1.4rem] mb-2 opacity-60"
+          className="mb-2 text-[1.4rem] opacity-60"
           style={{
             opacity: hasEntered && !isClosing ? 0.6 : 0,
             transform: hasEntered && !isClosing ? "translateY(0)" : "translateY(8px)",
@@ -80,7 +83,7 @@ function ForgeIntroModal({
           ✦
         </div>
         <h2
-          className="font-[var(--font-cinzel-decorative)] text-[0.95rem] text-accent mb-4 drop-shadow-[0_0_16px_#9b6dff30]"
+          className="text-accent mb-4 text-[0.95rem] font-[var(--font-cinzel-decorative)] drop-shadow-[0_0_16px_#9b6dff30]"
           style={{
             opacity: hasEntered && !isClosing ? 1 : 0,
             transform: hasEntered && !isClosing ? "translateY(0)" : "translateY(8px)",
@@ -91,7 +94,7 @@ function ForgeIntroModal({
           {title}
         </h2>
         <div
-          className="h-px mx-auto mb-4"
+          className="mx-auto mb-4 h-px"
           style={{
             width: hasEntered && !isClosing ? "40px" : "0px",
             background: "linear-gradient(to right, transparent, #9b6dff4d, transparent)",
@@ -100,7 +103,7 @@ function ForgeIntroModal({
           }}
         />
         <p
-          className="text-[0.72rem] text-text/60 leading-relaxed italic mb-6"
+          className="text-text/60 mb-6 text-[0.72rem] leading-relaxed italic"
           style={{
             opacity: hasEntered && !isClosing ? 1 : 0,
             transform: hasEntered && !isClosing ? "translateY(0)" : "translateY(8px)",
@@ -112,7 +115,7 @@ function ForgeIntroModal({
         </p>
         <button
           onClick={handleClose}
-          className="py-2.5 px-7 border-none rounded-[14px] bg-gradient-to-br from-[#3a2a6a] to-accent text-white font-[var(--font-cinzel)] text-[0.75rem] font-semibold tracking-[0.12em] uppercase cursor-pointer transition-all duration-200 active:scale-[0.97] shadow-[0_4px_22px_#9b6dff28]"
+          className="to-accent cursor-pointer rounded-[14px] border-none bg-gradient-to-br from-[#3a2a6a] px-7 py-2.5 text-[0.75rem] font-[var(--font-cinzel)] font-semibold tracking-[0.12em] text-white uppercase shadow-[0_4px_22px_#9b6dff28] transition-all duration-200 active:scale-[0.97]"
           style={{
             opacity: hasEntered && !isClosing ? 1 : 0,
             transform: hasEntered && !isClosing ? "translateY(0)" : "translateY(10px)",
@@ -133,7 +136,7 @@ type ForgeSectionProps = {
   isAdmin?: boolean;
 };
 
-export function ForgeSection({ forge, isAdmin }: ForgeSectionProps): React.JSX.Element {
+export function ForgeSection({ forge, isAdmin }: Readonly<ForgeSectionProps>): React.JSX.Element {
   const { key, title, successMessage, introText, adminActionList, component: ForgeComponent } = forge;
 
   const isRevealed = forge.useRevealed();
@@ -158,7 +161,7 @@ export function ForgeSection({ forge, isAdmin }: ForgeSectionProps): React.JSX.E
         )}
         <div
           data-forge-section={key}
-          className="rounded-[18px] border overflow-hidden py-8 px-4 transition-colors duration-700"
+          className="overflow-hidden rounded-[18px] border px-4 py-8 transition-colors duration-700"
           style={{
             borderColor: isSolved ? "var(--color-solved-border)" : "var(--color-locked-border)",
             background: isSolved
@@ -168,7 +171,7 @@ export function ForgeSection({ forge, isAdmin }: ForgeSectionProps): React.JSX.E
           }}
         >
           <div
-            className={`text-center text-[0.5rem] tracking-[0.25em] mb-2 uppercase transition-colors duration-700 ${isSolved ? "text-success/60" : "text-muted/50"}`}
+            className={`mb-2 text-center text-[0.5rem] tracking-[0.25em] uppercase transition-colors duration-700 ${isSolved ? "text-success/60" : "text-muted/50"}`}
           >
             {title}
           </div>
@@ -179,7 +182,7 @@ export function ForgeSection({ forge, isAdmin }: ForgeSectionProps): React.JSX.E
             }}
           />
           {!isSolved && isAdmin && (
-            <div className="mt-4 flex gap-2 justify-center flex-wrap">
+            <div className="mt-4 flex flex-wrap justify-center gap-2">
               <Button
                 variant="admin"
                 color="success"
@@ -197,7 +200,7 @@ export function ForgeSection({ forge, isAdmin }: ForgeSectionProps): React.JSX.E
                   <button
                     key={action.label}
                     onClick={action.onClick}
-                    className={`px-3 py-1 rounded-md text-[0.55rem] tracking-[0.15em] uppercase border border-${c}/30 text-${c}/50 bg-${c}/5 hover:border-${c}/60 hover:text-${c}/80 hover:bg-${c}/10 transition-all duration-150 active:scale-95`}
+                    className={`rounded-md border px-3 py-1 text-[0.55rem] tracking-[0.15em] uppercase border-${c}/30 text-${c}/50 bg-${c}/5 hover:border-${c}/60 hover:text-${c}/80 hover:bg-${c}/10 transition-all duration-150 active:scale-95`}
                   >
                     ↺ {action.label}
                   </button>
@@ -206,11 +209,11 @@ export function ForgeSection({ forge, isAdmin }: ForgeSectionProps): React.JSX.E
             </div>
           )}
           {isSolved && (
-            <div className="mt-6 pt-4 border-t border-success/15 text-center animate-[forge-unblur_0.8s_ease-out_both]">
-              <div className="text-[0.5rem] text-success/40 tracking-[0.2em] uppercase mb-1.5">
+            <div className="border-success/15 mt-6 animate-[forge-unblur_0.8s_ease-out_both] border-t pt-4 text-center">
+              <div className="text-success/40 mb-1.5 text-[0.5rem] tracking-[0.2em] uppercase">
                 ✦ Épreuve accomplie ✦
               </div>
-              <p className="text-[0.6rem] text-success/55 leading-relaxed italic max-w-[260px] mx-auto">
+              <p className="text-success/55 mx-auto max-w-[260px] text-[0.6rem] leading-relaxed italic">
                 {successMessage}
               </p>
               {isAdmin && (
@@ -279,7 +282,7 @@ export function ForgeSection({ forge, isAdmin }: ForgeSectionProps): React.JSX.E
     <div
       ref={containerRef}
       data-forge-section={key}
-      className="relative rounded-[18px] border border-locked-border overflow-hidden"
+      className="border-locked-border relative overflow-hidden rounded-[18px] border"
       style={{
         background: "linear-gradient(155deg, #130f26, #0b0917)",
         ...((phase === "shattering" || phase === "revealing") && {
@@ -289,14 +292,14 @@ export function ForgeSection({ forge, isAdmin }: ForgeSectionProps): React.JSX.E
     >
       {/* Contenu : placeholder flouté avant révélation, vrai composant après */}
       <div
-        className="pointer-events-none select-none py-8 px-4"
+        className="pointer-events-none px-4 py-8 select-none"
         style={{
           filter: phase === "revealing" ? undefined : "blur(6px)",
           opacity: phase === "revealing" ? undefined : 0.3,
           ...(phase === "revealing" && { animation: "forge-unblur 0.8s ease-out forwards" }),
         }}
       >
-        <div className="text-center text-[0.5rem] tracking-[0.25em] text-muted/50 mb-2 uppercase">{title}</div>
+        <div className="text-muted/50 mb-2 text-center text-[0.5rem] tracking-[0.25em] uppercase">{title}</div>
         {phase === "revealing" ? (
           <ForgeComponent
             solved={isSolved}
@@ -312,7 +315,7 @@ export function ForgeSection({ forge, isAdmin }: ForgeSectionProps): React.JSX.E
       {/* Anneau de pulse au shattering */}
       {phase === "shattering" && (
         <div
-          className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-24 h-24 rounded-full pointer-events-none"
+          className="pointer-events-none absolute top-1/2 left-1/2 h-24 w-24 -translate-x-1/2 -translate-y-1/2 rounded-full"
           style={{
             background: "radial-gradient(circle, #9b6dff80, #9b6dff20, transparent 70%)",
             animation: "forge-pulse-ring 0.7s ease-out forwards",
@@ -321,7 +324,7 @@ export function ForgeSection({ forge, isAdmin }: ForgeSectionProps): React.JSX.E
       )}
       {phase === "shattering" && (
         <div
-          className="absolute inset-0 pointer-events-none"
+          className="pointer-events-none absolute inset-0"
           style={{
             background: "radial-gradient(circle at 50% 50%, #9b6dff40, #e8c96a15, transparent 70%)",
             animation: "forge-flash 0.6s ease-out forwards",
@@ -329,14 +332,14 @@ export function ForgeSection({ forge, isAdmin }: ForgeSectionProps): React.JSX.E
         />
       )}
       {phase === "shattering" && (
-        <div className="absolute inset-0 pointer-events-none">
+        <div className="pointer-events-none absolute inset-0">
           {RUNE_GLYPH_LIST.map((rune, i) => {
             const { angle, dist, rot } = RUNE_DATA_LIST[i];
 
             return (
               <span
                 key={i}
-                className="absolute left-1/2 top-1/2 text-[0.7rem] text-accent/70"
+                className="text-accent/70 absolute top-1/2 left-1/2 text-[0.7rem]"
                 style={
                   {
                     "--rune-tx": `${String(Math.cos(angle) * dist)}px`,
@@ -358,20 +361,27 @@ export function ForgeSection({ forge, isAdmin }: ForgeSectionProps): React.JSX.E
       {phase !== "revealing" && phase !== "done" && (
         <div
           ref={lockRef}
-          className="absolute inset-0 flex flex-color items-center justify-center gap-3 cursor-pointer"
+          className="flex-color absolute inset-0 flex cursor-pointer items-center justify-center gap-3"
+          role="button"
+          tabIndex={0}
           onClick={handleUnlock}
+          onKeyDown={(e) => {
+            if (e.key === "Enter" || e.key === " ") {
+              handleUnlock();
+            }
+          }}
           style={{
             ...(phase === "shaking" && { animation: "forge-lock-shake 0.5s ease-in-out" }),
             ...(phase === "shattering" && { animation: "forge-lock-shatter 0.5s ease-in forwards" }),
           }}
         >
           <LockIcon />
-          <span className="text-[0.55rem] tracking-[0.25em] text-muted uppercase">{title}</span>
+          <span className="text-muted text-[0.55rem] tracking-[0.25em] uppercase">{title}</span>
           {isAdmin && (
             <Button
               variant="admin"
               color="success"
-              className="mt-2 z-10"
+              className="z-10 mt-2"
               onClick={(e) => {
                 e.stopPropagation();
                 forge.reveal();

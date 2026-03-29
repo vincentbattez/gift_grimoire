@@ -28,7 +28,6 @@ export function SuccessModal(): React.JSX.Element {
       setHasEntered(true);
     });
 
-    // eslint-disable-next-line consistent-return
     return () => {
       cancelAnimationFrame(raf);
     };
@@ -60,13 +59,14 @@ export function SuccessModal(): React.JSX.Element {
 
   return (
     <div
-      className={`fixed inset-0 z-[110] bg-black/85 backdrop-blur-[6px] flex items-center justify-center transition-opacity duration-400 ${
-        isVisible && !isClosing ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"
+      className={`fixed inset-0 z-[110] flex items-center justify-center bg-black/85 backdrop-blur-[6px] transition-opacity duration-400 ${
+        isVisible && !isClosing ? "pointer-events-auto opacity-100" : "pointer-events-none opacity-0"
       }`}
+      role="presentation"
       onClick={handleClose}
     >
       <div
-        className={`max-w-[340px] w-[85%] rounded-2xl border border-success/30 px-6 py-8 text-center transition-all duration-500 ${
+        className={`border-success/30 w-[85%] max-w-[340px] rounded-2xl border px-6 py-8 text-center transition-all duration-500 ${
           hasEntered && !isClosing ? "scale-100 opacity-100" : "scale-90 opacity-0"
         }`}
         style={{
@@ -74,6 +74,7 @@ export function SuccessModal(): React.JSX.Element {
           boxShadow: "0 0 40px #4ecca320, 0 0 80px #4ecca310",
           transitionTimingFunction: "cubic-bezier(.34,1.56,.64,1)",
         }}
+        role="presentation"
         onClick={(e) => {
           e.stopPropagation();
         }}
@@ -81,7 +82,7 @@ export function SuccessModal(): React.JSX.Element {
         {/* Rune — stagger 0 */}
         {enigmaData && (
           <div
-            className="text-[1.6rem] text-success/30 mb-1 tracking-[0.3em]"
+            className="text-success/30 mb-1 text-[1.6rem] tracking-[0.3em]"
             style={{
               opacity: hasEntered && !isClosing ? 1 : 0,
               transform: hasEntered && !isClosing ? "translateY(0)" : "translateY(8px)",
@@ -94,7 +95,7 @@ export function SuccessModal(): React.JSX.Element {
         )}
         {/* Gift — stagger 1 */}
         <div
-          className="text-[3rem] mb-2"
+          className="mb-2 text-[3rem]"
           style={{
             opacity: hasEntered && !isClosing ? 1 : 0,
             transform: hasEntered && !isClosing ? "translateY(0) scale(1)" : "translateY(12px) scale(0.8)",
@@ -106,7 +107,7 @@ export function SuccessModal(): React.JSX.Element {
         </div>
         {/* Title — stagger 2 */}
         <h2
-          className="font-[var(--font-cinzel-decorative)] text-[1.1rem] text-success mb-2 drop-shadow-[0_0_20px_#4ecca340]"
+          className="text-success mb-2 text-[1.1rem] font-[var(--font-cinzel-decorative)] drop-shadow-[0_0_20px_#4ecca340]"
           style={{
             opacity: hasEntered && !isClosing ? 1 : 0,
             transform: hasEntered && !isClosing ? "translateY(0)" : "translateY(8px)",
@@ -119,7 +120,7 @@ export function SuccessModal(): React.JSX.Element {
         {/* Flavor text — stagger 3 */}
         {flavorText && (
           <p
-            className="text-[1rem] text-text/70 mb-4"
+            className="text-text/70 mb-4 text-[1rem]"
             style={{
               opacity: hasEntered && !isClosing ? 1 : 0,
               transform: hasEntered && !isClosing ? "translateY(0)" : "translateY(8px)",
@@ -132,7 +133,7 @@ export function SuccessModal(): React.JSX.Element {
         )}
         {/* Separator — stagger 4 */}
         <div
-          className="h-px mx-auto mb-4"
+          className="mx-auto mb-4 h-px"
           style={{
             width: hasEntered && !isClosing ? "40px" : "0px",
             background: "linear-gradient(to right, transparent, #4ecca34d, transparent)",
@@ -149,17 +150,17 @@ export function SuccessModal(): React.JSX.Element {
             transitionDelay: "1s",
           }}
         >
-          <p className="text-[0.8rem] text-success/70 leading-relaxed mb-1">
+          <p className="text-success/70 mb-1 text-[0.8rem] leading-relaxed">
             Le sceau s'est brisé… <br /> Tu peux désormais ouvrir
           </p>
-          <p className="text-[1.8rem] font-[var(--font-cinzel-decorative)] text-gold tracking-[0.08em] my-3 drop-shadow-[0_0_16px_#e8c96a40]">
+          <p className="text-gold my-3 text-[1.8rem] font-[var(--font-cinzel-decorative)] tracking-[0.08em] drop-shadow-[0_0_16px_#e8c96a40]">
             Boîte n°{displayBoxNumber}
           </p>
         </div>
         {/* Button — stagger 6 */}
         <button
           onClick={handleClose}
-          className="mt-2 py-3 px-8 border-none rounded-[14px] bg-gradient-to-br from-[#2a6a4a] to-success text-white font-[var(--font-cinzel)] text-[0.82rem] font-semibold tracking-[0.12em] uppercase cursor-pointer transition-all duration-200 active:scale-[0.97] shadow-[0_4px_22px_#4ecca328]"
+          className="to-success mt-2 cursor-pointer rounded-[14px] border-none bg-gradient-to-br from-[#2a6a4a] px-8 py-3 text-[0.82rem] font-[var(--font-cinzel)] font-semibold tracking-[0.12em] text-white uppercase shadow-[0_4px_22px_#4ecca328] transition-all duration-200 active:scale-[0.97]"
           style={{
             opacity: hasEntered && !isClosing ? 1 : 0,
             transform: hasEntered && !isClosing ? "translateY(0)" : "translateY(10px)",

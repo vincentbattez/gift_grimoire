@@ -2,7 +2,7 @@ type InkVictoryModalProps = {
   onContinue: () => void;
 };
 
-export function InkVictoryModal({ onContinue }: InkVictoryModalProps): React.JSX.Element {
+export function InkVictoryModal({ onContinue }: Readonly<InkVictoryModalProps>): React.JSX.Element {
   return (
     <div
       className="fixed inset-0 z-[200] flex items-center justify-center"
@@ -12,7 +12,7 @@ export function InkVictoryModal({ onContinue }: InkVictoryModalProps): React.JSX
       }}
     >
       <div
-        className="mx-6 px-7 py-8 rounded-2xl flex flex-color items-center gap-5 text-center"
+        className="flex-color mx-6 flex items-center gap-5 rounded-2xl px-7 py-8 text-center"
         style={{
           border: "1px solid rgba(232,201,106,0.35)",
           background: "linear-gradient(155deg, #1a1430, #0d0920)",
@@ -20,10 +20,10 @@ export function InkVictoryModal({ onContinue }: InkVictoryModalProps): React.JSX
           animation: "ink-modal-reveal 0.55s ease-out both",
         }}
       >
-        <div className="text-[0.45rem] tracking-[0.4em] text-gold/40 uppercase">✦ L'Encre Révélatrice ✦</div>
+        <div className="text-gold/40 text-[0.45rem] tracking-[0.4em] uppercase">✦ L'Encre Révélatrice ✦</div>
 
         <p
-          className="text-[0.8rem] text-text/90 leading-loose italic"
+          className="text-text/90 text-[0.8rem] leading-loose italic"
           style={{
             fontFamily: "var(--font-cinzel)",
             letterSpacing: "0.05em",
@@ -33,7 +33,7 @@ export function InkVictoryModal({ onContinue }: InkVictoryModalProps): React.JSX
           "maintenant, tu sais ce qu'il te reste à faire..."
         </p>
 
-        <div className="flex gap-2 text-gold/25 text-base">
+        <div className="text-gold/25 flex gap-2 text-base">
           <span>ᚠ</span>
           <span>ᚢ</span>
           <span>ᚦ</span>
@@ -41,8 +41,7 @@ export function InkVictoryModal({ onContinue }: InkVictoryModalProps): React.JSX
 
         <button
           onClick={onContinue}
-          className="px-6 py-2.5 rounded-xl text-[0.6rem] tracking-[0.2em] uppercase
-            transition-all duration-200 active:scale-95"
+          className="rounded-xl px-6 py-2.5 text-[0.6rem] tracking-[0.2em] uppercase transition-all duration-200 active:scale-95"
           style={{
             border: "1px solid rgba(232,201,106,0.4)",
             color: "rgba(232,201,106,0.85)",

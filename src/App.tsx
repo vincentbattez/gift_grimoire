@@ -78,7 +78,7 @@ function ScreenFlash(): React.JSX.Element {
   return (
     <div
       ref={screenFlashRef}
-      className="fixed inset-0 z-[90] pointer-events-none opacity-0"
+      className="pointer-events-none fixed inset-0 z-[90] opacity-0"
       style={{
         background: "radial-gradient(circle at 50% 50%, #e8c96a40, #4ecca320, transparent 70%)",
       }}
@@ -95,10 +95,10 @@ export default function App(): React.JSX.Element {
   return (
     <>
       <Starfield />
-      <div className="relative z-1 max-w-[430px] mx-auto px-4 pb-12">
+      <div className="relative z-1 mx-auto max-w-[430px] px-4 pb-12">
         <Header />
         <EnigmaGrid isAdmin={isAdmin} />
-        <p className="mt-6 text-center text-[0.6rem] text-muted/80">
+        <p className="text-muted/80 mt-6 text-center text-[0.6rem]">
           <span className="text-danger/50 font-bold">❤</span> Imaginé et developpé{" "}
           <span className="text-danger/50 font-bold">avec amour</span> pour Léamour - 2026{" "}
           <span className="text-danger/50 font-bold">❤</span>
@@ -108,14 +108,14 @@ export default function App(): React.JSX.Element {
             resetAttempt();
             useMagnetStore.getState().reset();
           }}
-          className="w-full mt-2 mb-4 py-2 text-[0.5rem] text-muted/20 bg-transparent border-none cursor-default select-none"
+          className="text-muted/20 mt-2 mb-4 w-full cursor-default border-none bg-transparent py-2 text-[0.5rem] select-none"
         >
           reset
         </button>
         {isAdmin && (
           <button
             onClick={logoutAdmin}
-            className="w-full py-1 text-[0.55rem] text-amber-400/40 hover:text-amber-400/80 bg-transparent border border-amber-400/20 hover:border-amber-400/50 rounded transition-colors cursor-pointer"
+            className="w-full cursor-pointer rounded border border-amber-400/20 bg-transparent py-1 text-[0.55rem] text-amber-400/40 transition-colors hover:border-amber-400/50 hover:text-amber-400/80"
           >
             ⚙ quitter le mode admin
           </button>

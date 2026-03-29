@@ -10,7 +10,13 @@ type InkWordCardProps = {
   onGuess: (wordText: string, guess: string) => "correct" | "wrong" | "ignored";
 };
 
-export function InkWordCard({ wordText, state, patternList, direction, onGuess }: InkWordCardProps): React.JSX.Element {
+export function InkWordCard({
+  wordText,
+  state,
+  patternList,
+  direction,
+  onGuess,
+}: Readonly<InkWordCardProps>): React.JSX.Element {
   const [inputValue, setInputValue] = useState("");
   const [hasError, setHasError] = useState(false);
 
@@ -77,9 +83,9 @@ export function InkWordCard({ wordText, state, patternList, direction, onGuess }
       }}
     >
       {/* Pattern + direction + guess indicators */}
-      <div className="flex items-center justify-between mb-2.5">
+      <div className="mb-2.5 flex items-center justify-between">
         <div className="flex items-center gap-1.5">
-          <span className="text-[0.5rem] text-muted/30" title={direction === "H" ? "horizontal" : "vertical"}>
+          <span className="text-muted/30 text-[0.5rem]" title={direction === "H" ? "horizontal" : "vertical"}>
             {direction === "H" ? "→" : "↓"}
           </span>
           <div className="flex gap-1">
@@ -106,7 +112,7 @@ export function InkWordCard({ wordText, state, patternList, direction, onGuess }
         </div>
 
         {!state.solved && (
-          <div className="flex gap-1 items-center">
+          <div className="flex items-center gap-1">
             {Array.from({ length: INK_CONFIG.maxGuessesPerWord }, (_, i) => (
               <div
                 key={i}
@@ -136,15 +142,14 @@ export function InkWordCard({ wordText, state, patternList, direction, onGuess }
             placeholder="Deviner…"
             maxLength={wordText.length + 2}
             autoCapitalize="characters"
-            className="flex-1 px-2.5 py-1.5 rounded-lg text-[0.65rem] bg-transparent placeholder:text-muted/25 text-text tracking-widest uppercase transition-colors duration-200"
+            className="placeholder:text-muted/25 text-text flex-1 rounded-lg bg-transparent px-2.5 py-1.5 text-[0.65rem] tracking-widest uppercase transition-colors duration-200"
             style={{
               border: `1px solid ${hasError ? "#ff6b8a50" : "rgba(34,26,53,0.7)"}`,
             }}
           />
           <button
             onClick={handleSubmit}
-            className="px-3 py-1.5 rounded-lg text-[0.6rem] tracking-[0.15em] uppercase
-              transition-all duration-150 active:scale-95"
+            className="rounded-lg px-3 py-1.5 text-[0.6rem] tracking-[0.15em] uppercase transition-all duration-150 active:scale-95"
             style={{
               border: "1px solid rgba(155,109,255,0.3)",
               color: "rgba(155,109,255,0.7)",
@@ -156,14 +161,14 @@ export function InkWordCard({ wordText, state, patternList, direction, onGuess }
         </div>
       )}
 
-      {hasError && <p className="mt-1.5 text-[0.5rem] text-danger/55 italic tracking-wide">L'encre refuse ce mot…</p>}
+      {hasError && <p className="text-danger/55 mt-1.5 text-[0.5rem] tracking-wide italic">L'encre refuse ce mot…</p>}
 
-      {isLocked && <p className="text-[0.5rem] text-danger/45 italic tracking-wide">L'encre a séché sur ce mot…</p>}
+      {isLocked && <p className="text-danger/45 text-[0.5rem] tracking-wide italic">L'encre a séché sur ce mot…</p>}
 
       {state.solved && (
         <div className="flex items-center gap-1.5">
           <span className="text-success/60 text-[0.5rem]">✦</span>
-          <p className="text-[0.5rem] text-success/55 italic tracking-wide">Révélé</p>
+          <p className="text-success/55 text-[0.5rem] tracking-wide italic">Révélé</p>
         </div>
       )}
     </div>

@@ -4,7 +4,7 @@ export type WordConfig = {
   direction: "H" | "V";
 };
 
-export type InkForgeConfig = {
+type InkForgeConfig = {
   gridCols: number;
   gridRows: number;
   maxDrops: number;
@@ -40,7 +40,7 @@ export const INK_CONFIG: InkForgeConfig = {
 };
 
 /** Map "row,col" → { letter, wordTextList[] } */
-export function buildLetterMap(config: InkForgeConfig): Map<string, { letter: string; wordTextList: string[] }> {
+function buildLetterMap(config: InkForgeConfig): Map<string, { letter: string; wordTextList: string[] }> {
   const map = new Map<string, { letter: string; wordTextList: string[] }>();
   for (const word of config.wordList) {
     for (let i = 0; i < word.text.length; i++) {
