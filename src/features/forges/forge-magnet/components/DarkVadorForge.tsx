@@ -1,25 +1,25 @@
 import { useRef, useState } from "react";
-import darkVadorSrc from "../../../../assets/audios/pascale-dark_vador-enigme.mp3";
-import { sndAnalysis, sndScrambleSolved } from "../../../../audio";
-import { AudioWarningModal } from "../../../../components/AudioWarningModal";
-import { LastAttemptModal } from "../../../../components/LastAttemptModal";
-import { PlayCountDot } from "../../../../components/PlayCountDot";
-import { CornerOrnaments } from "../../../../components/ui/CornerOrnaments";
-import { getEntityState } from "../../../../ha";
-import { CooldownLabel } from "../../../cooldown/components/CooldownLabel";
-import { isAttemptUsedToday } from "../../../cooldown/store";
-import { EnigmaPicker } from "../../../enigma/components/EnigmaPicker";
-import { useForgeStore } from "../../store";
-import type { ForgeProps } from "../../types";
-import { CHECK_DURATION_MS, ENTITY_ID } from "../config";
-import { useMagnetStore } from "../store";
+import darkVadorSrc from "@/assets/audios/pascale-dark_vador-enigme.mp3";
+import { sndAnalysis, sndScrambleSolved } from "@/audio";
+import { getEntityState } from "@/ha";
+import { AudioWarningModal } from "@components/AudioWarningModal";
+import { LastAttemptModal } from "@components/LastAttemptModal";
+import { PlayCountDot } from "@components/PlayCountDot";
+import { CornerOrnaments } from "@components/ui/CornerOrnaments";
+import { CooldownLabel } from "@features/cooldown/components/CooldownLabel";
+import { isAttemptUsedToday } from "@features/cooldown/store";
+import { EnigmaPicker } from "@features/enigma/components/EnigmaPicker";
+import { CHECK_DURATION_MS, ENTITY_ID } from "@features/forges/forge-magnet/config";
+import { useMagnetStore } from "@features/forges/forge-magnet/store";
+import { useForgeStore } from "@features/forges/store";
+import type { ForgeProps } from "@features/forges/types";
 import { WideWaveform } from "./WideWaveform";
 
 /**
  * Forge : La chaleur de l'Arc-en-ciel
  * Joue l'audio Dark Vador, puis détecte le signal Home Assistant de l'aimant.
  */
-export function DarkVadorForge({ solved, onSolve }: ForgeProps) {
+export function DarkVadorForge({ solved, onSolve }: ForgeProps): React.JSX.Element {
   const darkVadorPlayedAt = useMagnetStore((s) => s.darkVadorPlayedAt);
   const recordDarkVadorPlay = useMagnetStore((s) => s.recordDarkVadorPlay);
   const hasAudioWarningAcknowledged = useForgeStore((s) => s.audioWarningAcknowledged);
@@ -33,7 +33,7 @@ export function DarkVadorForge({ solved, onSolve }: ForgeProps) {
   const [isShowingLastAttempt, setIsShowingLastAttempt] = useState(false);
   const shakeRef = useRef<HTMLButtonElement>(null);
 
-  async function playAudio() {
+  async function playAudio(): Promise<void> {
     const audio = new Audio(darkVadorSrc);
     setIsPlaying(true);
 
@@ -49,7 +49,7 @@ export function DarkVadorForge({ solved, onSolve }: ForgeProps) {
     }
   }
 
-  function handlePlay() {
+  function handlePlay(): void {
     if (isPlaying) {
       return;
     }
@@ -62,7 +62,7 @@ export function DarkVadorForge({ solved, onSolve }: ForgeProps) {
     setIsShowingLastAttempt(true);
   }
 
-  async function handleCheck() {
+  async function handleCheck(): Promise<void> {
     if (isChecking || isShowingPicker) {
       return;
     }
@@ -114,7 +114,7 @@ export function DarkVadorForge({ solved, onSolve }: ForgeProps) {
     return (
       <div className="mt-6">
         <div
-          className="w-full relative overflow-hidden flex flex-col items-center gap-2 py-4 px-4 rounded-[14px] border-[1.5px] border-solved-border/50 shadow-[0_0_22px_#4ecca325]"
+          className="w-full relative overflow-hidden flex flex-color items-center gap-2 py-4 px-4 rounded-[14px] border-[1.5px] border-solved-border/50 shadow-[0_0_22px_#4ecca325]"
           style={{ background: "linear-gradient(155deg, #0a1f1a, #080f0c)" }}
         >
           <div
@@ -142,7 +142,7 @@ export function DarkVadorForge({ solved, onSolve }: ForgeProps) {
       <div className="mt-6">
         <button
           onClick={handlePlay}
-          className="w-full relative overflow-hidden flex flex-col items-center gap-2 py-4 px-4 rounded-[14px] border-[1.5px] transition-all duration-300 select-none cursor-pointer border-accent/30 hover:border-accent/55 active:scale-[0.98]"
+          className="w-full relative overflow-hidden flex flex-color items-center gap-2 py-4 px-4 rounded-[14px] border-[1.5px] transition-all duration-300 select-none cursor-pointer border-accent/30 hover:border-accent/55 active:scale-[0.98]"
           style={{ background: "linear-gradient(155deg, #130f26, #0b0917)" }}
         >
           <div
@@ -182,7 +182,7 @@ export function DarkVadorForge({ solved, onSolve }: ForgeProps) {
       <div className="mt-6">
         <button
           disabled
-          className="w-full relative overflow-hidden flex flex-col items-center gap-2 py-4 px-4 rounded-[14px] border-[1.5px] transition-all duration-300 select-none cursor-not-allowed border-accent/60 shadow-[0_0_28px_#9b6dff35]"
+          className="w-full relative overflow-hidden flex flex-color items-center gap-2 py-4 px-4 rounded-[14px] border-[1.5px] transition-all duration-300 select-none cursor-not-allowed border-accent/60 shadow-[0_0_28px_#9b6dff35]"
           style={{ background: "linear-gradient(155deg, #130f26, #0b0917)" }}
         >
           <div
@@ -270,7 +270,7 @@ export function DarkVadorForge({ solved, onSolve }: ForgeProps) {
           void handleCheck();
         }}
         disabled={isChecking || isShowingPicker}
-        className={`w-full relative overflow-hidden flex flex-col items-center gap-2 py-4 px-4 rounded-[14px] border-[1.5px] transition-all duration-300 select-none cursor-pointer ${borderClass}`}
+        className={`w-full relative overflow-hidden flex flex-color items-center gap-2 py-4 px-4 rounded-[14px] border-[1.5px] transition-all duration-300 select-none cursor-pointer ${borderClass}`}
         style={{
           background: (() => {
             if (isShowingPicker) {

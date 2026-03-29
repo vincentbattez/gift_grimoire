@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import {
   sndCardFlip,
   sndConvergence,
@@ -12,12 +12,12 @@ import {
   sndQuillTap,
   sndWaxMelt,
   sndWaxStamp,
-} from "../../../audio";
-import { OrnamentDivider } from "../../../components/ui/OrnamentDivider";
-import { spawnCelebration, spawnParticles } from "../../../particles";
-import { ENIGMAS } from "../../enigma/config";
-import { useEnigmaStore } from "../../enigma/store";
-import { useFinaleStore } from "../store";
+} from "@/audio";
+import { spawnCelebration, spawnParticles } from "@/particles";
+import { OrnamentDivider } from "@components/ui/OrnamentDivider";
+import { ENIGMA_LIST } from "@features/enigma/config";
+import { useEnigmaStore } from "@features/enigma/store";
+import { useFinaleStore } from "@features/finale/store";
 
 const CELEBRATION_DURATION = 9000;
 const STAR_COUNT = 35;
@@ -36,16 +36,16 @@ type Rocket = {
   exploded: boolean;
 };
 
-const FINALE_EMOJIS = ["✨", "💛", "🌟", "💫", "⭐", "🦋", "💃", "🖼️", "🎭", "💓", "🌅", "❤️"];
+const FINALE_EMOJI_LIST = ["✨", "💛", "🌟", "💫", "⭐", "🦋", "💃", "🖼️", "🎭", "💓", "🌅", "❤️"];
 
-const GOLD_PARTICLES = Array.from({ length: 24 }, (_, i) => ({
+const GOLD_PARTICLE_LIST = Array.from({ length: 24 }, (_, i) => ({
   left: `${String(3 + (i % 6) * 16)}%`,
   top: `${String(3 + Math.floor(i / 6) * 24)}%`,
   size: 2 + (i % 4) * 1.2,
   delay: i * 0.28,
 }));
 
-function buildStars() {
+function buildStars(): { left: number; delay: number; duration: number; size: number; emoji: string }[] {
   return Array.from({ length: STAR_COUNT }, (_, i) => ({
     left: 5 + Math.random() * 90,
     delay: Math.random() * 3,
@@ -55,13 +55,13 @@ function buildStars() {
   }));
 }
 
-function buildEmojiBurst() {
-  const items: { emoji: string; left: number; delay: number; size: number; rot: number; pitch: number }[] = [];
+function buildEmojiBurst(): { emoji: string; left: number; delay: number; size: number; rot: number; pitch: number }[] {
+  const itemList: { emoji: string; left: number; delay: number; size: number; rot: number; pitch: number }[] = [];
   let cumDelay = 0.1;
   let gap = 0.15;
   for (let i = 0; i < EMOJI_BURST_COUNT; i++) {
-    items.push({
-      emoji: FINALE_EMOJIS[i % FINALE_EMOJIS.length],
+    itemList.push({
+      emoji: FINALE_EMOJI_LIST[i % FINALE_EMOJI_LIST.length],
       left: 5 + Math.random() * 90,
       delay: cumDelay,
       size: 1.4 + Math.random() * 0.8,
@@ -72,12 +72,12 @@ function buildEmojiBurst() {
     gap *= 0.97;
   }
 
-  return items;
+  return itemList;
 }
 
 // ── Slides ──
 
-function SlideContext() {
+function SlideContext(): React.JSX.Element {
   return (
     <div className="text-center">
       <div className="text-[2.5rem] mb-3 leading-none" style={{ filter: "drop-shadow(0 0 14px #c9a03250)" }}>
@@ -113,13 +113,13 @@ C'était ma façon de te dire ce que les mots seuls n'auraient pas suffi à expr
   );
 }
 
-function SlideStats() {
+function SlideStats(): React.JSX.Element {
   const enigmas = useEnigmaStore((s) => s.enigmas);
   const readLetters = useEnigmaStore((s) => s.readLetters);
   const solvedCount = Object.values(enigmas).filter((e) => e.solved).length;
   const lettersRead = Object.values(readLetters).filter(Boolean).length;
 
-  const stats = [
+  const statList = [
     { label: "Mystères percés", value: `${String(solvedCount)}/6`, icon: "🔓" },
     { label: "Lettres d'amour lues", value: `${String(lettersRead)}/6`, icon: "💌" },
     { label: "Clés forgées", value: "3/3", icon: "🗝️" },
@@ -141,7 +141,7 @@ function SlideStats() {
       <OrnamentDivider className="mb-5" />
 
       <div className="grid grid-cols-2 gap-3 mb-5">
-        {stats.map((s) => (
+        {statList.map((s) => (
           <div
             key={s.label}
             className="rounded-[12px] py-3 px-2"
@@ -166,7 +166,7 @@ function SlideStats() {
 
       {/* Character parade */}
       <div className="flex justify-center gap-2 mt-3">
-        {ENIGMAS.map((e) => (
+        {ENIGMA_LIST.map((e) => (
           <div
             key={e.id}
             className="text-[1.4rem]"
@@ -184,7 +184,7 @@ function SlideStats() {
   );
 }
 
-const LOVE_LINES = [
+const LOVE_LINE_LIST = [
   { text: "Chaque ligne de code de ce grimoire", pause: 1 },
   { text: "a été écrite en pensant à toi.", pause: 1.4 },
   { text: "", pause: 0.8 },
@@ -210,23 +210,23 @@ function TypewriterLine({
   golden?: boolean;
   delay: number;
   onDone?: () => void;
-}>) {
+}>): React.JSX.Element {
   const [visibleWords, setVisibleWords] = useState(0);
-  const words = text.split(" ");
+  const wordList = text.split(" ");
 
   useEffect(() => {
-    const timers: ReturnType<typeof setTimeout>[] = [];
+    const timerList: ReturnType<typeof setTimeout>[] = [];
 
     const startTimer = setTimeout(() => {
-      words.forEach((_, i) => {
+      wordList.forEach((_, i) => {
         const wordDelay = i * (golden ? 140 : 100);
 
-        timers.push(
+        timerList.push(
           setTimeout(() => {
             setVisibleWords(i + 1);
             sndQuillTap(Math.random() * 2 - 1);
 
-            if (i === words.length - 1) {
+            if (i === wordList.length - 1) {
               if (golden) {
                 sndGoldenWord();
               }
@@ -236,10 +236,10 @@ function TypewriterLine({
         );
       });
     }, delay);
-    timers.push(startTimer);
+    timerList.push(startTimer);
 
     return () => {
-      timers.forEach((t) => {
+      timerList.forEach((t) => {
         clearTimeout(t);
       });
     };
@@ -252,7 +252,7 @@ function TypewriterLine({
 
   return (
     <span style={{ color: golden ? "#8a6a20" : "#4a3a20" }}>
-      {words.map((word, i) => (
+      {wordList.map((word, i) => (
         <span
           key={i}
           className="inline-block transition-all duration-300"
@@ -263,26 +263,26 @@ function TypewriterLine({
           }}
         >
           {word}
-          {i < words.length - 1 ? "\u00A0" : ""}
+          {i < wordList.length - 1 ? "\u00A0" : ""}
         </span>
       ))}
     </span>
   );
 }
 
-function SlideLove() {
+function SlideLove(): React.JSX.Element {
   // Calculate cumulative delays for each line
-  const lineDelays: number[] = [];
+  const lineDelayList: number[] = [];
   let cumMs = 600; // initial delay before typing starts
-  for (const line of LOVE_LINES) {
-    lineDelays.push(cumMs);
+  for (const line of LOVE_LINE_LIST) {
+    lineDelayList.push(cumMs);
     const wordCount = line.text ? line.text.split(" ").length : 0;
     const typingTime = wordCount * (line.golden ? 140 : 100);
     cumMs += typingTime + line.pause * 400;
   }
 
   const [isSignatureVisible, setSignatureVisible] = useState(false);
-  const lastLineIdx = LOVE_LINES.length - 1;
+  const lastLineIdx = LOVE_LINE_LIST.length - 1;
 
   return (
     <div className="text-center">
@@ -299,12 +299,12 @@ function SlideLove() {
       <OrnamentDivider className="mb-4" />
 
       <div className="text-[0.8rem] leading-[1.85] mb-5 min-h-[180px]" style={{ fontFamily: "var(--font-cinzel)" }}>
-        {LOVE_LINES.map((line, i) => (
+        {LOVE_LINE_LIST.map((line, i) => (
           <div key={i}>
             <TypewriterLine
               text={line.text}
               golden={line.golden}
-              delay={lineDelays[i]}
+              delay={lineDelayList[i]}
               onDone={
                 i === lastLineIdx
                   ? () =>
@@ -343,7 +343,7 @@ function SlideLove() {
 
 const SEAL_HOLD_MS = 2000;
 
-function WaxSeal({ onComplete }: { onComplete: () => void }) {
+function WaxSeal({ onComplete }: { onComplete: () => void }): React.JSX.Element {
   const [progress, setProgress] = useState(0);
   const [isSealed, setIsSealed] = useState(false);
   const pressing = useRef(false);
@@ -393,7 +393,7 @@ function WaxSeal({ onComplete }: { onComplete: () => void }) {
     rafId.current = requestAnimationFrame(tick);
   }, [onComplete]);
 
-  function handleStart() {
+  function handleStart(): void {
     if (isSealed) {
       return;
     }
@@ -403,7 +403,7 @@ function WaxSeal({ onComplete }: { onComplete: () => void }) {
     rafId.current = requestAnimationFrame(tick);
   }
 
-  function handleEnd() {
+  function handleEnd(): void {
     if (!pressing.current) {
       return;
     }
@@ -426,7 +426,7 @@ function WaxSeal({ onComplete }: { onComplete: () => void }) {
   const dashOffset = circumference * (1 - progress);
 
   return (
-    <div className="flex flex-col items-center gap-2">
+    <div className="flex flex-color itemList-center gap-2">
       <div
         id="wax-seal"
         className="relative w-[68px] h-[68px] cursor-pointer select-none"
@@ -457,7 +457,7 @@ function WaxSeal({ onComplete }: { onComplete: () => void }) {
 
         {/* Wax seal body */}
         <div
-          className="absolute inset-[6px] rounded-full flex items-center justify-center"
+          className="absolute inset-[6px] rounded-full flex itemList-center justify-center"
           style={{
             background: isSealed
               ? "radial-gradient(circle at 40% 35%, #e8c96a, #c9a032, #8a6a20)"
@@ -536,9 +536,9 @@ function WaxSeal({ onComplete }: { onComplete: () => void }) {
   );
 }
 
-const SLIDES = [SlideContext, SlideStats, SlideLove];
+const SLIDE_LIST = [SlideContext, SlideStats, SlideLove];
 
-const NARRATIVE_TEXTS = [
+const NARRATIVE_TEXT_LIST = [
   "Le grimoire se referme…",
   "Les mystères retournent au silence…",
   "Mais la magie, elle, restera.",
@@ -548,13 +548,13 @@ const NARRATIVE_TEXTS = [
  * Narrative pre-celebration: cards flip to reveal runes,
  * forges glow, everything converges to center, then fireworks begin.
  */
-function NarrativeSequence() {
+function NarrativeSequence(): React.JSX.Element | null {
   const isFinaleNarrative = useFinaleStore((s) => s.finaleNarrative);
   const startFinale = useFinaleStore((s) => s.startFinale);
   const [phase, setPhase] = useState<"idle" | "text-intro" | "flipping" | "converging" | "glowing" | "done">("idle");
   const [flipIndex, setFlipIndex] = useState(-1);
   const [textIndex, setTextIndex] = useState(-1);
-  const timers = useRef<ReturnType<typeof setTimeout>[]>([]);
+  const timerList = useRef<ReturnType<typeof setTimeout>[]>([]);
   const started = useRef(false);
 
   useEffect(() => {
@@ -567,7 +567,7 @@ function NarrativeSequence() {
 
     // ── Timeline ──
     // Text 1 visible 5s, then cards flip, then converge right after, then text 2 visible 5s, flash, fireworks
-    const T = ENIGMAS.length * 400; // flip time (2400ms)
+    const T = ENIGMA_LIST.length * 400; // flip time (2400ms)
     const TEXT_MIN = 5000; // minimum text display
     const CONVERGE_DUR = 1400;
 
@@ -578,24 +578,24 @@ function NarrativeSequence() {
     // t=5600 — Overlay fades out, text fades out naturally (animation 5s)
     const flipFadeStart = TEXT_MIN;
 
-    timers.current.push(
+    timerList.current.push(
       setTimeout(() => {
         setPhase("flipping");
       }, flipFadeStart),
     );
 
-    // t=6100-8500 — Cards flip one by one (start after overlay has faded ~500ms)
+    // t=6100-8500 — Cards flip one by one (startList after overlay has faded ~500ms)
     const flipStart = flipFadeStart + 500;
 
-    ENIGMAS.forEach((_, i) => {
-      timers.current.push(
+    ENIGMA_LIST.forEach((_, i) => {
+      timerList.current.push(
         setTimeout(
           () => {
             setFlipIndex(i);
             sndCardFlip(i);
             navigator.vibrate(20);
 
-            const el = document.querySelector(`[data-card-id="${ENIGMAS[i].id}"]`);
+            const el = document.querySelector(`[data-card-id="${ENIGMA_LIST[i].id}"]`);
 
             if (el) {
               el.scrollIntoView({ behavior: "smooth", block: "center" });
@@ -614,7 +614,7 @@ function NarrativeSequence() {
     // t=9200 — Converge right after last flip + small pause for glow
     const convergeStart = flipStart + T + 600;
 
-    timers.current.push(
+    timerList.current.push(
       setTimeout(() => {
         setPhase("converging");
         sndConvergence();
@@ -623,7 +623,7 @@ function NarrativeSequence() {
         const cx = window.innerWidth / 2;
         const cy = window.innerHeight / 2;
 
-        ENIGMAS.forEach((enigma) => {
+        ENIGMA_LIST.forEach((enigma) => {
           const el = document.querySelector<HTMLElement>(`[data-card-id="${enigma.id}"]`);
 
           if (!el) {
@@ -642,7 +642,7 @@ function NarrativeSequence() {
     // t=10900 — Overlay ON + Text 2 "Les mystères retournent au silence…"
     const text2Start = convergeStart + CONVERGE_DUR + 300;
 
-    timers.current.push(
+    timerList.current.push(
       setTimeout(() => {
         setPhase("glowing");
         setTextIndex(1);
@@ -654,7 +654,7 @@ function NarrativeSequence() {
     // t=15900 — Text 3 "Mais la magie, elle, restera."
     const text3Start = text2Start + TEXT_MIN;
 
-    timers.current.push(
+    timerList.current.push(
       setTimeout(() => {
         setTextIndex(2);
       }, text3Start),
@@ -663,11 +663,11 @@ function NarrativeSequence() {
     // t=20900 — Cleanup + launch fireworks directly
     const finaleStart = text3Start + TEXT_MIN;
 
-    timers.current.push(
+    timerList.current.push(
       setTimeout(() => {
         setPhase("done");
 
-        ENIGMAS.forEach((enigma) => {
+        ENIGMA_LIST.forEach((enigma) => {
           const el = document.querySelector<HTMLElement>(`[data-card-id="${enigma.id}"]`);
 
           if (el) {
@@ -687,10 +687,10 @@ function NarrativeSequence() {
       }, finaleStart),
     );
 
-    const currentTimers = timers.current;
+    const currentTimerList = timerList.current;
 
     return () => {
-      currentTimers.forEach((t) => {
+      currentTimerList.forEach((t) => {
         clearTimeout(t);
       });
     };
@@ -703,7 +703,7 @@ function NarrativeSequence() {
         /* noop cleanup */
       };
     }
-    const enigma = ENIGMAS[flipIndex];
+    const enigma = ENIGMA_LIST[flipIndex];
     const el = document.querySelector<HTMLElement>(`[data-card-id="${enigma.id}"]`);
 
     if (!el) {
@@ -758,10 +758,10 @@ function NarrativeSequence() {
 
       {/* Narrative text */}
       {textIndex >= 0 && (
-        <div className="fixed inset-x-0 top-[12%] z-[195] flex flex-col items-center pointer-events-none px-6">
+        <div className="fixed inset-x-0 top-[12%] z-[195] flex flex-color itemList-center pointer-events-none px-6">
           <div
             key={textIndex}
-            className="rounded-2xl px-8 py-5 flex flex-col items-center"
+            className="rounded-2xl px-8 py-5 flex flex-color itemList-center"
             style={{
               background: "radial-gradient(ellipse at 50% 50%, #07060fE0, #07060fA0, transparent 80%)",
               animation: "narrative-text-fade 5s ease-in-out both",
@@ -775,7 +775,7 @@ function NarrativeSequence() {
                 textShadow: "0 0 40px #e8c96a80, 0 0 80px #e8c96a40, 0 0 120px #e8c96a20",
               }}
             >
-              {NARRATIVE_TEXTS[textIndex]}
+              {NARRATIVE_TEXT_LIST[textIndex]}
             </p>
             <OrnamentDivider className="mt-3" lineWidth="fixed" />
           </div>
@@ -787,7 +787,7 @@ function NarrativeSequence() {
 
 // ── Main Component ──
 
-export function FinaleModal() {
+export function FinaleModal(): React.JSX.Element {
   const isFinaleActive = useFinaleStore((s) => s.finaleActive);
   const isFinaleModalOpen = useFinaleStore((s) => s.finaleModalOpen);
   const openFinaleModal = useFinaleStore((s) => s.openFinaleModal);
@@ -796,7 +796,7 @@ export function FinaleModal() {
   const [celebrationPhase, setCelebrationPhase] = useState<
     "idle" | "launching" | "exploding" | "stars" | "converge" | "nova" | "done"
   >("idle");
-  const [rockets, setRockets] = useState<Rocket[]>([]);
+  const [rocketList, setRockets] = useState<Rocket[]>([]);
   const rocketIdRef = useRef(0);
   const [slideIndex, setSlideIndex] = useState(0);
   const [slideDir, setSlideDir] = useState<"in" | "out">("in");
@@ -875,7 +875,7 @@ export function FinaleModal() {
     const cx = vw / 2;
     const cy = vh / 2;
 
-    // Phase 1: First salvo — 3 rockets launched in quick succession
+    // Phase 1: First salvo — 3 rocketList launched in quick succession
     setCelebrationPhase("launching");
     sndFinale();
 
@@ -886,7 +886,7 @@ export function FinaleModal() {
       setTimeout(() => launchRocket(70, cx + 80, cy * 0.7, "#4ecca3", 800, 0.9, true), 700),
     );
 
-    // Transition to exploding phase after first rockets land
+    // Transition to exploding phase after first rocketList land
     // eslint-disable-next-line unicorn/prefer-single-call
     celebTimers.current.push(
       setTimeout(() => {
@@ -895,7 +895,7 @@ export function FinaleModal() {
       }, 1000),
     );
 
-    // Phase 2: Second salvo — more rockets, different positions
+    // Phase 2: Second salvo — more rocketList, different positions
     // eslint-disable-next-line unicorn/prefer-single-call
     celebTimers.current.push(
       setTimeout(() => launchRocket(15, cx - 120, cy * 0.4, "#ff6b8a", 750, 0.7, false), 1800),
@@ -909,7 +909,7 @@ export function FinaleModal() {
       setTimeout(() => {
         setCelebrationPhase("stars");
         navigator.vibrate([30, 50, 30]);
-        // Two more rockets during stars
+        // Two more rocketList during stars
         launchRocket(35, cx - 60, cy * 0.45, "#ff6b8a", 700, 0.6, false);
         launchRocket(65, cx + 60, cy * 0.55, "#4ecca3", 750, 0.6, false);
       }, 3500),
@@ -926,18 +926,18 @@ export function FinaleModal() {
       }, 5500),
     );
 
-    // Phase 5: Grand finale — rapid fire rockets
+    // Phase 5: Grand finale — rapid fire rocketList
     // eslint-disable-next-line unicorn/prefer-single-call
     celebTimers.current.push(
       setTimeout(() => {
-        const colors = ["#e8c96a", "#9b6dff", "#4ecca3", "#ff6b8a", "#e8c96a"];
+        const colorList = ["#e8c96a", "#9b6dff", "#4ecca3", "#ff6b8a", "#e8c96a"];
 
-        colors.forEach((col, i) => {
+        colorList.forEach((color, i) => {
           setTimeout(() => {
             const x = 15 + Math.random() * 70;
             const tx = cx + (Math.random() - 0.5) * 200;
             const ty = cy * (0.3 + Math.random() * 0.4);
-            launchRocket(x, tx, ty, col, 600 + Math.random() * 200, 0.9, i % 2 === 0);
+            launchRocket(x, tx, ty, color, 600 + Math.random() * 200, 0.9, i % 2 === 0);
           }, i * 250);
         });
       }, 6500),
@@ -964,10 +964,10 @@ export function FinaleModal() {
       }, CELEBRATION_DURATION),
     );
 
-    const currentCelebTimers = celebTimers.current;
+    const currentCelebTimerList = celebTimers.current;
 
     return () => {
-      currentCelebTimers.forEach((t) => {
+      currentCelebTimerList.forEach((t) => {
         clearTimeout(t);
       });
     };
@@ -1009,7 +1009,7 @@ export function FinaleModal() {
   }, [isFinaleModalOpen]);
 
   const nextSlide = useCallback(() => {
-    if (slideIndex >= SLIDES.length - 1) {
+    if (slideIndex >= SLIDE_LIST.length - 1) {
       return;
     }
     sndPageTurn();
@@ -1034,8 +1034,8 @@ export function FinaleModal() {
     }, 300);
   }, [slideIndex]);
 
-  function handleClose() {
-    if (slideIndex < SLIDES.length - 1) {
+  function handleClose(): void {
+    if (slideIndex < SLIDE_LIST.length - 1) {
       return;
     } // Can only close on last slide
     sndGoldenSeal();
@@ -1050,7 +1050,7 @@ export function FinaleModal() {
   }
 
   const isModalOpen = isFinaleModalOpen && !isClosing;
-  const CurrentSlide = SLIDES[slideIndex];
+  const CurrentSlide = SLIDE_LIST[slideIndex];
 
   return (
     <>
@@ -1068,7 +1068,7 @@ export function FinaleModal() {
         {isFinaleActive && !isFinaleModalOpen && (
           <>
             {/* Rocket projectiles */}
-            {rockets.map((r) => (
+            {rocketList.map((r) => (
               <div
                 key={r.id}
                 className="absolute pointer-events-none"
@@ -1184,7 +1184,7 @@ export function FinaleModal() {
                 opacity: celebrationPhase === "converge" ? 1 : 0,
               }}
             >
-              {FINALE_EMOJIS.slice(0, 8).map((emoji, i) => (
+              {FINALE_EMOJI_LIST.slice(0, 8).map((emoji, i) => (
                 <div
                   key={i}
                   className="absolute left-1/2 top-1/2 pointer-events-none"
@@ -1202,7 +1202,7 @@ export function FinaleModal() {
 
             {/* Golden nova — fades in at nova phase */}
             <div
-              className="absolute inset-0 flex items-center justify-center transition-opacity duration-500"
+              className="absolute inset-0 flex itemList-center justify-center transition-opacity duration-500"
               style={{
                 opacity: celebrationPhase === "nova" ? 1 : 0,
               }}
@@ -1222,7 +1222,7 @@ export function FinaleModal() {
       {/* ── Modal ── */}
       {(isFinaleModalOpen || isClosing) && (
         <div
-          className={`fixed inset-0 z-[210] flex items-center justify-center p-4 transition-opacity duration-600 ${
+          className={`fixed inset-0 z-[210] flex itemList-center justify-center p-4 transition-opacity duration-600 ${
             isModalOpen ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"
           }`}
           style={{
@@ -1265,8 +1265,8 @@ export function FinaleModal() {
               e.stopPropagation();
             }}
           >
-            {/* Gold particles */}
-            {GOLD_PARTICLES.map((p, i) => (
+            {/* Gold particleList */}
+            {GOLD_PARTICLE_LIST.map((p, i) => (
               <div
                 key={i}
                 className="absolute rounded-full pointer-events-none"
@@ -1300,12 +1300,12 @@ export function FinaleModal() {
               </div>
 
               {/* Navigation */}
-              <div className="flex items-center justify-between mt-6">
+              <div className="flex itemList-center justify-between mt-6">
                 {/* Prev */}
                 <button
                   onClick={prevSlide}
                   disabled={slideIndex === 0}
-                  className="w-[32px] h-[32px] rounded-full flex items-center justify-center text-[0.7rem] border transition-all duration-200 cursor-pointer disabled:opacity-20 disabled:cursor-default"
+                  className="w-[32px] h-[32px] rounded-full flex itemList-center justify-center text-[0.7rem] border transition-all duration-200 cursor-pointer disabled:opacity-20 disabled:cursor-default"
                   style={{
                     borderColor: "#c9a03240",
                     background: "#f5e6c8",
@@ -1316,8 +1316,8 @@ export function FinaleModal() {
                 </button>
 
                 {/* Dots */}
-                <div className="flex items-center gap-2">
-                  {SLIDES.map((_, i) => (
+                <div className="flex itemList-center gap-2">
+                  {SLIDE_LIST.map((_, i) => (
                     <div
                       key={i}
                       className="rounded-full transition-all duration-300"
@@ -1332,10 +1332,10 @@ export function FinaleModal() {
                 </div>
 
                 {/* Next */}
-                {slideIndex < SLIDES.length - 1 ? (
+                {slideIndex < SLIDE_LIST.length - 1 ? (
                   <button
                     onClick={nextSlide}
-                    className="w-[32px] h-[32px] rounded-full flex items-center justify-center text-[0.7rem] border transition-all duration-200 cursor-pointer"
+                    className="w-[32px] h-[32px] rounded-full flex itemList-center justify-center text-[0.7rem] border transition-all duration-200 cursor-pointer"
                     style={{
                       borderColor: "#c9a03240",
                       background: "#f5e6c8",
@@ -1350,7 +1350,7 @@ export function FinaleModal() {
               </div>
 
               {/* Wax seal — only on last slide */}
-              {slideIndex === SLIDES.length - 1 && (
+              {slideIndex === SLIDE_LIST.length - 1 && (
                 <div
                   className="mt-6 flex justify-center"
                   style={{ animation: "finale-slide-in 0.6s ease-out 0.3s both" }}

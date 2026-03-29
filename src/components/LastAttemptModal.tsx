@@ -1,15 +1,15 @@
 import { useState } from "react";
-import { CooldownLabel } from "../features/cooldown/components/CooldownLabel";
+import { CooldownLabel } from "@features/cooldown/components/CooldownLabel";
 import { Modal } from "./ui/Modal";
 
-export function LastAttemptModal({ isOpen, onConfirm }: { isOpen: boolean; onConfirm: () => void }) {
+export function LastAttemptModal({ isOpen, onConfirm }: { isOpen: boolean; onConfirm: () => void }): React.JSX.Element {
   const [mountedAt] = useState(() => Date.now());
 
   return (
     <Modal
       isOpen={isOpen}
       zIndex={300}
-      className="border-danger/25 flex flex-col items-center text-center py-8 px-6"
+      className="border-danger/25 flex flex-color items-center text-center py-8 px-6"
       style={{
         background: "linear-gradient(155deg, #1a0f16, #0d0810)",
         boxShadow: "0 0 40px #ff6b8a15, inset 0 1px 0 #ffffff08",

@@ -56,13 +56,19 @@ const COLOR_MAP: Record<
   },
 };
 
-export function Button({ variant = "primary", color = "accent", size = "md", className = "", ...props }: ButtonProps) {
+export function Button({
+  variant = "primary",
+  color = "accent",
+  size = "md",
+  className = "",
+  ...props
+}: ButtonProps): React.JSX.Element {
   if (variant === "admin") {
-    const c = COLOR_MAP[color];
+    const colorStyles = COLOR_MAP[color];
 
     return (
       <button
-        className={`px-3 py-1 rounded-md text-[0.55rem] tracking-[0.15em] uppercase border ${c.border} ${c.text} ${c.bg} ${c.hoverBorder} ${c.hoverText} ${c.hoverBg} transition-all duration-150 active:scale-95 ${className}`}
+        className={`px-3 py-1 rounded-md text-[0.55rem] tracking-[0.15em] uppercase border ${colorStyles.border} ${colorStyles.text} ${colorStyles.bg} ${colorStyles.hoverBorder} ${colorStyles.hoverText} ${colorStyles.hoverBg} transition-all duration-150 active:scale-95 ${className}`}
         {...props}
       />
     );

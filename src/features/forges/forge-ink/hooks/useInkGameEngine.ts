@@ -7,16 +7,21 @@ import {
   sndInkMissAdjacent,
   sndInkWordSolved,
   sndScrambleSolved,
-} from "../../../../audio";
-import { getWordCells, INK_CONFIG, LETTER_MAP, PROXIMITY_MAP, type WordState } from "../config";
-import { useInkStore } from "../store";
-import { playCelebration, playHitParticles, playVictoryShimmer, playWordRipple } from "../vfx/ink-vfx";
+} from "@/audio";
+import { getWordCells, INK_CONFIG, LETTER_MAP, PROXIMITY_MAP, type WordState } from "@features/forges/forge-ink/config";
+import { useInkStore } from "@features/forges/forge-ink/store";
+import {
+  playCelebration,
+  playHitParticles,
+  playVictoryShimmer,
+  playWordRipple,
+} from "@features/forges/forge-ink/vfx/ink-vfx";
 
 // ── Private helpers ───────────────────────────────────────────────────────
 
 function initWordStates(): Record<string, WordState> {
   const states: Record<string, WordState> = {};
-  for (const word of INK_CONFIG.words) {
+  for (const word of INK_CONFIG.wordList) {
     states[word.text] = {
       solved: false,
       guessesLeft: INK_CONFIG.maxGuessesPerWord,
@@ -26,28 +31,28 @@ function initWordStates(): Record<string, WordState> {
   return states;
 }
 
-function computeWordPattern(wordText: string, revealedCells: Set<string>): string[] {
-  const word = INK_CONFIG.words.find((w) => w.text === wordText);
+function computeWordPattern(wordText: string, revealedCellList: Set<string>): string[] {
+  const word = INK_CONFIG.wordList.find((w) => w.text === wordText);
 
   if (!word) {
     throw new Error(`Unknown word: ${wordText}`);
   }
 
   return Array.from(word.text, (letter, i) => {
-    const row = word.direction === "H" ? word.start[0] : word.start[0] + i;
-    const col = word.direction === "H" ? word.start[1] + i : word.start[1];
+    const row = word.direction === "H" ? word.startList[0] : word.startList[0] + i;
+    const color = word.direction === "H" ? word.startList[1] + i : word.startList[1];
 
-    return revealedCells.has(`${String(row)},${String(col)}`) ? letter : "_";
+    return revealedCellList.has(`${String(row)},${String(color)}`) ? letter : "_";
   });
 }
 
-function getActiveWordTexts(revealedCells: Set<string>): string[] {
-  return INK_CONFIG.words
-    .filter((word) => getWordCells(word).some(([r, c]) => revealedCells.has(`${String(r)},${String(c)}`)))
+function getActiveWordTexts(revealedCellList: Set<string>): string[] {
+  return INK_CONFIG.wordList
+    .filter((word) => getWordCells(word).some(([r, c]) => revealedCellList.has(`${String(r)},${String(c)}`)))
     .map((w) => w.text);
 }
 
-const normalize = (s: string) => s.normalize("NFD").replaceAll(/[\u0300-\u036F]/g, "");
+const normalize = (s: string): string => s.normalize("NFD").replaceAll(/[\u0300-\u036F]/g, "");
 
 function todayStamp(): string {
   const d = new Date();
@@ -58,8 +63,8 @@ function todayStamp(): string {
 // ── Public interface ──────────────────────────────────────────────────────
 
 export type InkGameEngine = {
-  revealedCells: Set<string>;
-  missedCells: Set<string>;
+  revealedCellList: Set<string>;
+  missedCellList: Set<string>;
   wordStates: Record<string, WordState>;
   dropsLeft: number;
   animating: { key: string; result: "hit" | "miss" } | null;
@@ -69,8 +74,8 @@ export type InkGameEngine = {
   tapMessage: string | null;
   isShowingSolvedModal: boolean;
   isSolved: boolean;
-  activeWords: string[];
-  handleCellTap: (row: number, col: number) => void;
+  activeWordList: string[];
+  handleCellTap: (row: number, color: number) => void;
   handleWordGuess: (wordText: string, guess: string) => "correct" | "wrong" | "ignored";
   dismissVictoryModal: () => void;
   resetAll: () => void;
@@ -91,12 +96,12 @@ export function useInkGameEngine(
   const freshGame = isStale ? null : storedGame;
 
   // ── Persisted state ──
-  const [revealedCells, setRevealedCells] = useState<Set<string>>(() => new Set(freshGame?.revealedCells));
+  const [revealedCellList, setRevealedCells] = useState<Set<string>>(() => new Set(freshGame?.revealedCellList));
   const [wordStates, setWordStates] = useState<Record<string, WordState>>(
     () => freshGame?.wordStates ?? initWordStates(),
   );
   const [dropsLeft, setDropsLeft] = useState(() => freshGame?.dropsLeft ?? INK_CONFIG.maxDrops);
-  const [missedCells, setMissedCells] = useState<Set<string>>(() => new Set(freshGame?.missedCells));
+  const [missedCellList, setMissedCells] = useState<Set<string>>(() => new Set(freshGame?.missedCellList));
 
   // ── Ephemeral state ──
   const [animatingMissCells, setAnimatingMissCells] = useState(new Set<string>());
@@ -127,13 +132,13 @@ export function useInkGameEngine(
   // ── Persistence sync ──
   useEffect(() => {
     setInkGameState({
-      revealedCells: [...revealedCells],
-      missedCells: [...missedCells],
+      revealedCellList: [...revealedCellList],
+      missedCellList: [...missedCellList],
       wordStates,
       dropsLeft,
       dayStamp: todayStamp(),
     });
-  }, [revealedCells, missedCells, wordStates, dropsLeft, setInkGameState]);
+  }, [revealedCellList, missedCellList, wordStates, dropsLeft, setInkGameState]);
 
   // ── Admin re-lock (propSolved true → false) ──
   useEffect(() => {
@@ -162,7 +167,7 @@ export function useInkGameEngine(
 
     setWordStates((prev) => {
       const next = { ...prev };
-      for (const word of INK_CONFIG.words) {
+      for (const word of INK_CONFIG.wordList) {
         if (!next[word.text].solved) {
           next[word.text] = { ...next[word.text], guessesLeft: INK_CONFIG.maxGuessesPerWord };
         }
@@ -177,7 +182,7 @@ export function useInkGameEngine(
     if (isSolved) {
       return;
     }
-    const isAllWordsSolved = INK_CONFIG.words.every((w) => wordStates[w.text].solved);
+    const isAllWordsSolved = INK_CONFIG.wordList.every((w) => wordStates[w.text].solved);
 
     if (!isAllWordsSolved) {
       return;
@@ -197,12 +202,12 @@ export function useInkGameEngine(
     }, 300);
   }, [wordStates, isSolved, gridRef]);
 
-  // ── Graceful reset (ink exhausted, all words locked/solved) ──
+  // ── Graceful reset (ink exhausted, all wordList locked/solved) ──
   useEffect(() => {
     if (isSolved || dropsLeft > 0 || isResetting) {
       return;
     }
-    const isAllLocked = INK_CONFIG.words.every(
+    const isAllLocked = INK_CONFIG.wordList.every(
       (w) => wordStates[w.text].solved || wordStates[w.text].guessesLeft === 0,
     );
 
@@ -223,7 +228,7 @@ export function useInkGameEngine(
 
       setWordStates((prev) => {
         const next = { ...prev };
-        for (const word of INK_CONFIG.words) {
+        for (const word of INK_CONFIG.wordList) {
           const current = next[word.text];
 
           if (!current.solved) {
@@ -242,7 +247,7 @@ export function useInkGameEngine(
 
   // ── Cell tap handler ──
   const handleCellTap = useCallback(
-    (row: number, col: number) => {
+    (row: number, color: number) => {
       const now = Date.now();
 
       if (now - lastTapRef.current < 500) {
@@ -250,9 +255,9 @@ export function useInkGameEngine(
       }
       lastTapRef.current = now;
 
-      const key = `${String(row)},${String(col)}`;
+      const key = `${String(row)},${String(color)}`;
 
-      if (revealedCells.has(key) || missedCells.has(key) || animating !== null || dropsLeft <= 0) {
+      if (revealedCellList.has(key) || missedCellList.has(key) || animating !== null || dropsLeft <= 0) {
         return;
       }
 
@@ -284,7 +289,7 @@ export function useInkGameEngine(
 
         if (result === "hit") {
           sndInkHit();
-          const newRevealed = new Set([...revealedCells, key]);
+          const newRevealed = new Set([...revealedCellList, key]);
           setRevealedCells(newRevealed);
           setNewlyRevealedCells((prev) => new Set([...prev, key]));
 
@@ -299,8 +304,8 @@ export function useInkGameEngine(
 
           playHitParticles(gridRef, key);
 
-          // Auto-solve fully-revealed words
-          const autoSolved = INK_CONFIG.words.filter((word) => {
+          // Auto-solve fully-revealed wordList
+          const autoSolvedList = INK_CONFIG.wordList.filter((word) => {
             if (wordStates[word.text].solved) {
               return false;
             }
@@ -308,16 +313,16 @@ export function useInkGameEngine(
             return getWordCells(word).every(([r, c]) => newRevealed.has(`${String(r)},${String(c)}`));
           });
 
-          if (autoSolved.length > 0) {
+          if (autoSolvedList.length > 0) {
             setWordStates((prev) => {
               const next = { ...prev };
-              for (const word of autoSolved) {
+              for (const word of autoSolvedList) {
                 next[word.text] = { ...next[word.text], solved: true };
               }
 
               return next;
             });
-            for (const word of autoSolved) {
+            for (const word of autoSolvedList) {
               sndInkWordSolved();
               navigator.vibrate([30, 20, 50]);
               playWordRipple(gridRef, word);
@@ -338,7 +343,7 @@ export function useInkGameEngine(
         }
       }, 420);
     },
-    [revealedCells, missedCells, animating, dropsLeft, wordStates, gridRef],
+    [revealedCellList, missedCellList, animating, dropsLeft, wordStates, gridRef],
   );
 
   // ── Word guess handler ──
@@ -354,16 +359,16 @@ export function useInkGameEngine(
       if (val === normalize(wordText)) {
         sndInkWordSolved();
         navigator.vibrate([30, 20, 50]);
-        const word = INK_CONFIG.words.find((w) => w.text === wordText);
+        const word = INK_CONFIG.wordList.find((w) => w.text === wordText);
 
         if (!word) {
           return "ignored";
         }
-        const cells = getWordCells(word);
+        const cellList = getWordCells(word);
 
         setRevealedCells((prev) => {
           const next = new Set(prev);
-          cells.forEach(([r, c]) => next.add(`${String(r)},${String(c)}`));
+          cellList.forEach(([r, c]) => next.add(`${String(r)},${String(c)}`));
 
           return next;
         });
@@ -410,11 +415,11 @@ export function useInkGameEngine(
     onSolve();
   }, [onSolve]);
 
-  const activeWords = useMemo(() => getActiveWordTexts(revealedCells), [revealedCells]);
+  const activeWordList = useMemo(() => getActiveWordTexts(revealedCellList), [revealedCellList]);
 
   return {
-    revealedCells,
-    missedCells,
+    revealedCellList,
+    missedCellList,
     wordStates,
     dropsLeft,
     animating,
@@ -424,11 +429,11 @@ export function useInkGameEngine(
     tapMessage,
     isShowingSolvedModal,
     isSolved,
-    activeWords,
+    activeWordList,
     handleCellTap,
     handleWordGuess,
     dismissVictoryModal,
     resetAll,
-    getWordPattern: (wordText: string) => computeWordPattern(wordText, revealedCells),
+    getWordPattern: (wordText: string) => computeWordPattern(wordText, revealedCellList),
   };
 }

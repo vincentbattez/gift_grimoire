@@ -1,11 +1,13 @@
-import globals from "globals";
-import tseslint from "typescript-eslint";
+import prettierConfig from "eslint-config-prettier";
+import eslintPluginImport from "eslint-plugin-import";
+import eslintPluginPrettier from "eslint-plugin-prettier";
 import reactHooks from "eslint-plugin-react-hooks";
 import reactRefresh from "eslint-plugin-react-refresh";
-import prettierConfig from "eslint-config-prettier";
-import eslintPluginPrettier from "eslint-plugin-prettier";
-import unusedImports from "eslint-plugin-unused-imports";
 import eslintPluginUnicorn from "eslint-plugin-unicorn";
+import unusedImports from "eslint-plugin-unused-imports";
+import globals from "globals";
+import tseslint from "typescript-eslint";
+
 
 export default tseslint.config(
   { ignores: ["dist/", "node_modules/", "eslint.config.js", "commitlint.config.ts"] },
@@ -27,7 +29,16 @@ export default tseslint.config(
     },
     plugins: {
       prettier: eslintPluginPrettier,
+      import: eslintPluginImport,
       "unused-imports": unusedImports,
+    },
+    settings: {
+      "import/resolver": {
+        typescript: {
+          alwaysTryTypes: true,
+          project: "./tsconfig.json",
+        },
+      },
     },
     rules: {
       // — Prettier
@@ -65,6 +76,17 @@ export default tseslint.config(
       "@typescript-eslint/prefer-nullish-coalescing": "warn",
       "@typescript-eslint/no-dynamic-delete": "warn",
       "@typescript-eslint/no-shadow": "warn",
+      "@typescript-eslint/no-unnecessary-condition": "off",
+      "@typescript-eslint/no-unnecessary-type-conversion": "off",
+      "@typescript-eslint/no-unnecessary-type-parameters": "off",
+      "@typescript-eslint/explicit-function-return-type": [
+        "error",
+        {
+          allowExpressions: true,
+          allowTypedFunctionExpressions: true,
+          allowHigherOrderFunctions: true,
+        },
+      ],
       "@typescript-eslint/naming-convention": [
         "error",
         // — Variables & params: camelCase (+ UPPER_CASE for constants)
@@ -95,10 +117,44 @@ export default tseslint.config(
           selector: "typeLike",
           format: ["PascalCase"],
         },
-        // — Enums members: PascalCase
+        // — Arrays: suffix List
+        {
+          selector: ["variable", "typeProperty"],
+          types: ["array"],
+          format: null,
+          custom: {
+            regex: "^(?!data(?:List)?$)([a-z][a-zA-Z0-9]*List[a-zA-Z0-9]*(?<!Data)|[A-Z][A-Z0-9]*(?:_[A-Z0-9]+)*_LIST[A-Z0-9_]*)$",
+            match: true,
+          },
+        },
+        // — Interfaces: prefix I
+        {
+          selector: "interface",
+          format: ["PascalCase"],
+          prefix: ["I"],
+        },
+        // — Enums: suffix Enum
+        {
+          selector: "enum",
+          format: ["PascalCase"],
+          suffix: ["Enum"],
+        },
+        // — Enums members: UPPER_CASE
         {
           selector: "enumMember",
-          format: ["PascalCase"],
+          format: ["UPPER_CASE"],
+        },
+      ],
+
+      // — Imports
+      "import/extensions": "off",
+      "import/no-unresolved": "off",
+      "import/prefer-default-export": "off",
+      "import/no-default-export": "error",
+      "no-restricted-imports": [
+        "error",
+        {
+          patterns: ["~/*", "../*"],
         },
       ],
 
@@ -109,7 +165,22 @@ export default tseslint.config(
       curly: ["error", "all"],
       "no-nested-ternary": "warn",
       eqeqeq: "error",
+      "new-cap": "warn",
       "no-shadow": "off",
+      "no-param-reassign": "off",
+      "no-underscore-dangle": "off",
+      "no-use-before-define": "off",
+      "no-restricted-syntax": [
+        "error",
+        {
+          selector: ":matches(PropertyDefinition, MethodDefinition)[accessibility=\"private\"]",
+          message: "Use `#private` members instead.",
+        },
+      ],
+      "function-paren-newline": "off",
+      "array-bracket-newline": ["warn", { multiline: true }],
+      "array-bracket-spacing": ["warn", "never"],
+      "array-element-newline": ["warn", "consistent"],
       "padding-line-between-statements": [
         "error",
         { blankLine: "always", prev: "*", next: "return" },
@@ -126,6 +197,16 @@ export default tseslint.config(
       "unicorn/prevent-abbreviations": "off",
       "unicorn/no-array-for-each": "off",
       "unicorn/no-keyword-prefix": "off",
+    },
+  },
+  // Allow default exports in app.ts
+  {
+    files: [
+      "src/App.tsx",
+      "vite.config.ts"
+    ],
+    rules: {
+      "import/no-default-export": "off"
     },
   },
 );

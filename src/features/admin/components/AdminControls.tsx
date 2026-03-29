@@ -1,10 +1,10 @@
-import { useCooldownStore } from "../../cooldown/store";
-import { ENIGMAS } from "../../enigma/config";
-import { useEnigmaStore } from "../../enigma/store";
-import type { EnigmaPersistedStatus } from "../../enigma/types";
-import { FORGES } from "../../forges/forges.config";
+import { useCooldownStore } from "@features/cooldown/store";
+import { ENIGMA_LIST } from "@features/enigma/config";
+import { useEnigmaStore } from "@features/enigma/store";
+import type { EnigmaPersistedStatus } from "@features/enigma/types";
+import { FORGE_LIST } from "@features/forges/forges.config";
 
-const STATUSES: EnigmaPersistedStatus[] = ["locked", "unlocked", "solved", "completed"];
+const STATUS_LIST: EnigmaPersistedStatus[] = ["locked", "unlocked", "solved", "completed"];
 
 const STATUS_STYLE: Record<EnigmaPersistedStatus, string> = {
   locked: "border-muted/30 text-muted/50 bg-muted/5",
@@ -38,7 +38,7 @@ function getEnigmaCurrentStatus(
  * - Setter d'état par énigme
  * - Reset cooldown timer
  */
-export function AdminControls() {
+export function AdminControls(): React.JSX.Element {
   const setEnigmaStatus = useEnigmaStore((s) => s.setEnigmaStatus);
   const resetAttempt = useCooldownStore((s) => s.resetAttempt);
   const enigmas = useEnigmaStore((s) => s.enigmas);
@@ -54,7 +54,7 @@ export function AdminControls() {
           onClick={() => {
             const { unlock } = useEnigmaStore.getState();
 
-            ENIGMAS.forEach((e) => {
+            ENIGMA_LIST.forEach((e) => {
               unlock(e.id);
             });
           }}
@@ -66,12 +66,12 @@ export function AdminControls() {
           onClick={() => {
             const es = useEnigmaStore.getState();
 
-            ENIGMAS.forEach((e) => {
+            ENIGMA_LIST.forEach((e) => {
               es.unlock(e.id);
               es.solve(e.id);
             });
 
-            FORGES.forEach((f) => {
+            FORGE_LIST.forEach((f) => {
               f.solve();
               f.reveal();
             });
@@ -92,7 +92,7 @@ export function AdminControls() {
 
       {/* Setter d'état par énigme */}
       <div className="space-y-2">
-        {ENIGMAS.map((e) => {
+        {ENIGMA_LIST.map((e) => {
           const state = enigmas[e.id];
 
           const current = getEnigmaCurrentStatus(state, readLetters[e.id]);
@@ -103,7 +103,7 @@ export function AdminControls() {
                 {e.icon} {e.id}
               </span>
               <div className="flex gap-1 flex-wrap">
-                {STATUSES.map((status) => (
+                {STATUS_LIST.map((status) => (
                   <button
                     key={status}
                     onClick={() => {

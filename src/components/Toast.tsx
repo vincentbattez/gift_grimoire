@@ -1,7 +1,7 @@
 import { useEffect } from "react";
-import { useUIStore } from "../store";
+import { useUIStore } from "@/store";
 
-export function Toast() {
+export function Toast(): React.JSX.Element {
   const message = useUIStore((s) => s.toastMessage);
   const hideToast = useUIStore((s) => s.hideToast);
 

@@ -1,9 +1,9 @@
-import { Badge } from "../../../components/ui/Badge";
-import { useEnigmaStore } from "../../enigma/store";
-import { useCooldownStore } from "../store";
-import { useCooldown } from "../useCooldown";
+import { Badge } from "@components/ui/Badge";
+import { useCooldownStore } from "@features/cooldown/store";
+import { useCooldown } from "@features/cooldown/useCooldown";
+import { useEnigmaStore } from "@features/enigma/store";
 
-export function CooldownBadge() {
+export function CooldownBadge(): React.JSX.Element | null {
   const enigmas = useEnigmaStore((s) => s.enigmas);
   const hasUnlocked = Object.values(enigmas).some((e) => e.unlocked || e.solved);
   const lastAttempt = useCooldownStore((s) => s.lastAttempt);

@@ -12,7 +12,7 @@ import type { ForgeModule } from "./types";
  * Registre des forges pluggables.
  * Chaque forge gère son propre état (solved/revealed) dans son store local.
  */
-export const FORGES: ForgeModule[] = [
+export const FORGE_LIST: ForgeModule[] = [
   {
     key: "magnet",
     title: "La chaleur de L'Arc-en-ciel",
@@ -83,7 +83,7 @@ export const FORGES: ForgeModule[] = [
     reset: () => {
       useInkStore.getState().reset();
     },
-    adminActions: [
+    adminActionList: [
       {
         label: "reset ink drops",
         onClick: () => {

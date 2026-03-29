@@ -1,6 +1,6 @@
 export type WordConfig = {
   text: string;
-  start: [number, number]; // [row, col]
+  startList: [number, number]; // [row, col]
   direction: "H" | "V";
 };
 
@@ -9,7 +9,7 @@ export type InkForgeConfig = {
   gridRows: number;
   maxDrops: number;
   maxGuessesPerWord: number;
-  words: WordConfig[];
+  wordList: WordConfig[];
 };
 
 // Grille 7 colonnes × 9 lignes (mobile-safe)
@@ -17,7 +17,7 @@ export type InkForgeConfig = {
 // Ligne 0 : ECRAN horizontal — partage R avec RESONANCE en (0,3)
 // Ligne 3 : VOILE horizontal — partage O avec RESONANCE en (3,3)
 //
-//  col:  0 1 2 3 4 5 6
+//  color:  0 1 2 3 4 5 6
 //  row0:   E C R A N
 //  row1:       E
 //  row2:       S
@@ -32,27 +32,27 @@ export const INK_CONFIG: InkForgeConfig = {
   gridRows: 9,
   maxDrops: 6,
   maxGuessesPerWord: 3,
-  words: [
-    { text: "RESONANCE", start: [0, 3], direction: "V" },
-    { text: "ECRAN", start: [0, 1], direction: "H" },
-    { text: "VOILE", start: [3, 2], direction: "H" },
+  wordList: [
+    { text: "RESONANCE", startList: [0, 3], direction: "V" },
+    { text: "ECRAN", startList: [0, 1], direction: "H" },
+    { text: "VOILE", startList: [3, 2], direction: "H" },
   ],
 };
 
-/** Map "row,col" → { letter, wordTexts[] } */
-export function buildLetterMap(config: InkForgeConfig): Map<string, { letter: string; wordTexts: string[] }> {
-  const map = new Map<string, { letter: string; wordTexts: string[] }>();
-  for (const word of config.words) {
+/** Map "row,col" → { letter, wordTextList[] } */
+export function buildLetterMap(config: InkForgeConfig): Map<string, { letter: string; wordTextList: string[] }> {
+  const map = new Map<string, { letter: string; wordTextList: string[] }>();
+  for (const word of config.wordList) {
     for (let i = 0; i < word.text.length; i++) {
-      const row = word.direction === "H" ? word.start[0] : word.start[0] + i;
-      const col = word.direction === "H" ? word.start[1] + i : word.start[1];
-      const key = `${String(row)},${String(col)}`;
+      const row = word.direction === "H" ? word.startList[0] : word.startList[0] + i;
+      const color = word.direction === "H" ? word.startList[1] + i : word.startList[1];
+      const key = `${String(row)},${String(color)}`;
       const entry = map.get(key);
 
       if (entry) {
-        entry.wordTexts.push(word.text);
+        entry.wordTextList.push(word.text);
       } else {
-        map.set(key, { letter: word.text[i], wordTexts: [word.text] });
+        map.set(key, { letter: word.text[i], wordTextList: [word.text] });
       }
     }
   }
@@ -66,8 +66,8 @@ export function getWordCells(word: WordConfig): [number, number][] {
     { length: word.text.length },
     (_, i) =>
       [
-        word.direction === "H" ? word.start[0] : word.start[0] + i,
-        word.direction === "H" ? word.start[1] + i : word.start[1],
+        word.direction === "H" ? word.startList[0] : word.startList[0] + i,
+        word.direction === "H" ? word.startList[1] + i : word.startList[1],
       ] as [number, number],
   );
 }
@@ -76,7 +76,7 @@ export function getWordCells(word: WordConfig): [number, number][] {
 
 export type WordState = { solved: boolean; guessesLeft: number };
 
-/** Map "row,col" → { letter, wordTexts[] } — pre-computed at module load */
+/** Map "row,col" → { letter, wordTextList[] } — pre-computed at module load */
 export const LETTER_MAP = buildLetterMap(INK_CONFIG);
 
 function computeProximityMap(): Map<string, "hot" | "warm"> {

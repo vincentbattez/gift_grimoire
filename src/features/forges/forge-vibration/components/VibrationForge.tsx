@@ -1,13 +1,13 @@
 import { useEffect, useRef, useState } from "react";
-import { sndDeepListen, sndOk } from "../../../../audio";
-import { pollEntityState } from "../../../../ha";
-import { EnigmaPicker } from "../../../enigma/components/EnigmaPicker";
-import type { ForgeProps } from "../../types";
-import { ENTITY_ID, LISTEN_DURATION_MS } from "../config";
+import { sndDeepListen, sndOk } from "@/audio";
+import { pollEntityState } from "@/ha";
+import { EnigmaPicker } from "@features/enigma/components/EnigmaPicker";
+import { ENTITY_ID, LISTEN_DURATION_MS } from "@features/forges/forge-vibration/config";
+import type { ForgeProps } from "@features/forges/types";
 
 type Phase = "idle" | "listening" | "detected" | "failed";
 
-function SoundWaveIcon({ color, size = 28 }: { color: string; size?: number }) {
+function SoundWaveIcon({ color, size = 28 }: { color: string; size?: number }): React.JSX.Element {
   return (
     <svg
       width={size}
@@ -28,7 +28,7 @@ function SoundWaveIcon({ color, size = 28 }: { color: string; size?: number }) {
 }
 
 /** Forge : Le Murmure Invisible — détecte une vibration via Home Assistant */
-export function VibrationForge({ solved, onSolve }: ForgeProps) {
+export function VibrationForge({ solved, onSolve }: ForgeProps): React.JSX.Element {
   const [phase, setPhase] = useState<Phase>("idle");
   const [progress, setProgress] = useState(0);
   const [isShowingPicker, setIsShowingPicker] = useState(false);
@@ -41,9 +41,9 @@ export function VibrationForge({ solved, onSolve }: ForgeProps) {
         /* noop cleanup */
       };
     }
-    const start = Date.now();
+    const startList = Date.now();
     const id = setInterval(() => {
-      setProgress(Math.min(1, (Date.now() - start) / LISTEN_DURATION_MS));
+      setProgress(Math.min(1, (Date.now() - startList) / LISTEN_DURATION_MS));
     }, 50);
 
     return () => {
@@ -51,7 +51,7 @@ export function VibrationForge({ solved, onSolve }: ForgeProps) {
     };
   }, [phase]);
 
-  async function handleClick() {
+  async function handleClick(): Promise<void> {
     if (phase === "listening" || phase === "detected") {
       return;
     }
@@ -87,22 +87,22 @@ export function VibrationForge({ solved, onSolve }: ForgeProps) {
 
   const SIZE = 110;
   const SW = 2.5;
-  const R = (SIZE - SW * 2) / 2;
-  const C = 2 * Math.PI * R;
+  const circleRadius = (SIZE - SW * 2) / 2;
+  const circumference = 2 * Math.PI * circleRadius;
 
   if (solved) {
     return (
-      <div className="flex flex-col items-center gap-3">
+      <div className="flex flex-color items-center gap-3">
         <div className="relative" style={{ width: SIZE, height: SIZE }}>
           <svg className="absolute inset-0 -rotate-90" width={SIZE} height={SIZE}>
             <circle
               cx={SIZE / 2}
               cy={SIZE / 2}
-              r={R}
+              r={circleRadius}
               fill="none"
               stroke="var(--color-success)"
               strokeWidth={SW}
-              strokeDasharray={C}
+              strokeDasharray={circumference}
               strokeDashoffset={0}
               strokeLinecap="round"
             />
@@ -180,7 +180,7 @@ export function VibrationForge({ solved, onSolve }: ForgeProps) {
   })();
 
   return (
-    <div className="flex flex-col items-center gap-3">
+    <div className="flex flex-color items-center gap-3">
       <button
         ref={btnRef}
         onClick={() => {
@@ -217,17 +217,25 @@ export function VibrationForge({ solved, onSolve }: ForgeProps) {
         )}
 
         <svg className="absolute inset-0 -rotate-90" width={SIZE} height={SIZE}>
-          <circle cx={SIZE / 2} cy={SIZE / 2} r={R} fill="none" stroke="white" strokeOpacity={0.04} strokeWidth={SW} />
+          <circle
+            cx={SIZE / 2}
+            cy={SIZE / 2}
+            r={circleRadius}
+            fill="none"
+            stroke="white"
+            strokeOpacity={0.04}
+            strokeWidth={SW}
+          />
           {phase === "listening" && (
             <circle
               cx={SIZE / 2}
               cy={SIZE / 2}
-              r={R}
+              r={circleRadius}
               fill="none"
               stroke={ringColor}
               strokeWidth={SW}
-              strokeDasharray={C}
-              strokeDashoffset={C * (1 - progress)}
+              strokeDasharray={circumference}
+              strokeDashoffset={circumference * (1 - progress)}
               strokeLinecap="round"
               style={{ transition: "stroke-dashoffset 80ms linear" }}
             />
@@ -236,11 +244,11 @@ export function VibrationForge({ solved, onSolve }: ForgeProps) {
             <circle
               cx={SIZE / 2}
               cy={SIZE / 2}
-              r={R}
+              r={circleRadius}
               fill="none"
               stroke={ringColor}
               strokeWidth={SW}
-              strokeDasharray={C}
+              strokeDasharray={circumference}
               strokeDashoffset={0}
               strokeLinecap="round"
               className="transition-all duration-500"

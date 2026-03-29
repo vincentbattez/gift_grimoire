@@ -1,6 +1,6 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
-import { ENIGMAS } from "./config";
+import { ENIGMA_LIST } from "./config";
 import { MODAL_CLOSE_MS } from "./timings";
 import type { EnigmaPersistedStatus } from "./types";
 
@@ -42,7 +42,7 @@ type EnigmaStore = {
 
 const initialEnigmas: Record<EnigmaId, EnigmaState> = {};
 
-ENIGMAS.forEach((e) => {
+ENIGMA_LIST.forEach((e) => {
   initialEnigmas[e.id] = { unlocked: false, solved: false };
 });
 

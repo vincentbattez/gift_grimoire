@@ -13,7 +13,12 @@ const COLOR_MAP: Record<string, { border: string; shadow: string }> = {
   accent: { border: "border-accent/30", shadow: "shadow-[0_0_20px_#9b6dff15]" },
 };
 
-export function Badge({ children, color = "accent", position = "bottom", className = "" }: BadgeProps) {
+export function Badge({
+  children,
+  color = "accent",
+  position = "bottom",
+  className = "",
+}: BadgeProps): React.JSX.Element {
   const { border, shadow } = COLOR_MAP[color];
   const posClass = position === "bottom" ? "bottom-5" : "top-5";
 

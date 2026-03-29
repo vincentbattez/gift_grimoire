@@ -14,7 +14,7 @@ function seededRandom(seed: number) {
   };
 }
 
-function CornerFiligree() {
+function CornerFiligree(): React.JSX.Element {
   return (
     <svg viewBox="0 0 60 60" fill="none">
       {/* Main scroll curve */}
@@ -38,7 +38,7 @@ function CornerFiligree() {
   );
 }
 
-function OrnateSeparator() {
+function OrnateSeparator(): React.JSX.Element {
   return (
     <div className="tarot-separator-ornate">
       <svg className="separator-svg" viewBox="0 0 200 16" preserveAspectRatio="none">
@@ -61,7 +61,7 @@ function OrnateSeparator() {
   );
 }
 
-function SacredGeometryRing() {
+function SacredGeometryRing(): React.JSX.Element {
   return (
     <svg className="sacred-geometry-ring" viewBox="0 0 100 100">
       {/* Outer dotted circle */}
@@ -77,11 +77,11 @@ function SacredGeometryRing() {
       <line x1="82" y1="50" x2="92" y2="50" stroke="currentColor" strokeWidth="0.4" />
       {/* Diagonal ticks */}
       {[45, 135, 225, 315].map((angle) => {
-        const rad = (angle * Math.PI) / 180;
-        const x1 = 50 + 38 * Math.cos(rad);
-        const y1 = 50 + 38 * Math.sin(rad);
-        const x2 = 50 + 44 * Math.cos(rad);
-        const y2 = 50 + 44 * Math.sin(rad);
+        const angleRadians = (angle * Math.PI) / 180;
+        const x1 = 50 + 38 * Math.cos(angleRadians);
+        const y1 = 50 + 38 * Math.sin(angleRadians);
+        const x2 = 50 + 44 * Math.cos(angleRadians);
+        const y2 = 50 + 44 * Math.sin(angleRadians);
 
         return <line key={angle} x1={x1} y1={y1} x2={x2} y2={y2} stroke="currentColor" strokeWidth="0.3" />;
       })}
@@ -94,7 +94,7 @@ function SacredGeometryRing() {
   );
 }
 
-function CartoucheFrame() {
+function CartoucheFrame(): React.JSX.Element {
   return (
     <div className="cartouche-frame">
       <svg className="cartouche-frame-svg" viewBox="0 0 200 300" preserveAspectRatio="none">
@@ -116,7 +116,7 @@ function CartoucheFrame() {
   );
 }
 
-function BottomMedallion({ numeral }: { numeral: string }) {
+function BottomMedallion({ numeral }: { numeral: string }): React.JSX.Element {
   return (
     <div className="tarot-bottom-medallion">
       <svg className="bottom-wing" viewBox="0 0 30 12">
@@ -134,11 +134,11 @@ function BottomMedallion({ numeral }: { numeral: string }) {
   );
 }
 
-function SideRail({ side }: { side: "left" | "right" }) {
+function SideRail({ side }: { side: "left" | "right" }): React.JSX.Element {
   return (
     <svg className={`side-rail side-rail-${side}`} viewBox="0 0 6 100" preserveAspectRatio="none">
       <line x1="3" y1="0" x2="3" y2="100" stroke="currentColor" strokeWidth="0.3" />
-      {/* Repeating diamond pattern */}
+      {/* Repeating diamond patternList */}
       {[10, 25, 40, 55, 70, 85].map((y) => (
         <polygon
           key={y}
@@ -151,8 +151,8 @@ function SideRail({ side }: { side: "left" | "right" }) {
   );
 }
 
-function Starfield({ seed }: { seed: number }) {
-  const stars = useMemo(() => {
+function Starfield({ seed }: { seed: number }): React.JSX.Element {
+  const starList = useMemo(() => {
     const rng = seededRandom(seed);
 
     return Array.from({ length: 30 }, () => ({
@@ -165,22 +165,22 @@ function Starfield({ seed }: { seed: number }) {
 
   return (
     <svg className="tarot-starfield" viewBox="0 0 100 100" preserveAspectRatio="none">
-      {stars.map((s, i) => (
+      {starList.map((s, i) => (
         <circle key={i} cx={s.cx} cy={s.cy} r={s.r} fill="var(--gold)" opacity={s.opacity} />
       ))}
     </svg>
   );
 }
 
-async function downloadCard(el: HTMLElement, enigma: EnigmaData) {
-  const dataUrl = await toPng(el, { pixelRatio: 3 });
+async function downloadCard(cardElement: HTMLElement, enigma: EnigmaData): Promise<void> {
+  const dataUrl = await toPng(cardElement, { pixelRatio: 3 });
   const link = document.createElement("a");
   link.download = `carte-${enigma.number}-${enigma.title.replaceAll(/[^\dA-Za-zÀ-ÿ]/g, "_")}.png`;
   link.href = dataUrl;
   link.click();
 }
 
-export function EnigmaSheet({ enigma, index }: { enigma: EnigmaData; index: number }) {
+export function EnigmaSheet({ enigma, index }: { enigma: EnigmaData; index: number }): React.JSX.Element {
   const cardRef = useRef<HTMLDivElement>(null);
 
   return (

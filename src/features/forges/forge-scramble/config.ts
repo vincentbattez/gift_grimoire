@@ -5,7 +5,7 @@ export type Letter = {
   char: string;
 };
 
-export const INITIAL_LETTERS: Letter[] = [
+export const INITIAL_LETTER_LIST: Letter[] = [
   { id: 1, char: "S" },
   { id: 2, char: "W" },
   { id: 3, char: "R" },

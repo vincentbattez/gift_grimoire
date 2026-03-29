@@ -1,16 +1,16 @@
 import { useRef, useState } from "react";
-import { useAdmin } from "../../../admin/useAdmin";
-import { CooldownLabel } from "../../../cooldown/components/CooldownLabel";
-import type { ForgeProps } from "../../types";
-import { INK_CONFIG, LETTER_MAP, PROXIMITY_MAP } from "../config";
-import { useInkGameEngine } from "../hooks/useInkGameEngine";
+import { useAdmin } from "@features/admin/useAdmin";
+import { CooldownLabel } from "@features/cooldown/components/CooldownLabel";
+import { INK_CONFIG, LETTER_MAP, PROXIMITY_MAP } from "@features/forges/forge-ink/config";
+import { useInkGameEngine } from "@features/forges/forge-ink/hooks/useInkGameEngine";
+import type { ForgeProps } from "@features/forges/types";
 import { InkCell } from "./InkCell";
 import { InkDropIndicator } from "./InkDropIndicator";
 import { InkSolvedView } from "./InkSolvedView";
 import { InkVictoryModal } from "./InkVictoryModal";
 import { InkWordCard } from "./InkWordCard";
 
-export function InkRevealForge({ solved: propSolved, onSolve }: ForgeProps) {
+export function InkRevealForge({ solved: propSolved, onSolve }: ForgeProps): React.JSX.Element {
   const isAdmin = useAdmin();
   const gridRef = useRef<HTMLDivElement>(null);
   const engine = useInkGameEngine(gridRef, propSolved, onSolve);
@@ -38,7 +38,7 @@ export function InkRevealForge({ solved: propSolved, onSolve }: ForgeProps) {
         </div>
       )}
 
-      {engine.revealedCells.size === 0 && engine.missedCells.size === 0 && !engine.isSolved && (
+      {engine.revealedCellList.size === 0 && engine.missedCellList.size === 0 && !engine.isSolved && (
         <div className="text-center text-[0.45rem] text-muted/40 italic tracking-wide mb-3">
           Touche une case pour y verser de l'encre
         </div>
@@ -56,11 +56,11 @@ export function InkRevealForge({ solved: propSolved, onSolve }: ForgeProps) {
       >
         {Array.from({ length: INK_CONFIG.gridCols * INK_CONFIG.gridRows }, (_, idx) => {
           const row = Math.floor(idx / INK_CONFIG.gridCols);
-          const col = idx % INK_CONFIG.gridCols;
-          const key = `${String(row)},${String(col)}`;
+          const color = idx % INK_CONFIG.gridCols;
+          const key = `${String(row)},${String(color)}`;
           const letterEntry = LETTER_MAP.get(key);
-          const isRevealed = engine.revealedCells.has(key);
-          const isMissed = engine.missedCells.has(key);
+          const isRevealed = engine.revealedCellList.has(key);
+          const isMissed = engine.missedCellList.has(key);
           const isAnimating = engine.animating?.key === key;
 
           const isHotLetter =
@@ -70,7 +70,7 @@ export function InkRevealForge({ solved: propSolved, onSolve }: ForgeProps) {
             (() => {
               const [cr, cc] = engine.proximityCenter.split(",").map(Number);
 
-              return (Math.abs(row - cr) === 1 && col === cc) || (row === cr && Math.abs(col - cc) === 1);
+              return (Math.abs(row - cr) === 1 && color === cc) || (row === cr && Math.abs(color - cc) === 1);
             })();
 
           let proximity: "hot" | "warm" | undefined;
@@ -78,7 +78,7 @@ export function InkRevealForge({ solved: propSolved, onSolve }: ForgeProps) {
           if (engine.proximityCenter && !isRevealed && !isMissed && !isAnimating) {
             const [cr, cc] = engine.proximityCenter.split(",").map(Number);
             const isAdjacentToMiss =
-              (Math.abs(row - cr) === 1 && col === cc) || (row === cr && Math.abs(col - cc) === 1);
+              (Math.abs(row - cr) === 1 && color === cc) || (row === cr && Math.abs(color - cc) === 1);
 
             if (isAdjacentToMiss) {
               proximity = PROXIMITY_MAP.get(key);
@@ -90,13 +90,13 @@ export function InkRevealForge({ solved: propSolved, onSolve }: ForgeProps) {
               key={key}
               cellKey={key}
               row={row}
-              col={col}
+              color={color}
               letter={letterEntry?.letter}
               isRevealed={isRevealed}
               isMissed={isMissed}
               isAnimating={isAnimating}
               isAnimatingHit={isAnimating && engine.animating?.result === "hit"}
-              wordSolved={isRevealed && !!letterEntry?.wordTexts.some((wt) => engine.wordStates[wt].solved)}
+              wordSolved={isRevealed && !!letterEntry?.wordTextList.some((wt) => engine.wordStates[wt].solved)}
               isNewlyRevealed={engine.newlyRevealedCells.has(key)}
               isAnimatingMiss={engine.animatingMissCells.has(key)}
               isHotLetter={isHotLetter}
@@ -110,19 +110,19 @@ export function InkRevealForge({ solved: propSolved, onSolve }: ForgeProps) {
       </div>
 
       {/* Words */}
-      {engine.activeWords.length > 0 && (
-        <div className="mt-5 flex flex-col gap-3">
+      {engine.activeWordList.length > 0 && (
+        <div className="mt-5 flex flex-color gap-3">
           <div className="text-center text-[0.45rem] tracking-[0.25em] text-muted/40 uppercase">— Mots à révéler —</div>
-          {engine.activeWords.map((wordText) => {
+          {engine.activeWordList.map((wordText) => {
             const state = engine.wordStates[wordText];
-            const word = INK_CONFIG.words.find((w) => w.text === wordText);
+            const word = INK_CONFIG.wordList.find((w) => w.text === wordText);
 
             return (
               <InkWordCard
                 key={wordText}
                 wordText={wordText}
                 state={state}
-                pattern={engine.getWordPattern(wordText)}
+                patternList={engine.getWordPattern(wordText)}
                 direction={word?.direction ?? "H"}
                 onGuess={engine.handleWordGuess}
               />

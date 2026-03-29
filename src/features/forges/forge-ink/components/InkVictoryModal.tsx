@@ -2,7 +2,7 @@ type InkVictoryModalProps = {
   onContinue: () => void;
 };
 
-export function InkVictoryModal({ onContinue }: InkVictoryModalProps) {
+export function InkVictoryModal({ onContinue }: InkVictoryModalProps): React.JSX.Element {
   return (
     <div
       className="fixed inset-0 z-[200] flex items-center justify-center"
@@ -12,7 +12,7 @@ export function InkVictoryModal({ onContinue }: InkVictoryModalProps) {
       }}
     >
       <div
-        className="mx-6 px-7 py-8 rounded-2xl flex flex-col items-center gap-5 text-center"
+        className="mx-6 px-7 py-8 rounded-2xl flex flex-color items-center gap-5 text-center"
         style={{
           border: "1px solid rgba(232,201,106,0.35)",
           background: "linear-gradient(155deg, #1a1430, #0d0920)",

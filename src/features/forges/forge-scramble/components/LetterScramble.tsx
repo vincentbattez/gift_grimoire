@@ -1,31 +1,31 @@
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
-import { sndLetterSwap, sndScrambleSolved } from "../../../../audio";
-import { EnigmaPicker } from "../../../enigma/components/EnigmaPicker";
-import type { ForgeProps } from "../../types";
-import { INITIAL_LETTERS, SOLUTION, type Letter } from "../config";
+import { sndLetterSwap, sndScrambleSolved } from "@/audio";
+import { EnigmaPicker } from "@features/enigma/components/EnigmaPicker";
+import { INITIAL_LETTER_LIST, SOLUTION, type Letter } from "@features/forges/forge-scramble/config";
+import type { ForgeProps } from "@features/forges/types";
 
-function shuffle<T>(arr: T[]): T[] {
-  const a = [...arr];
-  for (let i = a.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [a[i], a[j]] = [a[j], a[i]];
+function shuffle<T>(sourceArray: T[]): T[] {
+  const shuffledList = [...sourceArray];
+  for (let i = shuffledList.length - 1; i > 0; i--) {
+    const randomIndex = Math.floor(Math.random() * (i + 1));
+    [shuffledList[i], shuffledList[randomIndex]] = [shuffledList[randomIndex], shuffledList[i]];
   }
 
-  return a;
+  return shuffledList;
 }
 
 function makeShuffled(): Letter[] {
-  let shuffled = shuffle(INITIAL_LETTERS);
-  while (shuffled.map((l) => l.char).join("") === SOLUTION) {
-    shuffled = shuffle(INITIAL_LETTERS);
+  let shuffledList = shuffle(INITIAL_LETTER_LIST);
+  while (shuffledList.map((l) => l.char).join("") === SOLUTION) {
+    shuffledList = shuffle(INITIAL_LETTER_LIST);
   }
 
-  return shuffled;
+  return shuffledList;
 }
 
 /** Forge : Le Maillon des Égarés — glisser-déposer de lettres pour reconstituer le mot */
-export function LetterScramble({ solved, onSolve }: ForgeProps) {
-  const [letters, setLetters] = useState<Letter[]>(() =>
+export function LetterScramble({ solved, onSolve }: ForgeProps): React.JSX.Element {
+  const [letterList, setLetters] = useState<Letter[]>(() =>
     solved ? Array.from(SOLUTION, (char, i) => ({ id: i + 1, char })) : makeShuffled(),
   );
   const [isLocalSolved, setIsLocalSolved] = useState(false);
@@ -36,9 +36,9 @@ export function LetterScramble({ solved, onSolve }: ForgeProps) {
 
   const containerRef = useRef<HTMLDivElement>(null);
   const ghostRef = useRef<HTMLDivElement>(null);
-  const lettersRef = useRef(letters);
+  const lettersRef = useRef(letterList);
   // eslint-disable-next-line react-hooks/refs
-  lettersRef.current = letters;
+  lettersRef.current = letterList;
   const flipSnapshotRef = useRef(new Map<number, DOMRect>());
 
   // Réinitialisation quand le store admin re-lock l'épreuve
@@ -83,13 +83,13 @@ export function LetterScramble({ solved, onSolve }: ForgeProps) {
       el.style.transition = "transform 220ms cubic-bezier(0.25, 0.46, 0.45, 0.94)";
       el.style.transform = "";
 
-      const cleanup = () => {
+      const cleanup = (): void => {
         el.style.transition = "";
         el.removeEventListener("transitionend", cleanup);
       };
       el.addEventListener("transitionend", cleanup);
     });
-  }, [letters]);
+  }, [letterList]);
 
   const getCardRects = useCallback(() => {
     const container = containerRef.current;
@@ -121,15 +121,15 @@ export function LetterScramble({ solved, onSolve }: ForgeProps) {
         ghost.style.top = `${String(e.clientY)}px`;
       }
 
-      const onMove = (ev: PointerEvent) => {
+      const onMove = (ev: PointerEvent): void => {
         if (ghost) {
           ghost.style.left = `${String(ev.clientX)}px`;
           ghost.style.top = `${String(ev.clientY)}px`;
         }
-        const rects = getCardRects();
+        const rectList = getCardRects();
         let closest = -1;
         let closestDist = Infinity;
-        for (const { idx, rect } of rects) {
+        for (const { idx, rect } of rectList) {
           const dist = Math.hypot(ev.clientX - (rect.left + rect.width / 2), ev.clientY - (rect.top + rect.height / 2));
 
           if (dist < closestDist) {
@@ -140,7 +140,7 @@ export function LetterScramble({ solved, onSolve }: ForgeProps) {
         setTargetIdx(closestDist < 55 ? closest : null);
       };
 
-      const onUp = () => {
+      const onUp = (): void => {
         document.removeEventListener("pointermove", onMove);
         document.removeEventListener("pointerup", onUp);
 
@@ -163,7 +163,7 @@ export function LetterScramble({ solved, onSolve }: ForgeProps) {
 
         setLetters((prev) => {
           const fromIdx = prev.findIndex((l) => l.id === letter.id);
-          const rects = getCardRects();
+          const rectList = getCardRects();
 
           if (!ghost) {
             return prev;
@@ -172,7 +172,7 @@ export function LetterScramble({ solved, onSolve }: ForgeProps) {
           const gy = Number.parseFloat(ghost.style.top);
           let closest = -1;
           let closestDist = Infinity;
-          for (const { idx, rect } of rects) {
+          for (const { idx, rect } of rectList) {
             const dist = Math.hypot(gx - (rect.left + rect.width / 2), gy - (rect.top + rect.height / 2));
 
             if (dist < closestDist) {
@@ -182,18 +182,18 @@ export function LetterScramble({ solved, onSolve }: ForgeProps) {
           }
 
           if (closestDist < 55 && closest !== -1 && closest !== fromIdx) {
-            const arr = [...prev];
-            const [item] = arr.splice(fromIdx, 1);
-            arr.splice(closest, 0, item);
+            const arrList = [...prev];
+            const [item] = arrList.splice(fromIdx, 1);
+            arrList.splice(closest, 0, item);
             sndLetterSwap();
 
-            if (arr.map((l) => l.char).join("") === SOLUTION) {
+            if (arrList.map((l) => l.char).join("") === SOLUTION) {
               setIsLocalSolved(true);
               sndScrambleSolved();
               setIsShowingPicker(true);
             }
 
-            return arr;
+            return arrList;
           }
 
           return prev;
@@ -209,7 +209,7 @@ export function LetterScramble({ solved, onSolve }: ForgeProps) {
   return (
     <div className="mt-6">
       <div ref={containerRef} className="flex justify-center gap-1.5">
-        {letters.map((l, i) => (
+        {letterList.map((l, i) => (
           <div
             key={l.id}
             data-lid={l.id}

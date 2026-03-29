@@ -2,8 +2,8 @@ import { create } from "zustand";
 import { persist } from "zustand/middleware";
 
 export type InkGameState = {
-  revealedCells: string[];
-  missedCells: string[];
+  revealedCellList: string[];
+  missedCellList: string[];
   wordStates: Record<string, { solved: boolean; guessesLeft: number }>;
   dropsLeft: number;
   /** Date du jour (YYYY-MM-DD) où l'état a été sauvegardé — sert au reset quotidien */

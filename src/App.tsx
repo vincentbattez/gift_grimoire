@@ -11,7 +11,7 @@ import { EnigmaModal } from "./features/enigma/components/EnigmaModal";
 import { LoveLetterModal } from "./features/enigma/components/LoveLetterModal";
 import { SuccessModal } from "./features/enigma/components/SuccessModal";
 import { UnlockOverlay } from "./features/enigma/components/UnlockOverlay";
-import { ENIGMAS } from "./features/enigma/config";
+import { ENIGMA_LIST } from "./features/enigma/config";
 import { useEnigmaStore } from "./features/enigma/store";
 import { triggerUnlockEffect } from "./features/enigma/unlock";
 import { FinaleModal } from "./features/finale/components/FinaleModal";
@@ -22,7 +22,7 @@ initAdmin();
 
 let shouldShowIntro = false;
 
-function initGrimoireInit() {
+function initGrimoireInit(): void {
   const params = new URLSearchParams(location.search);
 
   if (params.get("init") !== "true") {
@@ -37,7 +37,7 @@ function initGrimoireInit() {
 
 initGrimoireInit();
 
-function useQRUnlock() {
+function useQRUnlock(): void {
   useEffect(() => {
     const params = new URLSearchParams(location.search);
     const raw = params.get("unlock");
@@ -45,7 +45,7 @@ function useQRUnlock() {
     if (!raw) {
       return;
     }
-    const enigma = ENIGMAS.find((e) => e.id === raw);
+    const enigma = ENIGMA_LIST.find((e) => e.id === raw);
 
     if (enigma) {
       history.replaceState({}, "", location.pathname);
@@ -57,27 +57,27 @@ function useQRUnlock() {
   }, []);
 }
 
-function ScreenFlash() {
+function ScreenFlash(): React.JSX.Element {
   const celebrateCardId = useEnigmaStore((s) => s.celebrateCardId);
-  const ref = useRef<HTMLDivElement>(null);
+  const screenFlashRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (!celebrateCardId) {
       return;
     }
-    const el = ref.current;
+    const element = screenFlashRef.current;
 
-    if (!el) {
+    if (!element) {
       return;
     }
-    el.style.animation = "none";
-    void el.offsetHeight; // force reflow
-    el.style.animation = "screen-flash 0.5s ease-out forwards";
+    element.style.animation = "none";
+    void element.offsetHeight; // force reflow
+    element.style.animation = "screen-flash 0.5s ease-out forwards";
   }, [celebrateCardId]);
 
   return (
     <div
-      ref={ref}
+      ref={screenFlashRef}
       className="fixed inset-0 z-[90] pointer-events-none opacity-0"
       style={{
         background: "radial-gradient(circle at 50% 50%, #e8c96a40, #4ecca320, transparent 70%)",
@@ -86,7 +86,7 @@ function ScreenFlash() {
   );
 }
 
-export default function App() {
+export default function App(): React.JSX.Element {
   useQRUnlock();
   const resetAttempt = useCooldownStore((s) => s.resetAttempt);
   const isAdmin = useAdmin();

@@ -1,10 +1,10 @@
 import { useEffect, useState } from "react";
-import { sndClick } from "../../../audio";
-import { fireEvent } from "../../../ha";
-import { ENIGMAS } from "../config";
-import { useEnigmaStore } from "../store";
+import { sndClick } from "@/audio";
+import { fireEvent } from "@/ha";
+import { ENIGMA_LIST } from "@features/enigma/config";
+import { useEnigmaStore } from "@features/enigma/store";
 
-export function SuccessModal() {
+export function SuccessModal(): React.JSX.Element {
   const boxNumber = useEnigmaStore((s) => s.successBoxNumber);
   const haEvent = useEnigmaStore((s) => s.successHaEvent);
   const enigmaId = useEnigmaStore((s) => s.successEnigmaId);
@@ -34,7 +34,7 @@ export function SuccessModal() {
     };
   }, [boxNumber, enigmaId]);
 
-  function handleClose() {
+  function handleClose(): void {
     if (isClosing) {
       return;
     }
@@ -54,7 +54,7 @@ export function SuccessModal() {
     }, 500);
   }
 
-  const enigmaData = displayEnigmaId ? ENIGMAS.find((e) => e.id === displayEnigmaId) : null;
+  const enigmaData = displayEnigmaId ? ENIGMA_LIST.find((e) => e.id === displayEnigmaId) : null;
   const flavorText = enigmaData?.successFlavor ?? null;
   const isVisible = boxNumber !== null || isClosing;
 

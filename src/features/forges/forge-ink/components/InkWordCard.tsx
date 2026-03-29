@@ -1,16 +1,16 @@
 import { useCallback, useState } from "react";
-import { Input } from "../../../../components/ui/Input";
-import { INK_CONFIG, type WordState } from "../config";
+import { Input } from "@components/ui/Input";
+import { INK_CONFIG, type WordState } from "@features/forges/forge-ink/config";
 
 type InkWordCardProps = {
   wordText: string;
   state: WordState;
-  pattern: string[];
+  patternList: string[];
   direction: "H" | "V";
   onGuess: (wordText: string, guess: string) => "correct" | "wrong" | "ignored";
 };
 
-export function InkWordCard({ wordText, state, pattern, direction, onGuess }: InkWordCardProps) {
+export function InkWordCard({ wordText, state, patternList, direction, onGuess }: InkWordCardProps): React.JSX.Element {
   const [inputValue, setInputValue] = useState("");
   const [hasError, setHasError] = useState(false);
 
@@ -83,7 +83,7 @@ export function InkWordCard({ wordText, state, pattern, direction, onGuess }: In
             {direction === "H" ? "→" : "↓"}
           </span>
           <div className="flex gap-1">
-            {pattern.map((ch, i) => (
+            {patternList.map((ch, i) => (
               <span
                 key={i}
                 className="flex items-end justify-center pb-0.5"

@@ -1,10 +1,16 @@
-import { useForgeStore } from "../features/forges/store";
+import { useForgeStore } from "@features/forges/store";
 import { Modal } from "./ui/Modal";
 
-export function AudioWarningModal({ isOpen, onConfirm }: { isOpen: boolean; onConfirm: () => void }) {
+export function AudioWarningModal({
+  isOpen,
+  onConfirm,
+}: {
+  isOpen: boolean;
+  onConfirm: () => void;
+}): React.JSX.Element {
   const acknowledgeAudioWarning = useForgeStore((s) => s.acknowledgeAudioWarning);
 
-  function handleConfirm() {
+  function handleConfirm(): void {
     acknowledgeAudioWarning();
     onConfirm();
   }
@@ -13,7 +19,7 @@ export function AudioWarningModal({ isOpen, onConfirm }: { isOpen: boolean; onCo
     <Modal
       isOpen={isOpen}
       zIndex={300}
-      className="border-accent/25 flex flex-col items-center text-center py-8 px-6"
+      className="border-accent/25 flex flex-color items-center text-center py-8 px-6"
       style={{
         background: "linear-gradient(155deg, #130f26, #0b0917)",
         boxShadow: "0 0 40px #9b6dff15, inset 0 1px 0 #ffffff08",

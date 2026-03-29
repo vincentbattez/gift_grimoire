@@ -1,7 +1,7 @@
 import { useCallback } from "react";
-import { useCooldownStore } from "../../cooldown/store";
-import { useEnigmaStore } from "../store";
-import type { EnigmaLifecycleEvents } from "../types";
+import { useCooldownStore } from "@features/cooldown/store";
+import { useEnigmaStore } from "@features/enigma/store";
+import type { EnigmaLifecycleEvents } from "@features/enigma/types";
 
 /**
  * Hook orchestrateur parent pour les énigmes.

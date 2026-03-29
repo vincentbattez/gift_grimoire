@@ -1,22 +1,30 @@
 import { useEffect, useRef, useState } from "react";
-import { sndClick, sndForgeReveal } from "../../../audio";
-import { LockIcon } from "../../../components/LockIcon";
-import { Button } from "../../../components/ui/Button";
-import { spawnParticles } from "../../../particles";
-import type { ForgeModule } from "../types";
+import { sndClick, sndForgeReveal } from "@/audio";
+import { spawnParticles } from "@/particles";
+import { LockIcon } from "@components/LockIcon";
+import { Button } from "@components/ui/Button";
+import type { ForgeModule } from "@features/forges/types";
 
 type ForgePhase = "locked" | "shaking" | "shattering" | "revealing" | "done";
 
-const RUNE_GLYPHS = ["ᚠ", "ᚢ", "ᚦ", "ᚨ", "ᚱ", "ᚲ", "ᚷ", "ᚹ"];
+const RUNE_GLYPH_LIST = ["ᚠ", "ᚢ", "ᚦ", "ᚨ", "ᚱ", "ᚲ", "ᚷ", "ᚹ"];
 
-const RUNE_DATA = RUNE_GLYPHS.map((_, i) => ({
-  angle: ((Math.PI * 2) / RUNE_GLYPHS.length) * i,
+const RUNE_DATA_LIST = RUNE_GLYPH_LIST.map((_, i) => ({
+  angle: ((Math.PI * 2) / RUNE_GLYPH_LIST.length) * i,
   dist: 60 + Math.random() * 40,
   rot: Math.random() * 360,
 }));
 
 // ── Forge Intro Modal ─────────────────────────────────────────────────────
-function ForgeIntroModal({ title, text, onClose }: { title: string; text: string; onClose: () => void }) {
+function ForgeIntroModal({
+  title,
+  text,
+  onClose,
+}: {
+  title: string;
+  text: string;
+  onClose: () => void;
+}): React.JSX.Element {
   const [hasEntered, setHasEntered] = useState(false);
   const [isClosing, setIsClosing] = useState(false);
 
@@ -30,7 +38,7 @@ function ForgeIntroModal({ title, text, onClose }: { title: string; text: string
     };
   }, []);
 
-  function handleClose() {
+  function handleClose(): void {
     if (isClosing) {
       return;
     }
@@ -125,8 +133,8 @@ type ForgeSectionProps = {
   isAdmin?: boolean;
 };
 
-export function ForgeSection({ forge, isAdmin }: ForgeSectionProps) {
-  const { key, title, successMessage, introText, adminActions, component: ForgeComponent } = forge;
+export function ForgeSection({ forge, isAdmin }: ForgeSectionProps): React.JSX.Element {
+  const { key, title, successMessage, introText, adminActionList, component: ForgeComponent } = forge;
 
   const isRevealed = forge.useRevealed();
   const isSolved = forge.useSolved();
@@ -182,7 +190,7 @@ export function ForgeSection({ forge, isAdmin }: ForgeSectionProps) {
               >
                 ✦ unlock
               </Button>
-              {adminActions?.map((action) => {
+              {adminActionList?.map((action) => {
                 const c = action.color ?? "sky-400";
 
                 return (
@@ -224,7 +232,7 @@ export function ForgeSection({ forge, isAdmin }: ForgeSectionProps) {
     );
   }
 
-  function handleUnlock() {
+  function handleUnlock(): void {
     if (phase !== "locked") {
       return;
     }
@@ -322,8 +330,8 @@ export function ForgeSection({ forge, isAdmin }: ForgeSectionProps) {
       )}
       {phase === "shattering" && (
         <div className="absolute inset-0 pointer-events-none">
-          {RUNE_GLYPHS.map((rune, i) => {
-            const { angle, dist, rot } = RUNE_DATA[i];
+          {RUNE_GLYPH_LIST.map((rune, i) => {
+            const { angle, dist, rot } = RUNE_DATA_LIST[i];
 
             return (
               <span
@@ -350,7 +358,7 @@ export function ForgeSection({ forge, isAdmin }: ForgeSectionProps) {
       {phase !== "revealing" && phase !== "done" && (
         <div
           ref={lockRef}
-          className="absolute inset-0 flex flex-col items-center justify-center gap-3 cursor-pointer"
+          className="absolute inset-0 flex flex-color items-center justify-center gap-3 cursor-pointer"
           onClick={handleUnlock}
           style={{
             ...(phase === "shaking" && { animation: "forge-lock-shake 0.5s ease-in-out" }),

@@ -19,7 +19,7 @@ export const enigmaSchema = z.object({
 
 export type Enigma = z.infer<typeof enigmaSchema>;
 
-export const ENIGMAS: Enigma[] = z.array(enigmaSchema).parse([
+export const ENIGMA_LIST: Enigma[] = z.array(enigmaSchema).parse([
   {
     id: "5",
     title: "La fissure invisible",

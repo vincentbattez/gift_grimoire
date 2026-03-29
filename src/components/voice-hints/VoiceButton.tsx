@@ -1,15 +1,15 @@
 import { useState } from "react";
-import { useCooldownStore } from "../../features/cooldown/store";
-import { useEnigmaStore } from "../../features/enigma/store";
-import { useForgeStore } from "../../features/forges/store";
-import { AudioWarningModal } from "../AudioWarningModal";
-import { LastAttemptModal } from "../LastAttemptModal";
-import { PlayCountDot } from "../PlayCountDot";
-import { CornerOrnaments } from "../ui/CornerOrnaments";
+import { AudioWarningModal } from "@components/AudioWarningModal";
+import { LastAttemptModal } from "@components/LastAttemptModal";
+import { PlayCountDot } from "@components/PlayCountDot";
+import { CornerOrnaments } from "@components/ui/CornerOrnaments";
+import { useCooldownStore } from "@features/cooldown/store";
+import { useEnigmaStore } from "@features/enigma/store";
+import { useForgeStore } from "@features/forges/store";
 import { MAX_PLAYS, type VoiceHint } from "./constants";
 import { WaveformIcon } from "./WaveformIcon";
 
-export function VoiceButton({ hint }: { hint: VoiceHint }) {
+export function VoiceButton({ hint }: { hint: VoiceHint }): React.JSX.Element {
   const count = useCooldownStore((s) => s.audioPlayCounts[hint.key] ?? 0);
   const incrementAudioPlay = useCooldownStore((s) => s.incrementAudioPlay);
   const hasAudioWarningAcknowledged = useForgeStore((s) => s.audioWarningAcknowledged);
@@ -23,7 +23,7 @@ export function VoiceButton({ hint }: { hint: VoiceHint }) {
   const [isShowingWarning, setIsShowingWarning] = useState(false);
   const [isShowingLastAttempt, setIsShowingLastAttempt] = useState(false);
 
-  async function playAudio() {
+  async function playAudio(): Promise<void> {
     const audio = new Audio(hint.src);
     setIsPlaying(true);
 
@@ -39,7 +39,7 @@ export function VoiceButton({ hint }: { hint: VoiceHint }) {
     }
   }
 
-  function confirmAndPlay() {
+  function confirmAndPlay(): void {
     if (isLastAttempt) {
       setIsShowingLastAttempt(true);
 
@@ -48,7 +48,7 @@ export function VoiceButton({ hint }: { hint: VoiceHint }) {
     void playAudio();
   }
 
-  function handlePlay() {
+  function handlePlay(): void {
     if (isExhausted || isPlaying) {
       return;
     }
@@ -99,7 +99,7 @@ export function VoiceButton({ hint }: { hint: VoiceHint }) {
       <button
         onClick={handlePlay}
         disabled={isExhausted}
-        className={`flex-1 relative overflow-hidden flex flex-col items-center gap-2 py-3.5 px-3 rounded-[14px] border-[1.5px] transition-all duration-300 select-none cursor-pointer ${borderClass}`}
+        className={`flex-1 relative overflow-hidden flex flex-color items-center gap-2 py-3.5 px-3 rounded-[14px] border-[1.5px] transition-all duration-300 select-none cursor-pointer ${borderClass}`}
         style={{
           background: isSuccess
             ? "linear-gradient(155deg, #0a1f1a, #080f0c)"

@@ -1,13 +1,13 @@
-import { useEffect, useRef, useState } from "react";
-import { sndAnalysis, sndBad, sndClick, sndDoubt, sndLoveReveal, sndOk } from "../../../audio";
-import { Input } from "../../../components/ui/Input";
-import { CooldownLabel } from "../../cooldown/components/CooldownLabel";
-import { isAttemptUsedToday, useCooldownStore } from "../../cooldown/store";
-import { ENIGMAS, type Enigma } from "../config";
-import { useEnigmaOrchestrator } from "../hooks/useEnigmaOrchestrator";
-import { useEnigmaStore } from "../store";
-import { ERROR_FEEDBACK_MS, INPUT_FOCUS_DELAY_MS, SOLVE_FEEDBACK_MS, SUSPENSE_MS } from "../timings";
-import type { EnigmaLifecycleEvents } from "../types";
+import React, { useEffect, useRef, useState } from "react";
+import { sndAnalysis, sndBad, sndClick, sndDoubt, sndLoveReveal, sndOk } from "@/audio";
+import { Input } from "@components/ui/Input";
+import { CooldownLabel } from "@features/cooldown/components/CooldownLabel";
+import { isAttemptUsedToday, useCooldownStore } from "@features/cooldown/store";
+import { ENIGMA_LIST, type Enigma } from "@features/enigma/config";
+import { useEnigmaOrchestrator } from "@features/enigma/hooks/useEnigmaOrchestrator";
+import { useEnigmaStore } from "@features/enigma/store";
+import { ERROR_FEEDBACK_MS, INPUT_FOCUS_DELAY_MS, SOLVE_FEEDBACK_MS, SUSPENSE_MS } from "@features/enigma/timings";
+import type { EnigmaLifecycleEvents } from "@features/enigma/types";
 import { DoubtOverlay } from "./DoubtOverlay";
 
 function normalize(s: string): string {
@@ -32,7 +32,7 @@ function ModalBody({
   isOpen: boolean;
   /** Événements lifecycle émis au parent orchestrateur */
   lifecycle: EnigmaLifecycleEvents;
-}) {
+}): React.JSX.Element {
   const lastAttempt = useCooldownStore((s) => s.lastAttempt);
   const closeModal = useEnigmaStore((s) => s.closeModal);
   const openLoveLetter = useEnigmaStore((s) => s.openLoveLetter);
@@ -81,49 +81,49 @@ function ModalBody({
     return;
   }, [isSolved]);
 
-  function onDragStart(clientY: number) {
+  function onDragStart(clientY: number): void {
     dragState.current = { startY: clientY, startTime: Date.now(), currentY: clientY };
     setIsDragging(true);
   }
-  function onDragMove(clientY: number) {
+  function onDragMove(clientY: number): void {
     if (!dragState.current) {
       return;
     }
     dragState.current.currentY = clientY;
     setDragOffset(Math.max(0, clientY - dragState.current.startY));
   }
-  function onDragEnd() {
+  function onDragEnd(): void {
     if (!dragState.current) {
       return;
     }
-    const dy = dragState.current.currentY - dragState.current.startY;
-    const dt = Date.now() - dragState.current.startTime;
+    const dragOffsetY = dragState.current.currentY - dragState.current.startY;
+    const dragDuration = Date.now() - dragState.current.startTime;
     dragState.current = null;
     setIsDragging(false);
 
-    if (dy / Math.max(dt, 1) > 0.5 || dy > (sheetRef.current?.offsetHeight ?? 400) * 0.4) {
+    if (dragOffsetY / Math.max(dragDuration, 1) > 0.5 || dragOffsetY > (sheetRef.current?.offsetHeight ?? 400) * 0.4) {
       sndClick();
       closeModal();
     }
     setDragOffset(0);
   }
 
-  function handleTouchStart(e: React.TouchEvent) {
+  function handleTouchStart(e: React.TouchEvent): void {
     onDragStart(e.touches[0].clientY);
   }
-  function handleTouchMove(e: React.TouchEvent) {
+  function handleTouchMove(e: React.TouchEvent): void {
     onDragMove(e.touches[0].clientY);
   }
-  function handleTouchEnd() {
+  function handleTouchEnd(): void {
     onDragEnd();
   }
-  function handleMouseDown(e: React.MouseEvent) {
+  function handleMouseDown(e: React.MouseEvent): void {
     onDragStart(e.clientY);
     // eslint-disable-next-line unicorn/consistent-function-scoping -- must capture fresh onDragMove ref
-    const handleMove = (ev: MouseEvent) => {
+    const handleMove = (ev: MouseEvent): void => {
       onDragMove(ev.clientY);
     };
-    const handleUp = () => {
+    const handleUp = (): void => {
       onDragEnd();
       globalThis.removeEventListener("mousemove", handleMove);
       globalThis.removeEventListener("mouseup", handleUp);
@@ -132,10 +132,10 @@ function ModalBody({
     globalThis.addEventListener("mouseup", handleUp);
   }
 
-  function startSuspenseTimer(offsetMs: number, startTime: number) {
-    const start = startTime - offsetMs;
+  function startSuspenseTimer(offsetMs: number, startTime: number): void {
+    const startList = startTime - offsetMs;
     const interval = setInterval(() => {
-      setSuspenseProgress(Math.min((Date.now() - start) / SUSPENSE_MS, 1));
+      setSuspenseProgress(Math.min((Date.now() - startList) / SUSPENSE_MS, 1));
     }, 50);
     const timeout = setTimeout(() => {
       clearInterval(interval);
@@ -143,10 +143,10 @@ function ModalBody({
       suspenseRef.current = null;
       resolve();
     }, SUSPENSE_MS - offsetMs);
-    suspenseRef.current = { interval, timeout, startTime: start, elapsed: offsetMs };
+    suspenseRef.current = { interval, timeout, startTime: startList, elapsed: offsetMs };
   }
 
-  function pauseSuspense() {
+  function pauseSuspense(): void {
     if (!suspenseRef.current) {
       return;
     }
@@ -155,12 +155,12 @@ function ModalBody({
     suspenseRef.current.elapsed = Date.now() - suspenseRef.current.startTime;
   }
 
-  function submit(startTime: number, rand1: number, rand2: number) {
+  function submit(startTime: number, decisionRandom: number, timingRandom: number): void {
     if (isSolved || attemptUsed || feedback === "suspense") {
       return;
     }
     const isCorrect = normalize(value) === normalize(enigma.answer);
-    const willDoubt = rand1 < (isCorrect ? 0.4 : 0.6);
+    const shouldShowDoubt = decisionRandom < (isCorrect ? 0.4 : 0.6);
 
     setFeedback("suspense");
     setFeedbackMsg("Le grimoire analyse ta réponse…");
@@ -168,8 +168,8 @@ function ModalBody({
     stopAnalysisRef.current = sndAnalysis();
     startSuspenseTimer(0, startTime);
 
-    if (willDoubt) {
-      const doubtAt = SUSPENSE_MS * (0.6 + rand2 * 0.3);
+    if (shouldShowDoubt) {
+      const doubtAt = SUSPENSE_MS * (0.6 + timingRandom * 0.3);
 
       setTimeout(() => {
         pauseSuspense();
@@ -182,7 +182,7 @@ function ModalBody({
     }
   }
 
-  function confirmDoubt(startTime: number) {
+  function confirmDoubt(startTime: number): void {
     sndClick();
     setIsShowingDoubt(false);
     setFeedbackMsg("Le grimoire reprend son analyse…");
@@ -191,7 +191,7 @@ function ModalBody({
     startSuspenseTimer(elapsed, startTime);
   }
 
-  function cancelDoubt() {
+  function cancelDoubt(): void {
     sndClick();
     setIsShowingDoubt(false);
     setFeedback(null);
@@ -201,7 +201,7 @@ function ModalBody({
     stopAnalysisRef.current = null;
   }
 
-  function resolve() {
+  function resolve(): void {
     const isCorrect = normalize(value) === normalize(enigma.answer);
 
     // Émettre onTry au parent (enregistre la tentative / cooldown)
@@ -273,7 +273,7 @@ function ModalBody({
     >
       {/* Drag handle */}
       <div
-        className="absolute top-0 left-0 right-0 h-10 cursor-grab active:cursor-grabbing touch-none flex items-start justify-center pt-2.5"
+        className="absolute top-0 left-0 right-0 h-10 cursor-grab active:cursor-grabbing touch-none flex items-startList justify-center pt-2.5"
         onTouchStart={handleTouchStart}
         onTouchMove={handleTouchMove}
         onTouchEnd={handleTouchEnd}
@@ -459,7 +459,7 @@ function ModalBody({
   );
 }
 
-export function EnigmaModal() {
+export function EnigmaModal(): React.JSX.Element {
   const modalId = useEnigmaStore((s) => s.modalEnigmaId);
   const closingId = useEnigmaStore((s) => s.modalClosingId);
   const displayId = modalId ?? closingId;
@@ -469,7 +469,7 @@ export function EnigmaModal() {
   const lifecycle = useEnigmaOrchestrator();
 
   const isAttemptUsed = isAttemptUsedToday(lastAttempt);
-  const enigma = displayId ? ENIGMAS.find((e) => e.id === displayId) : null;
+  const enigma = displayId ? ENIGMA_LIST.find((e) => e.id === displayId) : null;
   const isOpen = !!modalId;
   const isSolved = state?.solved ?? false;
 

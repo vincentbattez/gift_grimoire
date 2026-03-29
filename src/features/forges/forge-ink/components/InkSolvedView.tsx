@@ -1,6 +1,6 @@
-import { INK_CONFIG, LETTER_MAP } from "../config";
+import { INK_CONFIG, LETTER_MAP } from "@features/forges/forge-ink/config";
 
-export function InkSolvedView() {
+export function InkSolvedView(): React.JSX.Element {
   return (
     <div className="mt-4">
       <div
@@ -12,8 +12,8 @@ export function InkSolvedView() {
       >
         {Array.from({ length: INK_CONFIG.gridCols * INK_CONFIG.gridRows }, (_, idx) => {
           const row = Math.floor(idx / INK_CONFIG.gridCols);
-          const col = idx % INK_CONFIG.gridCols;
-          const entry = LETTER_MAP.get(`${String(row)},${String(col)}`);
+          const color = idx % INK_CONFIG.gridCols;
+          const entry = LETTER_MAP.get(`${String(row)},${String(color)}`);
 
           return (
             <div
@@ -34,7 +34,7 @@ export function InkSolvedView() {
                     fontWeight: 700,
                     textShadow: "0 0 8px #e8c96a60",
                     animation: "gold-letter-shimmer 2.5s ease-in-out infinite",
-                    animationDelay: `${String((row + col) * 0.12)}s`,
+                    animationDelay: `${String((row + color) * 0.12)}s`,
                   }}
                 >
                   {entry.letter}

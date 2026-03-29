@@ -22,7 +22,7 @@ export type ForgeModule = {
   introText?: string;
   component: ComponentType<ForgeProps>;
   /** Actions admin supplémentaires spécifiques à la forge */
-  adminActions?: ForgeAdminAction[];
+  adminActionList?: ForgeAdminAction[];
 
   /** Hook pour lire l'état solved de cette forge */
   useSolved: () => boolean;

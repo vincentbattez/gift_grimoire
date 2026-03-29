@@ -1,17 +1,17 @@
-import { VoiceHints } from "../../../components/voice-hints/VoiceHints";
-import { AdminControls } from "../../admin/components/AdminControls";
-import { useFinaleStore } from "../../finale/store";
-import { ForgeSection } from "../../forges/components/ForgeSection";
-import { FORGES } from "../../forges/forges.config";
-import { ENIGMAS } from "../config";
-import { useEnigmaStore } from "../store";
+import { VoiceHints } from "@components/voice-hints/VoiceHints";
+import { AdminControls } from "@features/admin/components/AdminControls";
+import { ENIGMA_LIST } from "@features/enigma/config";
+import { useEnigmaStore } from "@features/enigma/store";
+import { useFinaleStore } from "@features/finale/store";
+import { ForgeSection } from "@features/forges/components/ForgeSection";
+import { FORGE_LIST } from "@features/forges/forges.config";
 import { EnigmaCard } from "./EnigmaCard";
 
-function SectionLabel({ children }: { children: React.ReactNode }) {
+function SectionLabel({ children }: { children: React.ReactNode }): React.JSX.Element {
   return <div className="text-center text-[0.6rem] tracking-[0.35em] text-muted my-4 uppercase">{children}</div>;
 }
 
-function FinaleButton() {
+function FinaleButton(): React.JSX.Element | null {
   const enigmas = useEnigmaStore((s) => s.enigmas);
   const startNarrative = useFinaleStore((s) => s.startNarrative);
   const isFinaleActive = useFinaleStore((s) => s.finaleActive);
@@ -53,7 +53,7 @@ function FinaleButton() {
   );
 }
 
-function EnigmaSection({ isAdmin }: { isAdmin: boolean }) {
+function EnigmaSection({ isAdmin }: { isAdmin: boolean }): React.JSX.Element {
   const enigmas = useEnigmaStore((s) => s.enigmas);
   const solvedCount = Object.values(enigmas).filter((e) => e.solved).length;
 
@@ -63,7 +63,7 @@ function EnigmaSection({ isAdmin }: { isAdmin: boolean }) {
       <FinaleButton />
       {isAdmin && <AdminControls />}
       <div className="grid grid-cols-2 gap-3">
-        {ENIGMAS.map((e) => (
+        {ENIGMA_LIST.map((e) => (
           <div key={e.id} data-card-id={e.id}>
             <EnigmaCard enigma={e} isAdmin={isAdmin} />
           </div>
@@ -78,15 +78,15 @@ function EnigmaSection({ isAdmin }: { isAdmin: boolean }) {
   );
 }
 
-function ForgeList({ isAdmin }: { isAdmin: boolean }) {
+function ForgeList({ isAdmin }: { isAdmin: boolean }): React.JSX.Element {
   return (
     <>
       <SectionLabel>— La Forge des Clés —</SectionLabel>
       <p className="text-center text-[0.5rem] text-muted/40 -mt-2 mb-5 tracking-wide">
         Résolvez les épreuves pour forger de nouvelles clés
       </p>
-      <div className="flex flex-col gap-10">
-        {FORGES.map((forge) => (
+      <div className="flex flex-color gap-10">
+        {FORGE_LIST.map((forge) => (
           <ForgeSection key={forge.key} forge={forge} isAdmin={isAdmin} />
         ))}
       </div>
@@ -94,7 +94,7 @@ function ForgeList({ isAdmin }: { isAdmin: boolean }) {
   );
 }
 
-export function EnigmaGrid({ isAdmin }: { isAdmin: boolean }) {
+export function EnigmaGrid({ isAdmin }: { isAdmin: boolean }): React.JSX.Element {
   const enigmas = useEnigmaStore((s) => s.enigmas);
   const isPrologueCompleted = Object.values(enigmas).some((e) => e.unlocked || e.solved);
 

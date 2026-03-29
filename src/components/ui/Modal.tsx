@@ -25,13 +25,13 @@ export function Modal({
   style,
   duration = 300,
   backdropClassName = "bg-black/85 backdrop-blur-md",
-}: ModalProps) {
+}: ModalProps): React.ReactPortal | null {
   const [isVisible, setIsVisible] = useState(false);
   const [hasEntered, setHasEntered] = useState(false);
 
   useEffect(() => {
     if (isOpen) {
-      setIsVisible(true); // eslint-disable-line react-hooks/set-state-in-effect -- intentional two-phase animation pattern
+      setIsVisible(true); // eslint-disable-line react-hooks/set-state-in-effect -- intentional two-phase animation patternList
       const raf = requestAnimationFrame(() =>
         requestAnimationFrame(() => {
           setHasEntered(true);

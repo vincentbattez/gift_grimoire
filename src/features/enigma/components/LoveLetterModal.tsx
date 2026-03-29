@@ -1,19 +1,21 @@
 import { useEffect, useRef, useState } from "react";
-import { sndHeartPop, sndLoveClose } from "../../../audio";
-import { CornerOrnaments } from "../../../components/ui/CornerOrnaments";
-import { OrnamentDivider } from "../../../components/ui/OrnamentDivider";
-import { ENIGMAS } from "../config";
-import { useEnigmaStore } from "../store";
+import { sndHeartPop, sndLoveClose } from "@/audio";
+import { CornerOrnaments } from "@components/ui/CornerOrnaments";
+import { OrnamentDivider } from "@components/ui/OrnamentDivider";
+import { ENIGMA_LIST } from "@features/enigma/config";
+import { useEnigmaStore } from "@features/enigma/store";
 
 const CLOSE_MS = 500;
 const BURST_COUNT = 40;
 
-function buildBurst(emojis: string[]) {
-  const items: { emoji: string; left: number; delay: number; size: number; rot: number; pitch: number }[] = [];
+function buildBurst(
+  emojis: string[],
+): { emoji: string; left: number; delay: number; size: number; rot: number; pitch: number }[] {
+  const itemList: { emoji: string; left: number; delay: number; size: number; rot: number; pitch: number }[] = [];
   let cumDelay = 0.15;
   let gap = 0.2;
   for (let i = 0; i < BURST_COUNT; i++) {
-    items.push({
+    itemList.push({
       emoji: emojis[i % emojis.length],
       left: 10 + Math.random() * 80,
       delay: cumDelay,
@@ -25,17 +27,17 @@ function buildBurst(emojis: string[]) {
     gap *= 0.97;
   }
 
-  return items;
+  return itemList;
 }
 
-const GOLD_PARTICLES = Array.from({ length: 20 }, (_, i) => ({
+const GOLD_PARTICLE_LIST = Array.from({ length: 20 }, (_, i) => ({
   left: `${String(5 + (i % 5) * 22)}%`,
   top: `${String(Math.floor(i / 5) * 23 + 5)}%`,
   size: 2 + (i % 3) * 1.5,
   delay: i * 0.35,
 }));
 
-export function LoveLetterModal() {
+export function LoveLetterModal(): React.JSX.Element {
   const enigmaId = useEnigmaStore((s) => s.loveLetterEnigmaId);
   const closeLoveLetter = useEnigmaStore((s) => s.closeLoveLetter);
   const [hasEntered, setHasEntered] = useState(false);
@@ -43,7 +45,7 @@ export function LoveLetterModal() {
   const [isShowingHearts, setIsShowingHearts] = useState(false);
   const closingEnigmaRef = useRef<string | null>(null);
   const popTimers = useRef<ReturnType<typeof setTimeout>[]>([]);
-  const [burstData, setBurstData] = useState(() => buildBurst(["❤️"]));
+  const [burstDataList, setBurstData] = useState(() => buildBurst(["❤️"]));
 
   useEffect(() => {
     if (!enigmaId) {
@@ -53,9 +55,9 @@ export function LoveLetterModal() {
       return;
     }
     closingEnigmaRef.current = enigmaId;
-    const currentEnigma = ENIGMAS.find((e) => e.id === enigmaId);
-    const newBurst = buildBurst(currentEnigma?.loveLetter.emojis ?? ["❤️"]);
-    setBurstData(newBurst);
+    const currentEnigma = ENIGMA_LIST.find((e) => e.id === enigmaId);
+    const newBurstList = buildBurst(currentEnigma?.loveLetter.emojis ?? ["❤️"]);
+    setBurstData(newBurstList);
     setIsClosing(false);
     const raf = requestAnimationFrame(() => {
       setHasEntered(true);
@@ -66,7 +68,7 @@ export function LoveLetterModal() {
       setIsShowingHearts(true);
     }, 400);
 
-    popTimers.current = newBurst.map((h) =>
+    popTimers.current = newBurstList.map((h) =>
       setTimeout(
         () => {
           sndHeartPop(h.pitch);
@@ -89,10 +91,10 @@ export function LoveLetterModal() {
   // eslint-disable-next-line react-hooks/refs
   const displayId = enigmaId ?? (isClosing ? closingEnigmaRef.current : null);
   // eslint-disable-next-line react-hooks/refs
-  const enigma = displayId ? ENIGMAS.find((e) => e.id === displayId) : null;
+  const enigma = displayId ? ENIGMA_LIST.find((e) => e.id === displayId) : null;
   const isOpen = !!enigmaId && !isClosing;
 
-  function handleClose() {
+  function handleClose(): void {
     sndLoveClose();
     setIsClosing(true);
     setHasEntered(false);
@@ -105,7 +107,7 @@ export function LoveLetterModal() {
 
   return (
     <div
-      className={`fixed inset-0 z-[120] flex items-center justify-center p-4 transition-opacity duration-500 ${
+      className={`fixed inset-0 z-[120] flex itemList-center justify-center p-4 transition-opacity duration-500 ${
         isOpen ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"
       }`}
       style={{
@@ -118,7 +120,7 @@ export function LoveLetterModal() {
       {/* Heart burst */}
       {}
       {isShowingHearts &&
-        burstData.map((h, i) => (
+        burstDataList.map((h, i) => (
           <div
             key={i}
             className="absolute pointer-events-none z-10"
@@ -150,8 +152,8 @@ export function LoveLetterModal() {
             e.stopPropagation();
           }}
         >
-          {/* Gold particles background */}
-          {GOLD_PARTICLES.map((p, i) => (
+          {/* Gold particleList background */}
+          {GOLD_PARTICLE_LIST.map((p, i) => (
             <div
               key={i}
               className="absolute rounded-full pointer-events-none"
@@ -172,13 +174,13 @@ export function LoveLetterModal() {
             size="w-3 h-3"
             offset="10px"
             opacity="opacity-60"
-            corners={["tl", "bl", "br"]}
+            cornerList={["tl", "bl", "br"]}
           />
 
           {/* Close button */}
           <button
             onClick={handleClose}
-            className="absolute top-3 right-3 w-[28px] h-[28px] rounded-full flex items-center justify-center cursor-pointer text-[0.75rem] z-20 border border-[#c9a03230] bg-[#f5e6c8] text-[#8a7040] hover:bg-[#ede0c0] transition-colors"
+            className="absolute top-3 right-3 w-[28px] h-[28px] rounded-full flex itemList-center justify-center cursor-pointer text-[0.75rem] z-20 border border-[#c9a03230] bg-[#f5e6c8] text-[#8a7040] hover:bg-[#ede0c0] transition-colors"
           >
             ✕
           </button>

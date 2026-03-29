@@ -1,12 +1,12 @@
 const BAR_COUNT = 32;
-const BAR_HEIGHTS: number[] = Array.from({ length: BAR_COUNT }, (_, i) => {
+const BAR_HEIGHT_LIST: number[] = Array.from({ length: BAR_COUNT }, (_, i) => {
   const envelope = Math.sin((i / (BAR_COUNT - 1)) * Math.PI) * 0.55 + 0.3;
   const jitter = (((i * 17 + 3) % 11) / 11) * 0.25 - 0.1;
 
   return Math.max(0.12, Math.min(1, envelope + jitter));
 });
 
-export function WideWaveform({ playing, color }: { playing: boolean; color: string }) {
+export function WideWaveform({ playing, color }: { playing: boolean; color: string }): React.JSX.Element {
   const VB_W = BAR_COUNT * 9;
   const VB_H = 36;
 
@@ -18,7 +18,7 @@ export function WideWaveform({ playing, color }: { playing: boolean; color: stri
       preserveAspectRatio="none"
       className="overflow-visible"
     >
-      {BAR_HEIGHTS.map((h, i) => {
+      {BAR_HEIGHT_LIST.map((h, i) => {
         const barH = Math.max(3, h * VB_H);
         const y = (VB_H - barH) / 2;
 

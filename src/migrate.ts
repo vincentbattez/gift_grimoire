@@ -23,7 +23,7 @@ type PersistedStore = {
   version?: number;
 };
 
-function migrateFromV3() {
+function migrateFromV3(): void {
   const raw = localStorage.getItem(V3_KEY);
 
   if (!raw) {

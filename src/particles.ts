@@ -1,37 +1,37 @@
 export type Particle = {
-  x: number;
-  y: number;
-  vx: number;
-  vy: number;
-  r: number;
+  positionX: number;
+  positionY: number;
+  velocityX: number;
+  velocityY: number;
+  radius: number;
   life: number;
-  col: string;
+  color: string;
 };
 
-export const particles: Particle[] = [];
+export const particleList: Particle[] = [];
 
-export function spawnParticles(x: number, y: number, n = 22, col = "#9b6dff") {
-  for (let i = 0; i < n; i++) {
-    const a = ((Math.PI * 2) / n) * i + Math.random() * 0.6;
-    const s = Math.random() * 1.2 + 0.4;
+export function spawnParticles(centerX: number, centerY: number, particleCount = 22, color = "#9b6dff"): void {
+  for (let i = 0; i < particleCount; i++) {
+    const angle = ((Math.PI * 2) / particleCount) * i + Math.random() * 0.6;
+    const speed = Math.random() * 1.2 + 0.4;
 
-    particles.push({
-      x,
-      y,
-      vx: Math.cos(a) * s,
-      vy: Math.sin(a) * s,
-      r: Math.random() * 3 + 1,
+    particleList.push({
+      positionX: centerX,
+      positionY: centerY,
+      velocityX: Math.cos(angle) * speed,
+      velocityY: Math.sin(angle) * speed,
+      radius: Math.random() * 3 + 1,
       life: 1,
-      col,
+      color,
     });
   }
 }
 
-const FIREWORK_COLORS = ["#4ecca3", "#9b6dff", "#e8c96a", "#ff6b8a", "#59c3ff"];
+const FIREWORK_COLOR_LIST = ["#4ecca3", "#9b6dff", "#e8c96a", "#ff6b8a", "#59c3ff"];
 
-export function spawnCelebration(cx: number, cy: number) {
+export function spawnCelebration(centerX: number, centerY: number): void {
   // Vague 1 : explosion dorée centrale
-  spawnParticles(cx, cy, 60, "#e8c96a");
+  spawnParticles(centerX, centerY, 60, "#e8c96a");
 
   // Vague 2 : 6 explosions en cercle autour de la carte
   const radius = 80;
@@ -40,13 +40,13 @@ export function spawnCelebration(cx: number, cy: number) {
     const delay = 120 + i * 100;
 
     setTimeout(() => {
-      const col = FIREWORK_COLORS[Math.floor(Math.random() * FIREWORK_COLORS.length)];
+      const color = FIREWORK_COLOR_LIST[Math.floor(Math.random() * FIREWORK_COLOR_LIST.length)];
 
       spawnParticles(
-        cx + Math.cos(angle) * radius + Math.random() * 16 - 8,
-        cy + Math.sin(angle) * radius + Math.random() * 16 - 8,
+        centerX + Math.cos(angle) * radius + Math.random() * 16 - 8,
+        centerY + Math.sin(angle) * radius + Math.random() * 16 - 8,
         20,
-        col,
+        color,
       );
     }, delay);
   }
@@ -54,34 +54,34 @@ export function spawnCelebration(cx: number, cy: number) {
   // Vague 3 : embers montantes (vy négatif = vers le haut)
   setTimeout(() => {
     for (let i = 0; i < 30; i++) {
-      particles.push({
-        x: cx + Math.random() * 120 - 60,
-        y: cy + Math.random() * 40 - 20,
-        vx: Math.random() * 0.6 - 0.3,
-        vy: -(Math.random() * 1.5 + 0.5),
-        r: Math.random() * 2.5 + 0.8,
+      particleList.push({
+        positionX: centerX + Math.random() * 120 - 60,
+        positionY: centerY + Math.random() * 40 - 20,
+        velocityX: Math.random() * 0.6 - 0.3,
+        velocityY: -(Math.random() * 1.5 + 0.5),
+        radius: Math.random() * 2.5 + 0.8,
         life: 1,
-        col: Math.random() > 0.5 ? "#e8c96a" : "#4ecca3",
+        color: Math.random() > 0.5 ? "#e8c96a" : "#4ecca3",
       });
     }
   }, 400);
 
   // Vague 4 : explosion finale massive
   setTimeout(() => {
-    spawnParticles(cx, cy, 70, "#4ecca3");
+    spawnParticles(centerX, centerY, 70, "#4ecca3");
   }, 800);
 
   // Vague 5 : pluie de paillettes dorées
   setTimeout(() => {
     for (let i = 0; i < 25; i++) {
-      particles.push({
-        x: cx + Math.random() * 160 - 80,
-        y: cy - 60 - Math.random() * 40,
-        vx: Math.random() * 0.4 - 0.2,
-        vy: Math.random() * 0.8 + 0.2,
-        r: Math.random() * 2 + 0.5,
+      particleList.push({
+        positionX: centerX + Math.random() * 160 - 80,
+        positionY: centerY - 60 - Math.random() * 40,
+        velocityX: Math.random() * 0.4 - 0.2,
+        velocityY: Math.random() * 0.8 + 0.2,
+        radius: Math.random() * 2 + 0.5,
         life: 1,
-        col: "#e8c96a",
+        color: "#e8c96a",
       });
     }
   }, 1000);

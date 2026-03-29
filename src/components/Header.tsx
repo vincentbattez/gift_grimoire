@@ -1,11 +1,11 @@
-import { ENIGMAS } from "../features/enigma/config";
-import { useEnigmaStore } from "../features/enigma/store";
+import { ENIGMA_LIST } from "@features/enigma/config";
+import { useEnigmaStore } from "@features/enigma/store";
 import { ProgressBar } from "./ProgressBar.tsx";
 
-export function Header() {
+export function Header(): React.JSX.Element {
   const enigmas = useEnigmaStore((s) => s.enigmas);
   const solved = Object.values(enigmas).filter((e) => e.solved).length;
-  const pct = (solved / ENIGMAS.length) * 100;
+  const pct = (solved / ENIGMA_LIST.length) * 100;
 
   return (
     <header className="text-center pt-11 pb-5">
@@ -23,7 +23,7 @@ export function Header() {
       <p className="text-[0.72rem] text-muted mt-2.5 tracking-[0.15em] uppercase">
         Un sort protège chaque rune… <br /> sauras-tu le briser ?
       </p>
-      <ProgressBar progressPct={pct} />
+      <ProgressBar progressPercentage={pct} />
     </header>
   );
 }

@@ -1,9 +1,9 @@
 import type { RefObject } from "react";
-import { sndInkLetterReveal } from "../../../../audio";
-import { spawnParticles } from "../../../../particles";
-import { getWordCells, type WordConfig } from "../config";
+import { sndInkLetterReveal } from "@/audio";
+import { spawnParticles } from "@/particles";
+import { getWordCells, type WordConfig } from "@features/forges/forge-ink/config";
 
-export function playHitParticles(gridRef: RefObject<HTMLDivElement | null>, cellKey: string) {
+export function playHitParticles(gridRef: RefObject<HTMLDivElement | null>, cellKey: string): void {
   const el = gridRef.current?.querySelector<HTMLElement>(`[data-cell="${cellKey}"]`);
 
   if (!el) {
@@ -14,10 +14,10 @@ export function playHitParticles(gridRef: RefObject<HTMLDivElement | null>, cell
   spawnParticles(rect.left + rect.width / 2, rect.top + rect.height / 2, 15, "#e8c96a");
 }
 
-export function playWordRipple(gridRef: RefObject<HTMLDivElement | null>, word: WordConfig) {
-  const cells = getWordCells(word);
+export function playWordRipple(gridRef: RefObject<HTMLDivElement | null>, word: WordConfig): void {
+  const cellList = getWordCells(word);
 
-  cells.forEach(([r, c], idx) => {
+  cellList.forEach(([r, c], idx) => {
     setTimeout(() => {
       sndInkLetterReveal(idx);
       const el = gridRef.current?.querySelector<HTMLElement>(`[data-cell="${String(r)},${String(c)}"]`);
@@ -37,7 +37,7 @@ export function playWordRipple(gridRef: RefObject<HTMLDivElement | null>, word: 
   });
 }
 
-export function playCelebration(gridRef: RefObject<HTMLDivElement | null>, letterMapKeys: Iterable<string>) {
+export function playCelebration(gridRef: RefObject<HTMLDivElement | null>, letterMapKeys: Iterable<string>): void {
   if (!gridRef.current) {
     return;
   }
@@ -53,12 +53,12 @@ export function playCelebration(gridRef: RefObject<HTMLDivElement | null>, lette
   }
 }
 
-export function playVictoryShimmer(gridRef: RefObject<HTMLDivElement | null>) {
-  const cells = gridRef.current?.querySelectorAll<HTMLElement>("[data-cell]");
+export function playVictoryShimmer(gridRef: RefObject<HTMLDivElement | null>): void {
+  const cellList = gridRef.current?.querySelectorAll<HTMLElement>("[data-cell]");
 
-  cells?.forEach((el) => {
-    const [r, c] = (el.dataset.cell ?? "0,0").split(",").map(Number);
-    const delay = (r + c) * 50;
+  cellList?.forEach((el) => {
+    const [row, column] = (el.dataset.cell ?? "0,0").split(",").map(Number);
+    const delay = (row + column) * 50;
 
     setTimeout(() => {
       el.style.animation = "ink-victory-shimmer 0.6s ease-out both";

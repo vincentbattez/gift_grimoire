@@ -3,17 +3,17 @@ import { env } from "./env";
 export async function getEntityState(entityId: string): Promise<string | null> {
   try {
     const { HA_URL, HA_TOKEN } = env;
-    const r = await fetch(`${HA_URL}/api/states/${entityId}`, {
+    const response = await fetch(`${HA_URL}/api/states/${entityId}`, {
       headers: {
         Authorization: `Bearer ${HA_TOKEN}`,
         "Content-Type": "application/json",
       },
     });
 
-    if (!r.ok) {
+    if (!response.ok) {
       return null;
     }
-    const data = (await r.json()) as { state: string };
+    const data = (await response.json()) as { state: string };
 
     return data.state;
   } catch {
@@ -28,9 +28,9 @@ export function pollEntityState(
   timeoutMs: number,
   intervalMs = 500,
 ): Promise<boolean> {
-  return new Promise((resolve) => {
+  return new Promise<boolean>((resolve) => {
     let isResolved = false;
-    const done = (result: boolean) => {
+    const done = (result: boolean): void => {
       if (isResolved) {
         return;
       }
@@ -52,18 +52,18 @@ export function pollEntityState(
     }, intervalMs);
 
     // Check immediately
-    void getEntityState(entityId).then((s) => {
-      if (s === targetState) {
+    void getEntityState(entityId).then((currentState) => {
+      if (currentState === targetState) {
         done(true);
       }
     });
   });
 }
 
-export async function fireEvent(event: string) {
+export async function fireEvent(event: string): Promise<void> {
   try {
     const { HA_URL, HA_TOKEN } = env;
-    const r = await fetch(`${HA_URL}/api/events/${event}`, {
+    const response = await fetch(`${HA_URL}/api/events/${event}`, {
       method: "POST",
       headers: {
         Authorization: `Bearer ${HA_TOKEN}`,
@@ -71,7 +71,7 @@ export async function fireEvent(event: string) {
       },
       body: JSON.stringify({ source: "grimoire" }),
     });
-    console.log(r.ok ? `HA event: ${event}` : `HA error: ${String(r.status)}`);
+    console.log(response.ok ? `HA event: ${event}` : `HA error: ${String(response.status)}`);
   } catch (error) {
     console.error("HA error:", error);
   }

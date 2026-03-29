@@ -17,8 +17,8 @@ export function PlayCountDot({
   inactiveClass = "bg-white/8",
   solvedClass = "bg-success/50",
   solved = false,
-}: Props) {
-  const getDotClass = (i: number) => {
+}: Props): React.JSX.Element {
+  const getDotClass = (i: number): string => {
     if (solved) {
       return solvedClass;
     }

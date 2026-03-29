@@ -1,19 +1,19 @@
-import { sndClick } from "../../../audio";
-import { ENIGMAS } from "../config";
-import { useEnigmaStore } from "../store";
-import { triggerUnlockEffect } from "../unlock";
+import { sndClick } from "@/audio";
+import { ENIGMA_LIST } from "@features/enigma/config";
+import { useEnigmaStore } from "@features/enigma/store";
+import { triggerUnlockEffect } from "@features/enigma/unlock";
 
 const EXCLUDED_IDS = new Set(["Y", "F"]);
 
-export function EnigmaPicker({ onClose }: { onClose?: () => void }) {
+export function EnigmaPicker({ onClose }: { onClose?: () => void }): React.JSX.Element {
   const enigmaStates = useEnigmaStore((s) => s.enigmas);
 
-  const pickable = ENIGMAS.filter(
+  const pickableList = ENIGMA_LIST.filter(
     (e) => !EXCLUDED_IDS.has(e.id) && !enigmaStates[e.id].unlocked && !enigmaStates[e.id].solved,
   );
 
-  function handlePick(id: string) {
-    const enigma = ENIGMAS.find((e) => e.id === id);
+  function handlePick(id: string): void {
+    const enigma = ENIGMA_LIST.find((e) => e.id === id);
 
     if (enigma) {
       sndClick();
@@ -25,7 +25,7 @@ export function EnigmaPicker({ onClose }: { onClose?: () => void }) {
     }
   }
 
-  if (pickable.length === 0) {
+  if (pickableList.length === 0) {
     return (
       <div className="mt-4 text-center text-xs text-muted tracking-wide">
         Toutes les énigmes éligibles sont déjà déverrouillées.
@@ -34,16 +34,16 @@ export function EnigmaPicker({ onClose }: { onClose?: () => void }) {
   }
 
   return (
-    <div className="mt-4 flex flex-col items-center gap-3">
+    <div className="mt-4 flex flex-color items-center gap-3">
       <div className="text-[0.6rem] tracking-[0.25em] text-gold uppercase">Choisissez une énigme à déverrouiller</div>
       <div className="flex flex-wrap justify-center gap-2">
-        {pickable.map((e) => (
+        {pickableList.map((e) => (
           <button
             key={e.id}
             onClick={() => {
               handlePick(e.id);
             }}
-            className="flex flex-col items-center gap-1.5 px-3 py-2.5 rounded-xl
+            className="flex flex-color items-center gap-1.5 px-3 py-2.5 rounded-xl
               border border-accent/40 bg-gradient-to-br from-[#1c1438] to-[#130f26]
               active:scale-95 transition-all duration-150
               hover:border-accent hover:shadow-[0_0_16px_#9b6dff30]"

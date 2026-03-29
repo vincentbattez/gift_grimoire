@@ -1,16 +1,16 @@
 import { useEffect, useRef, useState } from "react";
-import { sndClick, sndGoldenSeal, sndVictory } from "../../../audio";
-import { LockIcon } from "../../../components/LockIcon";
-import { Button } from "../../../components/ui/Button";
-import { CornerOrnaments } from "../../../components/ui/CornerOrnaments";
-import { spawnCelebration } from "../../../particles";
-import type { Enigma } from "../config";
-import { useEnigmaStore } from "../store";
-import { CELEBRATION_DURATION_MS, CELEBRATION_SCROLL_SETTLE_MS } from "../timings";
-import { playUnlockCardEffect, triggerUnlockEffect } from "../unlock";
+import { sndClick, sndGoldenSeal, sndVictory } from "@/audio";
+import { spawnCelebration } from "@/particles";
+import { LockIcon } from "@components/LockIcon";
+import { Button } from "@components/ui/Button";
+import { CornerOrnaments } from "@components/ui/CornerOrnaments";
+import type { Enigma } from "@features/enigma/config";
+import { useEnigmaStore } from "@features/enigma/store";
+import { CELEBRATION_DURATION_MS, CELEBRATION_SCROLL_SETTLE_MS } from "@features/enigma/timings";
+import { playUnlockCardEffect, triggerUnlockEffect } from "@features/enigma/unlock";
 import { LockedModal } from "./LockedModal";
 
-export function EnigmaCard({ enigma, isAdmin }: { enigma: Enigma; isAdmin: boolean }) {
+export function EnigmaCard({ enigma, isAdmin }: { enigma: Enigma; isAdmin: boolean }): React.JSX.Element {
   const state = useEnigmaStore((s) => s.enigmas[enigma.id]);
   const openModal = useEnigmaStore((s) => s.openModal);
   const acknowledgeUnlock = useEnigmaStore((s) => s.acknowledgeUnlock);
@@ -21,7 +21,7 @@ export function EnigmaCard({ enigma, isAdmin }: { enigma: Enigma; isAdmin: boole
   const isNew = useEnigmaStore((s) => s.newlyUnlocked.has(enigma.id));
   const isLetterRead = useEnigmaStore((s) => s.readLetters[enigma.id]);
   const unlockingId = useEnigmaStore((s) => s.unlockingCardId);
-  const ref = useRef<HTMLDivElement>(null);
+  const cardRef = useRef<HTMLDivElement>(null);
   const [isShowingLocked, setIsShowingLocked] = useState(false);
   const prevUnlockingRef = useRef(unlockingId);
   const prevLetterReadRef = useRef(isLetterRead);
@@ -60,11 +60,11 @@ export function EnigmaCard({ enigma, isAdmin }: { enigma: Enigma; isAdmin: boole
   }, [unlockingId, enigma.id, enigma.title]);
 
   useEffect(() => {
-    if (!isCelebrating || !ref.current) {
+    if (!isCelebrating || !cardRef.current) {
       return;
     }
 
-    const card = ref.current;
+    const card = cardRef.current;
 
     // Scroll vers la carte
     card.scrollIntoView({ behavior: "smooth", block: "center" });
@@ -90,8 +90,8 @@ export function EnigmaCard({ enigma, isAdmin }: { enigma: Enigma; isAdmin: boole
       );
 
       // Particules spectaculaires
-      const r = card.getBoundingClientRect();
-      spawnCelebration(r.left + r.width / 2, r.top + r.height / 2);
+      const cardBounds = card.getBoundingClientRect();
+      spawnCelebration(cardBounds.left + cardBounds.width / 2, cardBounds.top + cardBounds.height / 2);
 
       // Nettoyage après la célébration puis affichage de la modal succès
       clearTimer = setTimeout(() => {
@@ -107,7 +107,7 @@ export function EnigmaCard({ enigma, isAdmin }: { enigma: Enigma; isAdmin: boole
     };
   }, [isCelebrating, clearCelebrate, showSuccessBox, enigma.boxNumber, enigma.haEvent, enigma.id]);
 
-  function handleClick() {
+  function handleClick(): void {
     if (isLocked) {
       setIsShowingLocked(true);
 
@@ -121,18 +121,18 @@ export function EnigmaCard({ enigma, isAdmin }: { enigma: Enigma; isAdmin: boole
     openModal(enigma.id);
   }
 
-  function handleAdminUnlock(e: React.MouseEvent) {
+  function handleAdminUnlock(e: React.MouseEvent): void {
     e.stopPropagation();
     triggerUnlockEffect(enigma.id, enigma.title);
   }
 
-  function handleAdminRelock(e: React.MouseEvent) {
+  function handleAdminRelock(e: React.MouseEvent): void {
     e.stopPropagation();
     relock(enigma.id);
   }
 
   const base =
-    "aspect-[2/3] rounded-[18px] border-[1.5px] relative overflow-hidden flex flex-col items-center justify-center p-3 px-2 select-none transition-all duration-700";
+    "aspect-[2/3] rounded-[18px] border-[1.5px] relative overflow-hidden flex flex-color items-center justify-center p-3 px-2 select-none transition-all duration-700";
 
   const stateClass = (() => {
     if (isSolved) {
@@ -148,7 +148,7 @@ export function EnigmaCard({ enigma, isAdmin }: { enigma: Enigma; isAdmin: boole
 
   return (
     <div
-      ref={ref}
+      ref={cardRef}
       className={`${base} ${stateClass}`}
       style={{
         background: "linear-gradient(155deg, #130f26, #0b0917)",
@@ -199,7 +199,7 @@ export function EnigmaCard({ enigma, isAdmin }: { enigma: Enigma; isAdmin: boole
           <div className="text-[0.6rem] tracking-[0.2em] text-muted uppercase">Énigme {enigma.id}</div>
         </>
       ) : (
-        <div className="relative z-[1] flex flex-col items-center">
+        <div className="relative z-[1] flex flex-color items-center">
           <div className={`text-[0.6rem] tracking-[0.2em] ${isSolved ? "text-gold/50" : "text-muted"} uppercase mb-2`}>
             Énigme {enigma.id}
           </div>

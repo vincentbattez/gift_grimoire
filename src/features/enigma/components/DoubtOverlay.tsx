@@ -7,7 +7,7 @@ export function DoubtOverlay({
   visible: boolean;
   onConfirm: () => void;
   onCancel: () => void;
-}) {
+}): React.JSX.Element {
   return (
     <>
       {/* Fond opaque derrière la sheet */}
@@ -41,7 +41,7 @@ export function DoubtOverlay({
           </div>
         )}
 
-        <div className="relative flex flex-col items-center px-6 pt-6 pb-7 text-center">
+        <div className="relative flex flex-color items-center px-6 pt-6 pb-7 text-center">
           {/* Runes en orbite */}
           {visible && (
             <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[140px] h-[140px] pointer-events-none">

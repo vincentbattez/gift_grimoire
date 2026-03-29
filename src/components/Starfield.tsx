@@ -1,112 +1,120 @@
 import { useEffect, useRef } from "react";
-import { particles } from "../particles";
+import { particleList } from "@/particles";
 
-type Star = { x: number; y: number; r: number; phase: number; spd: number; vx: number; vy: number };
+type Star = {
+  positionX: number;
+  positionY: number;
+  radius: number;
+  phase: number;
+  speed: number;
+  velocityX: number;
+  velocityY: number;
+};
 
-export function Starfield() {
+export function Starfield(): React.JSX.Element {
   const starRef = useRef<HTMLCanvasElement>(null);
   const particleRef = useRef<HTMLCanvasElement>(null);
 
   useEffect(() => {
-    const starCv = starRef.current;
-    const partCv = particleRef.current;
+    const starCanvas = starRef.current;
+    const particleCanvas = particleRef.current;
 
-    if (!starCv || !partCv) {
+    if (!starCanvas || !particleCanvas) {
       return;
     }
-    const starCtx = starCv.getContext("2d");
-    const partCtx = partCv.getContext("2d");
+    const starCanvasContext = starCanvas.getContext("2d");
+    const particleCanvasContext = particleCanvas.getContext("2d");
 
-    if (!starCtx || !partCtx) {
+    if (!starCanvasContext || !particleCanvasContext) {
       return;
     }
-    let stars: Star[] = [];
+    let starList: Star[] = [];
 
-    const sCv = starCv;
-    const pCv = partCv;
-    const sCtx = starCtx;
-    const pCtx = partCtx;
+    const starCanvasElement = starCanvas;
+    const particleCanvasElement = particleCanvas;
+    const starContext = starCanvasContext;
+    const particleContext = particleCanvasContext;
 
-    function resize() {
-      sCv.width = window.innerWidth;
-      sCv.height = window.innerHeight;
-      pCv.width = window.innerWidth;
-      pCv.height = window.innerHeight;
+    function resize(): void {
+      starCanvasElement.width = window.innerWidth;
+      starCanvasElement.height = window.innerHeight;
+      particleCanvasElement.width = window.innerWidth;
+      particleCanvasElement.height = window.innerHeight;
 
-      stars = Array.from({ length: 180 }, () => {
+      starList = Array.from({ length: 180 }, () => {
         const angle = Math.random() * Math.PI * 2;
         const speed = Math.random() * 0.12 + 0.03;
 
         return {
-          x: Math.random() * sCv.width,
-          y: Math.random() * sCv.height,
-          r: Math.random() * 1.6 + 0.3,
+          positionX: Math.random() * starCanvasElement.width,
+          positionY: Math.random() * starCanvasElement.height,
+          radius: Math.random() * 1.6 + 0.3,
           phase: Math.random() * Math.PI * 2,
-          spd: Math.random() * 0.02 + 0.008,
-          vx: Math.cos(angle) * speed,
-          vy: Math.sin(angle) * speed,
+          speed: Math.random() * 0.02 + 0.008,
+          velocityX: Math.cos(angle) * speed,
+          velocityY: Math.sin(angle) * speed,
         };
       });
     }
 
-    function draw(t: number) {
-      sCtx.clearRect(0, 0, sCv.width, sCv.height);
-      pCtx.clearRect(0, 0, pCv.width, pCv.height);
+    function draw(t: number): void {
+      starContext.clearRect(0, 0, starCanvasElement.width, starCanvasElement.height);
+      particleContext.clearRect(0, 0, particleCanvasElement.width, particleCanvasElement.height);
 
-      for (const s of stars) {
+      for (const star of starList) {
         // Déplacement avec wrap-around
-        s.x += s.vx;
-        s.y += s.vy;
+        star.positionX += star.velocityX;
+        star.positionY += star.velocityY;
 
-        if (s.x < -2) {
-          s.x = sCv.width + 2;
-        } else if (s.x > sCv.width + 2) {
-          s.x = -2;
+        if (star.positionX < -2) {
+          star.positionX = starCanvasElement.width + 2;
+        } else if (star.positionX > starCanvasElement.width + 2) {
+          star.positionX = -2;
         }
 
-        if (s.y < -2) {
-          s.y = sCv.height + 2;
-        } else if (s.y > sCv.height + 2) {
-          s.y = -2;
+        if (star.positionY < -2) {
+          star.positionY = starCanvasElement.height + 2;
+        } else if (star.positionY > starCanvasElement.height + 2) {
+          star.positionY = -2;
         }
 
         // Clignotement plus intense (min 0.05, amplitude complète)
-        const flicker = Math.sin(t * 0.001 * s.spd * 400 + s.phase);
-        const a = 0.05 + 0.95 * (flicker * flicker);
+        const flicker = Math.sin(t * 0.001 * star.speed * 400 + star.phase);
+        const alpha = 0.05 + 0.95 * (flicker * flicker);
 
         // Glow subtil pour les grosses étoiles
-        if (s.r > 1) {
-          sCtx.beginPath();
-          sCtx.arc(s.x, s.y, s.r * 3, 0, Math.PI * 2);
-          sCtx.fillStyle = `rgba(180,160,255,${String(a * 0.08)})`;
-          sCtx.fill();
+        if (star.radius > 1) {
+          starContext.beginPath();
+          starContext.arc(star.positionX, star.positionY, star.radius * 3, 0, Math.PI * 2);
+          starContext.fillStyle = `rgba(180,160,255,${String(alpha * 0.08)})`;
+          starContext.fill();
         }
 
-        sCtx.beginPath();
-        sCtx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
-        sCtx.fillStyle = `rgba(210,190,255,${String(a)})`;
-        sCtx.fill();
+        starContext.beginPath();
+        starContext.arc(star.positionX, star.positionY, star.radius, 0, Math.PI * 2);
+        starContext.fillStyle = `rgba(210,190,255,${String(alpha)})`;
+        starContext.fill();
       }
 
-      let i = particles.length;
+      let i = particleList.length;
       while (i--) {
-        const p = particles[i];
-        p.x += p.vx;
-        p.y += p.vy;
-        p.vy += 0.015;
-        p.life -= 0.008;
+        const particle = particleList[i];
+        particle.positionX += particle.velocityX;
+        particle.positionY += particle.velocityY;
+        particle.velocityY += 0.015;
+        particle.life -= 0.008;
 
-        if (p.life <= 0) {
-          particles.splice(i, 1);
+        if (particle.life <= 0) {
+          particleList.splice(i, 1);
           continue;
         }
-        const hex = Math.floor(p.life * 255)
+        const hex = Math.floor(particle.life * 255)
           .toString(16)
           .padStart(2, "0");
-        pCtx.beginPath();
-        pCtx.arc(p.x, p.y, p.r * p.life, 0, Math.PI * 2);
-        pCtx.fillStyle = p.col + hex;
-        pCtx.fill();
+        particleContext.beginPath();
+        particleContext.arc(particle.positionX, particle.positionY, particle.radius * particle.life, 0, Math.PI * 2);
+        particleContext.fillStyle = particle.color + hex;
+        particleContext.fill();
       }
 
       requestAnimationFrame(draw);

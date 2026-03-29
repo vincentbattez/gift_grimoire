@@ -1,7 +1,7 @@
 type InkCellProps = {
   cellKey: string;
   row: number;
-  col: number;
+  color: number;
   letter: string | undefined;
   isRevealed: boolean;
   isMissed: boolean;
@@ -14,13 +14,13 @@ type InkCellProps = {
   proximity: "hot" | "warm" | undefined;
   proximityCenter: string | null;
   disabled: boolean;
-  onTap: (row: number, col: number) => void;
+  onTap: (row: number, color: number) => void;
 };
 
 export function InkCell({
   cellKey,
   row,
-  col,
+  color,
   letter,
   isRevealed,
   isMissed,
@@ -34,7 +34,7 @@ export function InkCell({
   proximityCenter,
   disabled,
   onTap,
-}: InkCellProps) {
+}: InkCellProps): React.JSX.Element {
   const cellBorderClass = (() => {
     if (isRevealed) {
       if (wordSolved) {
@@ -108,7 +108,7 @@ export function InkCell({
       data-cell={cellKey}
       onClick={() => {
         if (!disabled) {
-          onTap(row, col);
+          onTap(row, color);
         }
       }}
       className={[

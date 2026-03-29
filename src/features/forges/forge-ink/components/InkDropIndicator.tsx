@@ -1,10 +1,10 @@
-import { INK_CONFIG } from "../config";
+import { INK_CONFIG } from "@features/forges/forge-ink/config";
 
 type InkDropIndicatorProps = {
   dropsLeft: number;
 };
 
-export function InkDropIndicator({ dropsLeft }: InkDropIndicatorProps) {
+export function InkDropIndicator({ dropsLeft }: InkDropIndicatorProps): React.JSX.Element {
   return (
     <>
       <div className="text-center text-[0.4rem] tracking-[0.2em] text-muted/30 uppercase mb-2">Gouttes restantes</div>

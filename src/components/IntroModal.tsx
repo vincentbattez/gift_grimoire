@@ -1,7 +1,7 @@
-import { useCallback, useEffect, useRef, useState } from "react";
-import { sndGrimoireOpen, sndPageTurn } from "../audio";
+import React, { useCallback, useEffect, useRef, useState } from "react";
+import { sndGrimoireOpen, sndPageTurn } from "@/audio";
 
-const SLIDES = [
+const SLIDE_LIST = [
   {
     icon: "✦",
     title: "Un souffle ancien…",
@@ -32,7 +32,7 @@ const SLIDES = [
 const SWIPE_THRESHOLD = 50;
 const VELOCITY_THRESHOLD = 0.3;
 
-export function IntroModal({ onClose }: { onClose: () => void }) {
+export function IntroModal({ onClose }: { onClose: () => void }): React.JSX.Element {
   const [current, setCurrent] = useState(0);
   const [hasEntered, setHasEntered] = useState(false);
   const [isExiting, setIsExiting] = useState(false);
@@ -49,7 +49,7 @@ export function IntroModal({ onClose }: { onClose: () => void }) {
   }, []);
 
   const goTo = useCallback((i: number) => {
-    const clamped = Math.max(0, Math.min(SLIDES.length - 1, i));
+    const clamped = Math.max(0, Math.min(SLIDE_LIST.length - 1, i));
 
     setCurrent((prev) => {
       if (prev !== clamped) {
@@ -60,7 +60,7 @@ export function IntroModal({ onClose }: { onClose: () => void }) {
     });
   }, []);
 
-  function handleClose() {
+  function handleClose(): void {
     sndGrimoireOpen();
     setIsExiting(true);
     setTimeout(onClose, 400);
@@ -68,12 +68,12 @@ export function IntroModal({ onClose }: { onClose: () => void }) {
 
   // ─── Drag handlers (horizontal swipe) ───
 
-  function onDragStart(clientX: number) {
+  function onDragStart(clientX: number): void {
     drag.current = { startX: clientX, startTime: Date.now(), currentX: clientX };
     setIsDragging(true);
   }
 
-  function onDragMove(clientX: number) {
+  function onDragMove(clientX: number): void {
     if (!drag.current) {
       return;
     }
@@ -81,7 +81,7 @@ export function IntroModal({ onClose }: { onClose: () => void }) {
     setDragX(clientX - drag.current.startX);
   }
 
-  function onDragEnd() {
+  function onDragEnd(): void {
     if (!drag.current) {
       return;
     }
@@ -90,7 +90,7 @@ export function IntroModal({ onClose }: { onClose: () => void }) {
     const velocity = Math.abs(dx) / Math.max(dt, 1);
 
     if (Math.abs(dx) > SWIPE_THRESHOLD || velocity > VELOCITY_THRESHOLD) {
-      if (dx < 0 && current < SLIDES.length - 1) {
+      if (dx < 0 && current < SLIDE_LIST.length - 1) {
         goTo(current + 1);
       } else if (dx > 0 && current > 0) {
         goTo(current - 1);
@@ -102,22 +102,22 @@ export function IntroModal({ onClose }: { onClose: () => void }) {
     setDragX(0);
   }
 
-  function handleTouchStart(e: React.TouchEvent) {
+  function handleTouchStart(e: React.TouchEvent): void {
     onDragStart(e.touches[0].clientX);
   }
-  function handleTouchMove(e: React.TouchEvent) {
+  function handleTouchMove(e: React.TouchEvent): void {
     onDragMove(e.touches[0].clientX);
   }
-  function handleTouchEnd() {
+  function handleTouchEnd(): void {
     onDragEnd();
   }
-  function handleMouseDown(e: React.MouseEvent) {
+  function handleMouseDown(e: React.MouseEvent): void {
     onDragStart(e.clientX);
     // eslint-disable-next-line unicorn/consistent-function-scoping -- must capture fresh onDragMove ref
-    const handleMove = (ev: MouseEvent) => {
+    const handleMove = (ev: MouseEvent): void => {
       onDragMove(ev.clientX);
     };
-    const handleUp = () => {
+    const handleUp = (): void => {
       onDragEnd();
       globalThis.removeEventListener("mousemove", handleMove);
       globalThis.removeEventListener("mouseup", handleUp);
@@ -126,7 +126,7 @@ export function IntroModal({ onClose }: { onClose: () => void }) {
     globalThis.addEventListener("mouseup", handleUp);
   }
 
-  const isLast = current === SLIDES.length - 1;
+  const isLast = current === SLIDE_LIST.length - 1;
 
   // Clamp drag to avoid over-scrolling at edges
   const clampedDragX = (current === 0 && dragX > 0) || (isLast && dragX < 0) ? dragX * 0.2 : dragX;
@@ -139,7 +139,7 @@ export function IntroModal({ onClose }: { onClose: () => void }) {
         hasEntered && !isExiting ? "opacity-100" : "opacity-0"
       }`}
     >
-      <div className="w-full max-w-[400px] mx-4 flex flex-col items-center">
+      <div className="w-full max-w-[400px] mx-4 flex flex-color items-center">
         {/* Slides track */}
         <div
           ref={containerRef}
@@ -153,13 +153,13 @@ export function IntroModal({ onClose }: { onClose: () => void }) {
             className={isDragging ? "" : "transition-transform duration-500 ease-out"}
             style={{
               display: "flex",
-              width: `${String(SLIDES.length * 100)}%`,
-              transform: `translateX(calc(${String(trackOffset)}% / ${String(SLIDES.length)} + ${String(clampedDragX)}px))`,
+              width: `${String(SLIDE_LIST.length * 100)}%`,
+              transform: `translateX(calc(${String(trackOffset)}% / ${String(SLIDE_LIST.length)} + ${String(clampedDragX)}px))`,
             }}
           >
-            {SLIDES.map((slide, i) => (
-              <div key={i} className="flex-shrink-0 px-2" style={{ width: `${String(100 / SLIDES.length)}%` }}>
-                <div className="flex flex-col items-center text-center py-8 px-4">
+            {SLIDE_LIST.map((slide, i) => (
+              <div key={i} className="flex-shrink-0 px-2" style={{ width: `${String(100 / SLIDE_LIST.length)}%` }}>
+                <div className="flex flex-color items-center text-center py-8 px-4">
                   <span
                     className={`text-[3rem] mb-5 block transition-all duration-500 ${
                       i === current ? "opacity-100 scale-100" : "opacity-30 scale-75"
@@ -184,7 +184,7 @@ export function IntroModal({ onClose }: { onClose: () => void }) {
 
         {/* Dots indicator */}
         <div className="flex gap-2.5 mt-4 mb-6">
-          {SLIDES.map((_, i) => (
+          {SLIDE_LIST.map((_, i) => (
             <button
               key={i}
               onClick={() => {

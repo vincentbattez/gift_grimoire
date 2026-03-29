@@ -26,7 +26,7 @@ export type EnigmaData = {
   };
 };
 
-export const ENIGMAS_DATA: EnigmaData[] = [
+export const ENIGMA_DATA_LIST: EnigmaData[] = [
   {
     number: "VI",
     title: "L'Empire du Rêve",

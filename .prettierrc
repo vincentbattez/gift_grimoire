@@ -10,6 +10,7 @@
   "importOrder": [
     "^react(.*)$",
     "<THIRD_PARTY_MODULES>",
+    "^@(?:features|components)?/",
     "^[./]"
   ],
   "importOrderSeparation": true,

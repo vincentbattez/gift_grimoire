@@ -1,4 +1,4 @@
-import { useCooldown } from "../useCooldown";
+import { useCooldown } from "@features/cooldown/useCooldown";
 
 /**
  * Affiche un label de cooldown formaté HH:MM:SS.
@@ -18,7 +18,7 @@ export function CooldownLabel({
   durationMs?: number | null;
   prefix?: string;
   className?: string;
-}) {
+}): React.JSX.Element | null {
   const { active: isActive, label } = useCooldown(lastTriggeredAt, durationMs);
 
   if (!isActive) {

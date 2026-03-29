@@ -1,11 +1,11 @@
 import { useState } from "react";
 import { createPortal } from "react-dom";
-import { LockIcon } from "../../../components/LockIcon";
+import { LockIcon } from "@components/LockIcon";
 
-export function LockedModal({ onClose }: { readonly onClose: () => void }) {
+export function LockedModal({ onClose }: { readonly onClose: () => void }): React.JSX.Element {
   const [isClosing, setIsClosing] = useState(false);
 
-  function handleClose(e?: React.MouseEvent) {
+  function handleClose(e?: React.MouseEvent): void {
     e?.stopPropagation();
 
     if (isClosing) {
@@ -17,7 +17,7 @@ export function LockedModal({ onClose }: { readonly onClose: () => void }) {
 
   return createPortal(
     <div
-      className="fixed inset-0 z-[100] flex flex-col items-center justify-center"
+      className="fixed inset-0 z-[100] flex flex-color items-center justify-center"
       style={{
         background: "radial-gradient(ellipse at 50% 40%, #1a1040ee, #07060ffa)",
         animation: isClosing ? "locked-modal-out 0.3s ease-in forwards" : "locked-modal-in 0.3s ease-out",

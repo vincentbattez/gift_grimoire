@@ -4,7 +4,11 @@ type OrnamentDividerProps = {
   lineWidth?: "flex" | "fixed";
 };
 
-export function OrnamentDivider({ color = "#c9a032", className = "", lineWidth = "flex" }: OrnamentDividerProps) {
+export function OrnamentDivider({
+  color = "#c9a032",
+  className = "",
+  lineWidth = "flex",
+}: OrnamentDividerProps): React.JSX.Element {
   const lineClass = lineWidth === "flex" ? "flex-1" : "w-10";
   const fadeColor = `${color}40`;
 

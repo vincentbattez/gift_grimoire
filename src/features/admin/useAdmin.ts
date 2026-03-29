@@ -10,12 +10,12 @@ function subscribe(cb: () => void) {
   };
 }
 
-function getSnapshot() {
+function getSnapshot(): boolean {
   return localStorage.getItem(KEY) === "true";
 }
 
 /** Reads `?admin=true` from URL once and persists to localStorage. */
-export function initAdmin() {
+export function initAdmin(): void {
   const params = new URLSearchParams(location.search);
 
   if (params.get(KEY) === "true") {
@@ -30,7 +30,7 @@ export function useAdmin(): boolean {
   return useSyncExternalStore(subscribe, getSnapshot);
 }
 
-export function logoutAdmin() {
+export function logoutAdmin(): void {
   localStorage.removeItem(KEY);
   globalThis.dispatchEvent(new Event("storage"));
 }

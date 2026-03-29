@@ -1,18 +1,18 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import { sndAmbientTension, sndClick, sndKeyInsert, sndLockOpen, sndUnlock } from "../../../audio";
-import { LockIcon } from "../../../components/LockIcon";
-import { spawnParticles } from "../../../particles";
-import { ENIGMAS } from "../config";
-import { useEnigmaStore } from "../store";
-import { triggerUnlockReveal } from "../unlock";
+import { sndAmbientTension, sndClick, sndKeyInsert, sndLockOpen, sndUnlock } from "@/audio";
+import { spawnParticles } from "@/particles";
+import { LockIcon } from "@components/LockIcon";
+import { ENIGMA_LIST } from "@features/enigma/config";
+import { useEnigmaStore } from "@features/enigma/store";
+import { triggerUnlockReveal } from "@features/enigma/unlock";
 
 /** Distance (px) at which the key snaps into the keyhole */
 const SNAP_THRESHOLD = 60;
-const FRAG_DISTANCES = Array.from({ length: 8 }, () => 80 + Math.random() * 40);
+const FRAG_DISTANCE_LIST = Array.from({ length: 8 }, () => 80 + Math.random() * 40);
 
 type Phase = "drag" | "unlocking" | "done";
 
-export function UnlockOverlay() {
+export function UnlockOverlay(): React.JSX.Element | null {
   const unlockingId = useEnigmaStore((s) => s.unlockingCardId);
   const unlockingTitle = useEnigmaStore((s) => s.unlockingTitle);
   const clearUnlocking = useEnigmaStore((s) => s.clearUnlocking);
@@ -81,13 +81,13 @@ export function UnlockOverlay() {
 
   const getDistToKeyhole = useCallback(
     (px: number, py: number) => {
-      const kh = getKeyholeCenter();
+      const keyholeCenter = getKeyholeCenter();
 
-      if (!kh) {
+      if (!keyholeCenter) {
         return Infinity;
       }
 
-      return Math.hypot(px - kh.x, py - kh.y);
+      return Math.hypot(px - keyholeCenter.x, py - keyholeCenter.y);
     },
     [getKeyholeCenter],
   );
@@ -119,8 +119,8 @@ export function UnlockOverlay() {
       const y = clientY - dragOffset.current.y;
       setKeyPos({ x, y });
 
-      const dist = getDistToKeyhole(x, y);
-      setProximity(Math.max(0, Math.min(1, 1 - dist / 200)));
+      const distanceToKeyhole = getDistToKeyhole(x, y);
+      setProximity(Math.max(0, Math.min(1, 1 - distanceToKeyhole / 200)));
     },
     [phase, getDistToKeyhole],
   );
@@ -188,19 +188,19 @@ export function UnlockOverlay() {
       }
       setIsDragging(false);
 
-      const dist = getDistToKeyhole(clientX - dragOffset.current.x, clientY - dragOffset.current.y);
+      const distanceToKeyhole = getDistToKeyhole(clientX - dragOffset.current.x, clientY - dragOffset.current.y);
 
-      if (dist < SNAP_THRESHOLD) {
+      if (distanceToKeyhole < SNAP_THRESHOLD) {
         // Snap to keyhole — offset so the teeth (bottom of key) align with the keyhole.
         // Key SVG is 150px tall, teeth are at ~83%. With translate(-50%,-50%) the center
         // is at 75px. Teeth offset from center = 150*0.83 - 75 = 50px.
         // So we position the key 50px above the keyhole.
-        const kh = getKeyholeCenter();
+        const keyholeCenter = getKeyholeCenter();
 
-        if (kh) {
-          setKeyPos({ x: kh.x, y: kh.y - 50 });
+        if (keyholeCenter) {
+          setKeyPos({ x: keyholeCenter.x, y: keyholeCenter.y - 50 });
           setPhase("unlocking");
-          triggerUnlockSequence(kh);
+          triggerUnlockSequence(keyholeCenter);
         }
       } else {
         // Spring back
@@ -218,10 +218,10 @@ export function UnlockOverlay() {
       const rect = e.currentTarget.getBoundingClientRect();
       onDragStart(e.clientX, e.clientY, rect);
 
-      const onMove = (ev: MouseEvent) => {
+      const onMove = (ev: MouseEvent): void => {
         onDragMove(ev.clientX, ev.clientY);
       };
-      const onUp = (ev: MouseEvent) => {
+      const onUp = (ev: MouseEvent): void => {
         onDragEnd(ev.clientX, ev.clientY);
         globalThis.removeEventListener("mousemove", onMove);
         globalThis.removeEventListener("mouseup", onUp);
@@ -235,25 +235,25 @@ export function UnlockOverlay() {
   // Touch handlers
   const onTouchStart = useCallback(
     (e: React.TouchEvent<HTMLDivElement>) => {
-      const t = e.touches[0];
+      const touch = e.touches[0];
       const rect = e.currentTarget.getBoundingClientRect();
-      onDragStart(t.clientX, t.clientY, rect);
+      onDragStart(touch.clientX, touch.clientY, rect);
     },
     [onDragStart],
   );
 
   const onTouchMove = useCallback(
     (e: React.TouchEvent) => {
-      const t = e.touches[0];
-      onDragMove(t.clientX, t.clientY);
+      const touch = e.touches[0];
+      onDragMove(touch.clientX, touch.clientY);
     },
     [onDragMove],
   );
 
   const onTouchEnd = useCallback(
     (e: React.TouchEvent) => {
-      const t = e.changedTouches[0];
-      onDragEnd(t.clientX, t.clientY);
+      const touch = e.changedTouches[0];
+      onDragEnd(touch.clientX, touch.clientY);
     },
     [onDragEnd],
   );
@@ -311,7 +311,7 @@ export function UnlockOverlay() {
               style={
                 {
                   "--frag-angle": `${String((360 / 8) * i)}deg`,
-                  "--frag-dist": `${String(FRAG_DISTANCES[i])}px`,
+                  "--frag-dist": `${String(FRAG_DISTANCE_LIST[i])}px`,
                 } as React.CSSProperties
               }
             />
@@ -324,7 +324,7 @@ export function UnlockOverlay() {
       {/* Enigma reveal after unlock */}
       {isDone &&
         (() => {
-          const enigma = ENIGMAS.find((e) => e.id === unlockingId);
+          const enigma = ENIGMA_LIST.find((e) => e.id === unlockingId);
 
           return (
             <div className="unlock-reveal is-visible">
