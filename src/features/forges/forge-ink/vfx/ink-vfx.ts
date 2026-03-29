@@ -1,7 +1,7 @@
 import type { RefObject } from "react";
-import { sndInkLetterReveal } from "@/audio";
 import { spawnParticles } from "@/particles";
 import { getWordCells, type WordConfig } from "@features/forges/forge-ink/config";
+import { sndInkLetterReveal } from "@features/forges/forge-ink/sfx/ink-sfx";
 
 export function playHitParticles(gridRef: RefObject<HTMLDivElement | null>, cellKey: string): void {
   const el = gridRef.current?.querySelector<HTMLElement>(`[data-cell="${cellKey}"]`);

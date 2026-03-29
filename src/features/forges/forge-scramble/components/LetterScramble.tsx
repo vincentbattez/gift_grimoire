@@ -1,8 +1,10 @@
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
-import { sndLetterSwap, sndScrambleSolved } from "@/audio";
+import { sndScrambleSolved } from "@/audio";
 import { randomVisual } from "@/utils/random";
 import { EnigmaPicker } from "@features/enigma/components/EnigmaPicker";
 import { INITIAL_LETTER_LIST, SOLUTION, type Letter } from "@features/forges/forge-scramble/config";
+import { sndLetterSwap } from "@features/forges/forge-scramble/sfx/scramble-sfx";
+import { animateFlip, snapPositions } from "@features/forges/forge-scramble/vfx/scramble-vfx";
 import type { ForgeProps } from "@features/forges/types";
 
 function shuffle<T>(sourceArray: T[]): T[] {
@@ -73,35 +75,7 @@ export function LetterScramble({ solved, onSolve }: Readonly<ForgeProps>): React
     }
     flipSnapshotRef.current = new Map();
 
-    const cards = container.querySelectorAll<HTMLElement>("[data-lid]");
-
-    cards.forEach((el) => {
-      const id = Number(el.dataset.lid);
-      const prev = snapshot.get(id);
-
-      if (!prev) {
-        return;
-      }
-      const curr = el.getBoundingClientRect();
-      const dx = prev.left - curr.left;
-      const dy = prev.top - curr.top;
-
-      if (dx === 0 && dy === 0) {
-        return;
-      }
-
-      el.style.transition = "none";
-      el.style.transform = `translate(${String(dx)}px, ${String(dy)}px)`;
-      el.getBoundingClientRect();
-      el.style.transition = "transform 220ms cubic-bezier(0.25, 0.46, 0.45, 0.94)";
-      el.style.transform = "";
-
-      const cleanup = (): void => {
-        el.style.transition = "";
-        el.removeEventListener("transitionend", cleanup);
-      };
-      el.addEventListener("transitionend", cleanup);
-    });
+    animateFlip(container, snapshot);
   }, [letterList]);
 
   const getCardRects = useCallback(() => {
@@ -204,12 +178,7 @@ export function LetterScramble({ solved, onSolve }: Readonly<ForgeProps>): React
         const container = containerRef.current;
 
         if (container) {
-          const snapshot = new Map<number, DOMRect>();
-
-          container.querySelectorAll<HTMLElement>("[data-lid]").forEach((el) => {
-            snapshot.set(Number(el.dataset.lid), el.getBoundingClientRect());
-          });
-          flipSnapshotRef.current = snapshot;
+          flipSnapshotRef.current = snapPositions(container);
         }
 
         setLetters(reorderLetters);

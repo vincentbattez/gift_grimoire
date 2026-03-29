@@ -11,6 +11,7 @@ import { isAttemptUsedToday } from "@features/cooldown/store";
 import { EnigmaPicker } from "@features/enigma/components/EnigmaPicker";
 import { CHECK_DURATION_MS, ENTITY_ID } from "@features/forges/forge-magnet/config";
 import { useMagnetStore } from "@features/forges/forge-magnet/store";
+import { playShake } from "@features/forges/forge-magnet/vfx/magnet-vfx";
 import { useForgeStore } from "@features/forges/store";
 import type { ForgeProps } from "@features/forges/types";
 import { WideWaveform } from "./WideWaveform";
@@ -98,9 +99,7 @@ export function DarkVadorForge({ solved, onSolve }: Readonly<ForgeProps>): React
       const el = shakeRef.current;
 
       if (el) {
-        el.style.animation = "none";
-        void el.offsetHeight;
-        el.style.animation = "shake 0.5s ease";
+        playShake(el);
       }
 
       setTimeout(() => {

@@ -1,13 +1,15 @@
 import { useEffect, useRef, useState } from "react";
-import { sndDeepListen, sndOk } from "@/audio";
+import { sndOk } from "@/audio";
 import { pollEntityState } from "@/ha";
 import { EnigmaPicker } from "@features/enigma/components/EnigmaPicker";
 import { ENTITY_ID, LISTEN_DURATION_MS } from "@features/forges/forge-vibration/config";
+import { sndDeepListen } from "@features/forges/forge-vibration/sfx/vibration-sfx";
+import { playShake } from "@features/forges/forge-vibration/vfx/vibration-vfx";
 import type { ForgeProps } from "@features/forges/types";
 
 type Phase = "idle" | "listening" | "detected" | "failed";
 
-function SoundWaveIcon({ color, size = 28 }: Readonly<{ color: string; size?: number }>): React.JSX.Element {
+function SoundWaveIcon({ color, size }: Readonly<{ color: string; size?: number }>): React.JSX.Element {
   return (
     <svg
       width={size}
@@ -74,9 +76,7 @@ export function VibrationForge({ solved, onSolve }: Readonly<ForgeProps>): React
       const el = btnRef.current;
 
       if (el) {
-        el.style.animation = "none";
-        void el.offsetHeight;
-        el.style.animation = "shake 0.5s ease";
+        playShake(el);
       }
 
       setTimeout(() => {

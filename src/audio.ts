@@ -2,13 +2,13 @@ import { randomVisual } from "@/utils/random";
 
 let audioContext: AudioContext | null = null;
 
-function getAudioContext(): AudioContext {
+export function getAudioContext(): AudioContext {
   audioContext ??= new AudioContext();
 
   return audioContext;
 }
 
-function tone(frequency: number, type: OscillatorType, volume: number, duration: number, delay = 0): void {
+export function tone(frequency: number, type: OscillatorType, volume: number, duration: number, delay = 0): void {
   const context = getAudioContext();
   const oscillator = context.createOscillator();
   const gainNode = context.createGain();
@@ -69,36 +69,6 @@ export const sndHeartPop = (pitchOffset = 0): void => {
 
   // Airy harmonic shimmer
   tone(base * 1.5, "sine", 0.025, 0.09, 0.01);
-};
-
-/** Modern fluid swap — letter slides into place */
-export const sndLetterSwap = (): void => {
-  const context = getAudioContext();
-  const currentTime = context.currentTime;
-
-  // Main body — pitch arc up then resolves down ("spring into place")
-  const oscillator = context.createOscillator();
-  const gainNode = context.createGain();
-  oscillator.connect(gainNode);
-  gainNode.connect(context.destination);
-  oscillator.type = "sine";
-  oscillator.frequency.setValueAtTime(310, currentTime);
-  oscillator.frequency.linearRampToValueAtTime(620, currentTime + 0.022);
-  oscillator.frequency.exponentialRampToValueAtTime(250, currentTime + 0.14);
-  gainNode.gain.setValueAtTime(0, currentTime);
-  gainNode.gain.linearRampToValueAtTime(0.17, currentTime + 0.007);
-  gainNode.gain.exponentialRampToValueAtTime(0.0001, currentTime + 0.16);
-  oscillator.start(currentTime);
-  oscillator.stop(currentTime + 0.17);
-
-  // Octave harmonic — adds richness without harshness
-  tone(620, "sine", 0.04, 0.11, 0.005);
-
-  // High shimmer — modern sparkle
-  tone(2500, "sine", 0.016, 0.08, 0.006);
-
-  // Warm sub tail — fullness
-  tone(125, "triangle", 0.065, 0.13, 0.012);
 };
 
 /** Shimmering chime — scramble solved */
@@ -334,106 +304,6 @@ export function sndDoubt(): void {
   pingGainNode.gain.exponentialRampToValueAtTime(0.0001, currentTime + 1.1);
   pingOscillator.start(currentTime + 0.65);
   pingOscillator.stop(currentTime + 1.15);
-}
-
-/** Deep listening drone — 10s meditative ambience, returns stop function */
-export function sndDeepListen(): () => void {
-  const context = getAudioContext();
-  const currentTime = context.currentTime;
-  const DUR = 10;
-  const allNodeList: { oscillator: OscillatorNode; gainNode: GainNode }[] = [];
-
-  // Warm sub-bass with slow breathing LFO (~0.15 Hz)
-  const subOscillator = context.createOscillator();
-  const subGainNode = context.createGain();
-  const breathLfoOscillator = context.createOscillator();
-  const breathDepthGainNode = context.createGain();
-  subOscillator.connect(subGainNode);
-  subGainNode.connect(context.destination);
-  subOscillator.type = "sine";
-  subOscillator.frequency.value = 55;
-  breathLfoOscillator.connect(breathDepthGainNode);
-  breathDepthGainNode.connect(subGainNode.gain);
-  breathLfoOscillator.type = "sine";
-  breathLfoOscillator.frequency.value = 0.15;
-  breathDepthGainNode.gain.value = 0.03;
-  subGainNode.gain.setValueAtTime(0, currentTime);
-  subGainNode.gain.linearRampToValueAtTime(0.07, currentTime + 2);
-  subGainNode.gain.setValueAtTime(0.07, currentTime + DUR - 2);
-  subGainNode.gain.linearRampToValueAtTime(0.0001, currentTime + DUR);
-  subOscillator.start(currentTime);
-  subOscillator.stop(currentTime + DUR);
-  breathLfoOscillator.start(currentTime);
-  breathLfoOscillator.stop(currentTime + DUR);
-  allNodeList.push({ oscillator: subOscillator, gainNode: subGainNode });
-
-  // Binaural-like beating — two close frequencies creating a slow 3Hz pulse
-  for (const frequency of [200, 203]) {
-    const oscillator = context.createOscillator();
-    const gainNode = context.createGain();
-    oscillator.connect(gainNode);
-    gainNode.connect(context.destination);
-    oscillator.type = "sine";
-    oscillator.frequency.value = frequency;
-    gainNode.gain.setValueAtTime(0, currentTime);
-    gainNode.gain.linearRampToValueAtTime(0.025, currentTime + 3);
-    gainNode.gain.setValueAtTime(0.025, currentTime + DUR - 2.5);
-    gainNode.gain.linearRampToValueAtTime(0.0001, currentTime + DUR);
-    oscillator.start(currentTime);
-    oscillator.stop(currentTime + DUR);
-    allNodeList.push({ oscillator, gainNode });
-  }
-
-  // Ethereal high harmonic — slowly drifting pitch
-  const highOscillator = context.createOscillator();
-  const highGainNode = context.createGain();
-  highOscillator.connect(highGainNode);
-  highGainNode.connect(context.destination);
-  highOscillator.type = "sine";
-  highOscillator.frequency.setValueAtTime(660, currentTime);
-  highOscillator.frequency.linearRampToValueAtTime(880, currentTime + DUR * 0.6);
-  highOscillator.frequency.linearRampToValueAtTime(740, currentTime + DUR);
-  highGainNode.gain.setValueAtTime(0, currentTime);
-  highGainNode.gain.linearRampToValueAtTime(0.015, currentTime + 4);
-  highGainNode.gain.setValueAtTime(0.015, currentTime + DUR - 3);
-  highGainNode.gain.linearRampToValueAtTime(0.0001, currentTime + DUR);
-  highOscillator.start(currentTime);
-  highOscillator.stop(currentTime + DUR);
-  allNodeList.push({ oscillator: highOscillator, gainNode: highGainNode });
-
-  // Soft periodic pings — 5 very subtle sonar-like tones spread across 10s
-  for (let i = 0; i < 5; i++) {
-    const pingTime = currentTime + 1.5 + i * 1.8;
-    const oscillator = context.createOscillator();
-    const gainNode = context.createGain();
-    oscillator.connect(gainNode);
-    gainNode.connect(context.destination);
-    oscillator.type = "sine";
-    oscillator.frequency.setValueAtTime(1200 + i * 40, pingTime);
-    oscillator.frequency.exponentialRampToValueAtTime(800, pingTime + 0.8);
-    gainNode.gain.setValueAtTime(0.0001, pingTime);
-    gainNode.gain.linearRampToValueAtTime(0.04, pingTime + 0.05);
-    gainNode.gain.exponentialRampToValueAtTime(0.0001, pingTime + 0.8);
-    oscillator.start(pingTime);
-    oscillator.stop(pingTime + 0.85);
-    allNodeList.push({ oscillator, gainNode });
-  }
-
-  return () => {
-    const now = context.currentTime;
-    for (const { oscillator, gainNode } of allNodeList) {
-      gainNode.gain.cancelScheduledValues(now);
-      gainNode.gain.setValueAtTime(gainNode.gain.value, now);
-      gainNode.gain.exponentialRampToValueAtTime(0.0001, now + 0.4);
-      oscillator.stop(now + 0.45);
-    }
-
-    try {
-      breathLfoOscillator.stop(now + 0.45);
-    } catch {
-      /* AudioNode déjà arrêté */
-    }
-  };
 }
 
 /** Modern slide transition — clean digital tick + airy swipe */
@@ -1009,106 +879,6 @@ export const sndFinale = (): void => {
   // Final golden bell
   tone(880, "sine", 0.08, 2, 6.2);
   tone(1760, "sine", 0.03, 1.5, 6.3);
-};
-
-/** Ink drop falling — water plip. ratio 0→1 : encrier vide→plein */
-export const sndInkDrop = (ratio = 1): void => {
-  const context = getAudioContext();
-  const currentTime = context.currentTime;
-
-  const startFreq = 600 + ratio * 500;
-  const endFreq = 200 + ratio * 200;
-
-  const oscillator = context.createOscillator();
-  const gainNode = context.createGain();
-  oscillator.connect(gainNode);
-  gainNode.connect(context.destination);
-  oscillator.type = "sine";
-  oscillator.frequency.setValueAtTime(startFreq, currentTime);
-  oscillator.frequency.exponentialRampToValueAtTime(endFreq, currentTime + 0.12);
-  gainNode.gain.setValueAtTime(0, currentTime);
-  gainNode.gain.linearRampToValueAtTime(0.1, currentTime + 0.01);
-  gainNode.gain.exponentialRampToValueAtTime(0.0001, currentTime + 0.18);
-  oscillator.start(currentTime);
-  oscillator.stop(currentTime + 0.2);
-
-  // Sub plip for water weight
-  tone(200, "sine", 0.06, 0.1, 0.01);
-};
-
-/** Crystalline hit — letter revealed */
-export const sndInkHit = (): void => {
-  const context = getAudioContext();
-  const currentTime = context.currentTime;
-
-  [1047, 1319, 1568].forEach((frequency, i) => {
-    const oscillator = context.createOscillator();
-    const gainNode = context.createGain();
-    oscillator.connect(gainNode);
-    gainNode.connect(context.destination);
-    oscillator.type = "sine";
-    oscillator.frequency.value = frequency;
-    const noteStartTime = currentTime + i * 0.06;
-    gainNode.gain.setValueAtTime(0, noteStartTime);
-    gainNode.gain.linearRampToValueAtTime(0.1, noteStartTime + 0.015);
-    gainNode.gain.exponentialRampToValueAtTime(0.0001, noteStartTime + 0.6);
-    oscillator.start(noteStartTime);
-    oscillator.stop(noteStartTime + 0.65);
-  });
-  tone(2093, "sine", 0.025, 0.4, 0.1);
-};
-
-/** Dull thud — miss */
-export const sndInkMiss = (): void => {
-  const context = getAudioContext();
-  const currentTime = context.currentTime;
-
-  const oscillator = context.createOscillator();
-  const gainNode = context.createGain();
-  oscillator.connect(gainNode);
-  gainNode.connect(context.destination);
-  oscillator.type = "sine";
-  oscillator.frequency.setValueAtTime(110, currentTime);
-  oscillator.frequency.exponentialRampToValueAtTime(50, currentTime + 0.2);
-  gainNode.gain.setValueAtTime(0.14, currentTime);
-  gainNode.gain.exponentialRampToValueAtTime(0.0001, currentTime + 0.3);
-  oscillator.start(currentTime);
-  oscillator.stop(currentTime + 0.35);
-
-  tone(220, "sawtooth", 0.04, 0.1);
-};
-
-/** Dull thud + warm tinkle — miss adjacent */
-export const sndInkMissAdjacent = (): void => {
-  sndInkMiss();
-  // Warm tinkle overlay
-  tone(1200, "triangle", 0.04, 0.5, 0.06);
-  tone(1500, "sine", 0.025, 0.4, 0.1);
-};
-
-/** Short triumph — word solved */
-export const sndInkWordSolved = (): void => {
-  [784, 988, 1175, 1568].forEach((frequency, i) => {
-    tone(frequency, "sine", 0.12, 0.5, i * 0.07);
-  });
-
-  [988, 1175].forEach((frequency, i) => {
-    tone(frequency, "triangle", 0.07, 1, 0.3 + i * 0.03);
-  });
-};
-
-/** Brief dissonant tone — wrong word guess */
-export const sndInkGuessError = (): void => {
-  tone(220, "triangle", 0.06, 0.2);
-  tone(233, "triangle", 0.05, 0.18, 0.01);
-};
-
-/** Crystalline ping — one per letter during word reveal cascadeList */
-export const sndInkLetterReveal = (index: number): void => {
-  const scaleList = [587, 659, 784, 880, 988, 1175, 1319, 1568, 1760];
-  const frequency = scaleList[index % scaleList.length];
-  tone(frequency, "sine", 0.07, 0.32);
-  tone(frequency * 2, "triangle", 0.025, 0.22, 0.01);
 };
 
 /** Ambient tension drone — crescendo over ~3s, returns stop function */

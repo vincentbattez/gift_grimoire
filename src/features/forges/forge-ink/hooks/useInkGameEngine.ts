@@ -1,4 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState, type RefObject } from "react";
+import { sndScrambleSolved } from "@/audio";
+import { getWordCells, INK_CONFIG, LETTER_MAP, PROXIMITY_MAP, type WordState } from "@features/forges/forge-ink/config";
 import {
   sndInkDrop,
   sndInkGuessError,
@@ -6,9 +8,7 @@ import {
   sndInkMiss,
   sndInkMissAdjacent,
   sndInkWordSolved,
-  sndScrambleSolved,
-} from "@/audio";
-import { getWordCells, INK_CONFIG, LETTER_MAP, PROXIMITY_MAP, type WordState } from "@features/forges/forge-ink/config";
+} from "@features/forges/forge-ink/sfx/ink-sfx";
 import { useInkStore } from "@features/forges/forge-ink/store";
 import {
   playCelebration,
@@ -35,7 +35,7 @@ function computeWordPattern(wordText: string, revealedCellList: Set<string>): st
   const word = INK_CONFIG.wordList.find((w) => w.text === wordText);
 
   if (!word) {
-    throw new Error(`Unknown word: ${wordText}`);
+    throw new Error(`Unknown word: ${wordText}`); // eslint-disable-line @typescript-eslint/only-throw-error -- Error object is thrown
   }
 
   return Array.from(word.text, (letter, i) => {
@@ -52,7 +52,7 @@ function getActiveWordTexts(revealedCellList: Set<string>): string[] {
     .map((w) => w.text);
 }
 
-const normalize = (s: string): string => s.normalize("NFD").replaceAll(/[\u0300-\u036F]/g, "");
+const normalize = (s: string): string => s.normalize("NFD").replaceAll(/[\u0300-\u036F]/g, ""); // eslint-disable-line sonarjs/null-dereference -- s is typed string
 
 function todayStamp(): string {
   const d = new Date();
@@ -361,7 +361,7 @@ export function useInkGameEngine(
   // ── Word guess handler ──
   const handleWordGuess = useCallback(
     (wordText: string, guess: string): "correct" | "wrong" | "ignored" => {
-      const val = normalize(guess.trim().toUpperCase());
+      const val = normalize(guess.trim().toUpperCase()); // eslint-disable-line sonarjs/null-dereference -- guess is typed string
       const state = wordStates[wordText];
 
       if (!val || state.guessesLeft === 0 || state.solved) {
