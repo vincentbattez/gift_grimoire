@@ -1,20 +1,22 @@
 # ---- Dependencies ----
-FROM node:25-alpine AS deps
+FROM node:25.6.0-alpine AS deps
 WORKDIR /app
 COPY package.json yarn.lock ./
 RUN yarn install --frozen-lockfile
 
 # ---- Build ----
-FROM node:25-alpine AS build
+FROM node:25.6.0-alpine AS build
 WORKDIR /app
 ARG VITE_HA_URL
 ARG VITE_HA_TOKEN
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
-RUN yarn build
+RUN : "${VITE_HA_URL:?Build argument VITE_HA_URL is required}" \
+    && : "${VITE_HA_TOKEN:?Build argument VITE_HA_TOKEN is required}" \
+    && yarn build
 
 # ---- Runtime ----
-FROM nginx:stable-alpine AS runtime
+FROM nginx:1.28-alpine AS runtime
 COPY --from=build /app/dist /usr/share/nginx/html
 COPY nginx.conf /etc/nginx/conf.d/default.conf
 EXPOSE 80
