@@ -1,4 +1,5 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
+import { useTranslation } from "react-i18next";
 import {
   sndCardFlip,
   sndConvergence,
@@ -87,6 +88,8 @@ function buildEmojiBurst(): { emoji: string; left: number; delay: number; size: 
 // ── Slides ──
 
 function SlideContext(): React.JSX.Element {
+  const { t } = useTranslation("finale");
+
   return (
     <div className="text-center">
       <div className="mb-3 text-[2.5rem] leading-none" style={{ filter: "drop-shadow(0 0 14px #c9a03250)" }}>
@@ -96,7 +99,7 @@ function SlideContext(): React.JSX.Element {
         className="mb-3 text-[0.95rem] font-semibold tracking-[0.06em]"
         style={{ fontFamily: "var(--font-cinzel-decorative)", color: "#8a6a20", textShadow: "0 0 20px #e8c96a30" }}
       >
-        Le Dernier Sortilège
+        {t("context.title")}
       </h3>
 
       <OrnamentDivider className="mb-4" />
@@ -105,34 +108,28 @@ function SlideContext(): React.JSX.Element {
         className="mb-4 text-[0.8rem] leading-[1.8] whitespace-pre-line"
         style={{ fontFamily: "var(--font-cinzel)", color: "#4a3a20" }}
       >
-        {`Tu as percé les six mystères,
-forgé les trois clés,
-et lu chaque lettre que mon cœur
-avait cachée pour toi.
-
-Ce grimoire n'était pas un jeu.
-
-C'était ma façon de te dire ce que les mots seuls n'auraient pas suffi à exprimer...`}
+        {t("context.body")}
       </p>
 
       <p className="text-[0.7rem] tracking-wide italic" style={{ fontFamily: "var(--font-cinzel)", color: "#a08a50" }}>
-        Chaque énigme portait un morceau de ce que tu représentes pour moi.
+        {t("context.footer")}
       </p>
     </div>
   );
 }
 
 function SlideStats(): React.JSX.Element {
+  const { t } = useTranslation("finale");
   const enigmas = useEnigmaStore((s) => s.enigmas);
   const readLetters = useEnigmaStore((s) => s.readLetters);
   const solvedCount = Object.values(enigmas).filter((e) => e.solved).length;
   const lettersRead = Object.values(readLetters).filter(Boolean).length;
 
   const statList = [
-    { label: "Mystères percés", value: `${String(solvedCount)}/6`, icon: "🔓" },
-    { label: "Lettres d'amour lues", value: `${String(lettersRead)}/6`, icon: "💌" },
-    { label: "Clés forgées", value: "3/3", icon: "🗝️" },
-    { label: "Personnages Disney", value: "6", icon: "✨" },
+    { label: t("stats.mysteriesSolved"), value: `${String(solvedCount)}/6`, icon: "🔓" },
+    { label: t("stats.lettersRead"), value: `${String(lettersRead)}/6`, icon: "💌" },
+    { label: t("stats.keysForged"), value: "3/3", icon: "🗝️" },
+    { label: t("stats.disneyCharacters"), value: "6", icon: "✨" },
   ];
 
   return (
@@ -144,7 +141,7 @@ function SlideStats(): React.JSX.Element {
         className="mb-4 text-[0.95rem] font-semibold tracking-[0.06em]"
         style={{ fontFamily: "var(--font-cinzel-decorative)", color: "#8a6a20", textShadow: "0 0 20px #e8c96a30" }}
       >
-        Ton aventure
+        {t("stats.title")}
       </h3>
 
       <OrnamentDivider className="mb-5" />
@@ -187,27 +184,11 @@ function SlideStats(): React.JSX.Element {
         ))}
       </div>
       <p className="mt-1.5 text-[0.5rem] tracking-[0.15em] uppercase" style={{ color: "#b09a60" }}>
-        Les gardiens du grimoire
+        {t("stats.guardians")}
       </p>
     </div>
   );
 }
-
-const LOVE_LINE_LIST = [
-  { text: "Chaque ligne de code de ce grimoire", pause: 1 },
-  { text: "a été écrite en pensant à toi.", pause: 1.4 },
-  { text: "", pause: 0.8 },
-  { text: "Tu es la raison pour laquelle", pause: 1 },
-  { text: "je crois encore à la magie.", pause: 1.2, golden: true },
-  { text: "Celle qui existe quand tu poses", pause: 1 },
-  { text: "ta tête sur mon épaule", pause: 1 },
-  { text: "et que le monde s'arrête.", pause: 1.4, golden: true },
-  { text: "", pause: 0.8 },
-  { text: "Je t'aime au-delà des mots,", pause: 1.2, golden: true },
-  { text: "au-delà des énigmes,", pause: 1 },
-  { text: "au-delà de tout ce que", pause: 1 },
-  { text: "ce grimoire pourra jamais contenir.", pause: 1.6 },
-];
 
 function TypewriterLine({
   text,
@@ -250,8 +231,8 @@ function TypewriterLine({
     });
 
     return () => {
-      timerList.forEach((t) => {
-        clearTimeout(t);
+      timerList.forEach((timer) => {
+        clearTimeout(timer);
       });
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps -- animation one-shot au mount, deps stables
@@ -282,10 +263,13 @@ function TypewriterLine({
 }
 
 function SlideLove(): React.JSX.Element {
+  const { t } = useTranslation("finale");
+  const loveLineList = t("love.lines", { returnObjects: true }) as { text: string; pause: number; golden?: boolean }[];
+
   // Calculate cumulative delays for each line
   const lineDelayList: number[] = [];
   let cumMs = 600; // initial delay before typing starts
-  for (const line of LOVE_LINE_LIST) {
+  for (const line of loveLineList) {
     lineDelayList.push(cumMs);
     const wordCount = line.text ? line.text.split(" ").length : 0;
     const typingTime = wordCount * (line.golden ? 140 : 100);
@@ -293,7 +277,7 @@ function SlideLove(): React.JSX.Element {
   }
 
   const [isSignatureVisible, setSignatureVisible] = useState(false);
-  const lastLineIdx = LOVE_LINE_LIST.length - 1;
+  const lastLineIdx = loveLineList.length - 1;
 
   return (
     <div className="text-center">
@@ -304,13 +288,13 @@ function SlideLove(): React.JSX.Element {
         className="mb-3 text-[0.95rem] font-semibold tracking-[0.06em]"
         style={{ fontFamily: "var(--font-cinzel-decorative)", color: "#8a6a20", textShadow: "0 0 20px #e8c96a30" }}
       >
-        Mon Léamour
+        {t("love.title")}
       </h3>
 
       <OrnamentDivider className="mb-4" />
 
       <div className="mb-5 min-h-[180px] text-[0.8rem] leading-[1.85]" style={{ fontFamily: "var(--font-cinzel)" }}>
-        {LOVE_LINE_LIST.map((line, i) => (
+        {loveLineList.map((line, i) => (
           <div key={i}>
             <TypewriterLine
               text={line.text}
@@ -342,10 +326,10 @@ function SlideLove(): React.JSX.Element {
           className="text-[0.76rem] tracking-wide italic"
           style={{ fontFamily: "var(--font-cinzel)", color: "#8a6a20" }}
         >
-          — Pour toujours, ton Vincent —
+          {t("love.signature")}
         </p>
         <p className="mt-2 text-[0.65rem] tracking-[0.12em]" style={{ color: "#b09a60" }}>
-          Avec tout mon amour, infiniment ♡
+          {t("love.withLove")}
         </p>
       </div>
     </div>
@@ -383,6 +367,7 @@ function getSealBoxShadow(isSealed: boolean, progress: number): string {
 }
 
 function WaxSeal({ onComplete }: Readonly<{ onComplete: () => void }>): React.JSX.Element {
+  const { t } = useTranslation("finale");
   const [progress, setProgress] = useState(0);
   const [isSealed, setIsSealed] = useState(false);
   const pressing = useRef(false);
@@ -551,7 +536,7 @@ function WaxSeal({ onComplete }: Readonly<{ onComplete: () => void }>): React.JS
           opacity: isSealed ? 1 : 0.6 + progress * 0.4,
         }}
       >
-        {isSealed ? "✦ Scellé ✦" : "Maintenir pour sceller"}
+        {isSealed ? t("seal.sealed") : t("seal.holdToSeal")}
       </span>
     </div>
   );
@@ -559,18 +544,14 @@ function WaxSeal({ onComplete }: Readonly<{ onComplete: () => void }>): React.JS
 
 const SLIDE_LIST = [SlideContext, SlideStats, SlideLove];
 
-const NARRATIVE_TEXT_LIST = [
-  "Le grimoire se referme…",
-  "Les mystères retournent au silence…",
-  "Mais la magie, elle, restera.",
-];
-
 /**
  * Narrative pre-celebration: cards flip to reveal runes,
  * forges glow, everything converges to center, then fireworks begin.
  */
 // eslint-disable-next-line sonarjs/function-return-type -- React component with conditional rendering
 function NarrativeSequence(): React.JSX.Element | null {
+  const { t } = useTranslation("finale");
+  const narrativeTextList = t("narrative", { returnObjects: true }) as string[];
   const isFinaleNarrative = useFinaleStore((s) => s.finaleNarrative);
   const startFinale = useFinaleStore((s) => s.startFinale);
   const [phase, setPhase] = useState<"idle" | "text-intro" | "flipping" | "converging" | "glowing" | "done">("idle");
@@ -720,8 +701,8 @@ function NarrativeSequence(): React.JSX.Element | null {
     const currentTimerList = timerList.current;
 
     return () => {
-      currentTimerList.forEach((t) => {
-        clearTimeout(t);
+      currentTimerList.forEach((timer) => {
+        clearTimeout(timer);
       });
     };
   }, [isFinaleNarrative, startFinale]);
@@ -744,12 +725,12 @@ function NarrativeSequence(): React.JSX.Element | null {
 
     el.style.animation = "narrative-card-flip 0.6s ease-in-out forwards";
     // Use timeout instead of animationend (which bubbles from child animations)
-    const t = setTimeout(() => {
+    const flipTimer = setTimeout(() => {
       el.style.animation = "narrative-card-glow 0.5s ease-out forwards";
     }, 600);
 
     return () => {
-      clearTimeout(t);
+      clearTimeout(flipTimer);
     };
   }, [flipIndex]);
 
@@ -805,7 +786,7 @@ function NarrativeSequence(): React.JSX.Element | null {
                 textShadow: "0 0 40px #e8c96a80, 0 0 80px #e8c96a40, 0 0 120px #e8c96a20",
               }}
             >
-              {NARRATIVE_TEXT_LIST[textIndex]}
+              {narrativeTextList[textIndex]}
             </p>
             <OrnamentDivider className="mt-3" lineWidth="fixed" />
           </div>
@@ -1001,8 +982,8 @@ export function FinaleModal(): React.JSX.Element {
     const currentCelebTimerList = celebTimers.current;
 
     return () => {
-      currentCelebTimerList.forEach((t) => {
-        clearTimeout(t);
+      currentCelebTimerList.forEach((timer) => {
+        clearTimeout(timer);
       });
     };
   }, [isFinaleActive, isFinaleModalOpen, openFinaleModal, launchRocket]);
@@ -1036,8 +1017,8 @@ export function FinaleModal(): React.JSX.Element {
     return () => {
       cancelAnimationFrame(raf);
 
-      popTimers.current.forEach((t) => {
-        clearTimeout(t);
+      popTimers.current.forEach((timer) => {
+        clearTimeout(timer);
       });
     };
   }, [isFinaleModalOpen]);

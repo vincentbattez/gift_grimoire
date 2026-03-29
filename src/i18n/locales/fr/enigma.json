@@ -1,0 +1,47 @@
+{
+  "card": {
+    "label": "Énigme {{id}}",
+    "envelope": "Une dernière chose pour toi..."
+  },
+  "modal": {
+    "dragToClose": "Faire glisser pour fermer",
+    "placeholder": "Murmure ta réponse ici…",
+    "submit": "Valider la Réponse ✦",
+    "exhausted": "Essai épuisé",
+    "thinking": "Le grimoire réfléchit…",
+    "analyzing": "Le grimoire analyse ta réponse…",
+    "runesHesitate": "Les runes hésitent…",
+    "resumeAnalysis": "Le grimoire reprend son analyse…",
+    "successFeedback": "✦ Les runes s'illuminent… le grimoire accepte ta réponse !",
+    "errorFeedback": "Les runes se sont éteintes… ce n'est pas le bon mot.",
+    "alreadyAccepted": "✦ Le grimoire a déjà accepté ta réponse",
+    "waitingAnswer": "Le grimoire attend ta réponse",
+    "resting": "Le grimoire se repose…",
+    "nextAttemptIn": "Prochaine tentative dans",
+    "grimoireSmiled": "Le grimoire t'a souri",
+    "openLetter": "Ouvrir ta lettre"
+  },
+  "locked": {
+    "sealed": "Ce mystère est scellé",
+    "forgeKey": "Forgez une clé dans la Forge pour briser le sceau",
+    "close": "Fermer"
+  },
+  "success": {
+    "title": "Mystère percé",
+    "sealBroken": "Le sceau s'est brisé…",
+    "canOpen": "Tu peux désormais ouvrir",
+    "boxNumber": "Boîte n°{{number}}",
+    "open": "Ouvrir"
+  },
+  "loveLetter": {
+    "title": "Une lettre pour toi",
+    "withLove": "Avec tout mon amour ♡"
+  },
+  "doubt": {
+    "title": "Le grimoire hésite",
+    "question": "Es-tu certaine de vouloir soumettre",
+    "questionLine2": "cette réponse aux runes ?",
+    "cancel": "Reformuler",
+    "confirm": "J'en suis sûre"
+  }
+}

@@ -1,4 +1,5 @@
 import { useRef, useState } from "react";
+import { useTranslation } from "react-i18next";
 import darkVadorSrc from "@/assets/audios/pascale-dark_vador-enigme.mp3";
 import { sndAnalysis, sndScrambleSolved } from "@/audio";
 import { getEntityState } from "@/ha";
@@ -21,6 +22,7 @@ import { WideWaveform } from "./WideWaveform";
  * Joue l'audio Dark Vador, puis détecte le signal Home Assistant de l'aimant.
  */
 export function DarkVadorForge({ solved, onSolve }: Readonly<ForgeProps>): React.JSX.Element {
+  const { t } = useTranslation("forge");
   const darkVadorPlayedAt = useMagnetStore((s) => s.darkVadorPlayedAt);
   const recordDarkVadorPlay = useMagnetStore((s) => s.recordDarkVadorPlay);
   const hasAudioWarningAcknowledged = useForgeStore((s) => s.audioWarningAcknowledged);
@@ -128,7 +130,7 @@ export function DarkVadorForge({ solved, onSolve }: Readonly<ForgeProps>): React
             <WideWaveform playing={false} color="var(--color-success)" />
           </div>
           <span className="text-success relative text-[0.58rem] font-semibold tracking-[0.22em] uppercase">
-            Dark Vador a trouvé un nouvel ami
+            {t("magnet.solvedLabel")}
           </span>
         </div>
       </div>
@@ -153,7 +155,7 @@ export function DarkVadorForge({ solved, onSolve }: Readonly<ForgeProps>): React
             <WideWaveform playing={false} color="#7a55cc" />
           </div>
           <span className="text-accent/80 relative text-[0.58rem] font-semibold tracking-[0.22em] uppercase">
-            Écouter le secret
+            {t("magnet.listenSecret")}
           </span>
           <PlayCountDot total={1} remaining={1} />
         </button>
@@ -193,7 +195,7 @@ export function DarkVadorForge({ solved, onSolve }: Readonly<ForgeProps>): React
             <WideWaveform playing={true} color="var(--color-accent)" />
           </div>
           <span className="text-accent relative text-[0.58rem] font-semibold tracking-[0.22em] uppercase">
-            Lecture en cours…
+            {t("magnet.playing")}
           </span>
         </button>
       </div>
@@ -322,25 +324,25 @@ export function DarkVadorForge({ solved, onSolve }: Readonly<ForgeProps>): React
           >
             {(() => {
               if (isChecking) {
-                return "Les forces convergent…";
+                return t("magnet.checking");
               }
 
               if (hasError) {
-                return "Rien ne s'est produit";
+                return t("magnet.error");
               }
 
               if (isShowingPicker) {
-                return "Une nouvelle amitié s'est formée !";
+                return t("magnet.success");
               }
 
-              return "Tenter un rapprochement";
+              return t("magnet.default");
             })()}
           </span>
         </div>
         {!isChecking && !isShowingPicker && (
           <CooldownLabel
             lastTriggeredAt={darkVadorPlayedAt}
-            prefix="Répéter l'énigme dans"
+            prefix={t("magnet.cooldownPrefix")}
             className="text-accent/25 relative font-mono text-[0.5rem] tracking-[0.15em]"
           />
         )}

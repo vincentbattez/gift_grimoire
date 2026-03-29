@@ -1,38 +1,15 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { sndGrimoireOpen, sndPageTurn } from "@/audio";
 
-const SLIDE_LIST = [
-  {
-    icon: "✦",
-    title: "Un souffle ancien…",
-    text: "Une force t'a choisie, toi et toi seule. Ce grimoire dormait depuis des siècles, attendant que la bonne personne l'éveille. Ses pages renferment des secrets que nul n'a encore percés… jusqu'à aujourd'hui.",
-  },
-  {
-    icon: "🌙",
-    title: "Le temps est ton allié",
-    text: "Ce grimoire ne se dévoile pas en un instant. Ses mystères se révèlent au fil des jours, comme une marée qui monte lentement. Reviens chaque jour — de nouvelles portes s'ouvriront peut-être…",
-  },
-  {
-    icon: "◉",
-    title: "Chaque essai compte",
-    text: "Certaines épreuves sont protégées par un sortilège d'épuisement. Les petits cercles lumineux indiquent tes tentatives restantes. À minuit, la magie se régénère et tu pourras réessayer.",
-  },
-  {
-    icon: "🔮",
-    title: "Six Mystères Scellés",
-    text: "Tout en bas du grimoire, six sceaux attendent d'être brisés. Pour y parvenir, il te faudra résoudre des énigmes ici… mais aussi dans le monde réel. Tous les indices sont déjà cachés quelque part dans la maison. Certaines manipulations sont plus… modernes qu'il n'y paraît.",
-  },
-  {
-    icon: "💜",
-    title: "À toi de jouer",
-    text: "Ce grimoire a été tissé rien que pour toi. Chaque rune, chaque sort, chaque secret porte ton nom.\n\nJoyeux anniversaire, mon Amour ✦",
-  },
-] as const;
+const SLIDE_ICON_LIST = ["✦", "🌙", "◉", "🔮", "💜"] as const;
 
 const SWIPE_THRESHOLD = 50;
 const VELOCITY_THRESHOLD = 0.3;
 
 export function IntroModal({ onClose }: Readonly<{ onClose: () => void }>): React.JSX.Element {
+  const { t } = useTranslation("common");
+  const slideList = t("intro.slides", { returnObjects: true }) as { title: string; text: string }[];
   const [current, setCurrent] = useState(0);
   const [hasEntered, setHasEntered] = useState(false);
   const [isExiting, setIsExiting] = useState(false);
@@ -48,17 +25,20 @@ export function IntroModal({ onClose }: Readonly<{ onClose: () => void }>): Reac
     });
   }, []);
 
-  const goTo = useCallback((i: number) => {
-    const clamped = Math.max(0, Math.min(SLIDE_LIST.length - 1, i));
+  const goTo = useCallback(
+    (i: number) => {
+      const clamped = Math.max(0, Math.min(slideList.length - 1, i));
 
-    setCurrent((prev) => {
-      if (prev !== clamped) {
-        sndPageTurn();
-      }
+      setCurrent((prev) => {
+        if (prev !== clamped) {
+          sndPageTurn();
+        }
 
-      return clamped;
-    });
-  }, []);
+        return clamped;
+      });
+    },
+    [slideList.length],
+  );
 
   function handleClose(): void {
     sndGrimoireOpen();
@@ -90,7 +70,7 @@ export function IntroModal({ onClose }: Readonly<{ onClose: () => void }>): Reac
     const velocity = Math.abs(dx) / Math.max(dt, 1);
 
     if (Math.abs(dx) > SWIPE_THRESHOLD || velocity > VELOCITY_THRESHOLD) {
-      if (dx < 0 && current < SLIDE_LIST.length - 1) {
+      if (dx < 0 && current < slideList.length - 1) {
         goTo(current + 1);
       } else if (dx > 0 && current > 0) {
         goTo(current - 1);
@@ -126,7 +106,7 @@ export function IntroModal({ onClose }: Readonly<{ onClose: () => void }>): Reac
     globalThis.addEventListener("mouseup", handleUp);
   }
 
-  const isLast = current === SLIDE_LIST.length - 1;
+  const isLast = current === slideList.length - 1;
 
   // Clamp drag to avoid over-scrolling at edges
   const clampedDragX = (current === 0 && dragX > 0) || (isLast && dragX < 0) ? dragX * 0.2 : dragX;
@@ -154,12 +134,12 @@ export function IntroModal({ onClose }: Readonly<{ onClose: () => void }>): Reac
             className={isDragging ? "" : "transition-transform duration-500 ease-out"}
             style={{
               display: "flex",
-              width: `${String(SLIDE_LIST.length * 100)}%`,
-              transform: `translateX(calc(${String(trackOffset)}% / ${String(SLIDE_LIST.length)} + ${String(clampedDragX)}px))`,
+              width: `${String(slideList.length * 100)}%`,
+              transform: `translateX(calc(${String(trackOffset)}% / ${String(slideList.length)} + ${String(clampedDragX)}px))`,
             }}
           >
-            {SLIDE_LIST.map((slide, i) => (
-              <div key={i} className="flex-shrink-0 px-2" style={{ width: `${String(100 / SLIDE_LIST.length)}%` }}>
+            {slideList.map((slide, i) => (
+              <div key={i} className="flex-shrink-0 px-2" style={{ width: `${String(100 / slideList.length)}%` }}>
                 <div className="flex flex-col items-center px-4 py-8 text-center">
                   <span
                     className={`mb-5 block text-[3rem] transition-all duration-500 ${
@@ -169,7 +149,7 @@ export function IntroModal({ onClose }: Readonly<{ onClose: () => void }>): Reac
                       filter: i === current ? "drop-shadow(0 0 16px #9b6dff80)" : "none",
                     }}
                   >
-                    {slide.icon}
+                    {SLIDE_ICON_LIST[i]}
                   </span>
                   <h2 className="text-gold mb-4 text-[1.1rem] font-[var(--font-cinzel-decorative)] tracking-wide drop-shadow-[0_0_20px_#e8c96a40]">
                     {slide.title}
@@ -185,7 +165,7 @@ export function IntroModal({ onClose }: Readonly<{ onClose: () => void }>): Reac
 
         {/* Dots indicator */}
         <div className="mt-4 mb-6 flex gap-2.5">
-          {SLIDE_LIST.map((_, i) => (
+          {slideList.map((_, i) => (
             <button
               key={i}
               onClick={() => {
@@ -209,7 +189,7 @@ export function IntroModal({ onClose }: Readonly<{ onClose: () => void }>): Reac
           }
           className="border-accent/40 bg-accent/10 text-accent hover:bg-accent/20 rounded-full border px-10 py-3.5 text-[0.8rem] font-[var(--font-cinzel)] tracking-[0.15em] uppercase transition-all duration-300 active:scale-95"
         >
-          {isLast ? "Ouvrir le Grimoire ✦" : "Suivant"}
+          {isLast ? t("intro.openGrimoire") : t("intro.next")}
         </button>
 
         {/* Skip */}
@@ -218,7 +198,7 @@ export function IntroModal({ onClose }: Readonly<{ onClose: () => void }>): Reac
             onClick={handleClose}
             className="text-muted/50 mt-3 cursor-pointer border-none bg-transparent text-[0.68rem] tracking-[0.1em] uppercase"
           >
-            Passer l'introduction
+            {t("intro.skip")}
           </button>
         )}
       </div>

@@ -1,5 +1,6 @@
 import type { CSSProperties } from "react";
 import React, { useEffect, useRef, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { sndAnalysis, sndBad, sndClick, sndDoubt, sndLoveReveal, sndOk } from "@/audio";
 import { randomVisual } from "@/utils/random";
 import { Input } from "@components/ui/Input";
@@ -50,16 +51,17 @@ function getTranslateClass(hasEntered: boolean, isOpen: boolean, isDragging: boo
   return "translate-y-full";
 }
 
-function getSubmitButtonText(attemptUsed: boolean, isSuspense: boolean): string {
+function getSubmitButtonText(attemptUsed: boolean, isSuspense: boolean, t: (key: string) => string): string {
+  // Note: `t` is typed loosely here to avoid importing TFunction — the enigma namespace is bound by the caller
   if (attemptUsed) {
-    return "Essai épuisé";
+    return t("modal.exhausted");
   }
 
   if (isSuspense) {
-    return "Le grimoire réfléchit…";
+    return t("modal.thinking");
   }
 
-  return "Valider la Réponse ✦";
+  return t("modal.submit");
 }
 
 function getSheetClass(isSolved: boolean, isDragging: boolean, translateClass: string, isShaking: boolean): string {
@@ -178,6 +180,7 @@ function ModalBody({
   /** Événements lifecycle émis au parent orchestrateur */
   lifecycle: EnigmaLifecycleEvents;
 }>): React.JSX.Element {
+  const { t } = useTranslation("enigma");
   const lastAttempt = useCooldownStore((s) => s.lastAttempt);
   const closeModal = useEnigmaStore((s) => s.closeModal);
   const openLoveLetter = useEnigmaStore((s) => s.openLoveLetter);
@@ -185,7 +188,7 @@ function ModalBody({
 
   const [value, setValue] = useState("");
   const [feedback, setFeedback] = useState<"ok" | "err" | "suspense" | null>(isSolved ? "ok" : null);
-  const [feedbackMsg, setFeedbackMsg] = useState(isSolved ? "✦ Le grimoire a déjà accepté ta réponse" : "");
+  const [feedbackMsg, setFeedbackMsg] = useState(isSolved ? t("modal.alreadyAccepted") : "");
   const [isShaking, setIsShaking] = useState(false);
   const [suspenseProgress, setSuspenseProgress] = useState(0);
   const [isShowingDoubt, setIsShowingDoubt] = useState(false);
@@ -255,7 +258,7 @@ function ModalBody({
     const shouldShowDoubt = decisionRandom < (isCorrect ? 0.4 : 0.6);
 
     setFeedback("suspense");
-    setFeedbackMsg("Le grimoire analyse ta réponse…");
+    setFeedbackMsg(t("modal.analyzing"));
     setSuspenseProgress(0);
     stopAnalysisRef.current = sndAnalysis();
     startSuspenseTimer(0, startTime);
@@ -268,7 +271,7 @@ function ModalBody({
         stopAnalysisRef.current?.();
         stopAnalysisRef.current = null;
         sndDoubt();
-        setFeedbackMsg("Les runes hésitent…");
+        setFeedbackMsg(t("modal.runesHesitate"));
         setIsShowingDoubt(true);
       }, doubtAt);
     }
@@ -277,7 +280,7 @@ function ModalBody({
   function confirmDoubt(startTime: number): void {
     sndClick();
     setIsShowingDoubt(false);
-    setFeedbackMsg("Le grimoire reprend son analyse…");
+    setFeedbackMsg(t("modal.resumeAnalysis"));
     const elapsed = suspenseRef.current?.elapsed ?? SUSPENSE_MS / 2;
     stopAnalysisRef.current = sndAnalysis(elapsed / 1000);
     startSuspenseTimer(elapsed, startTime);
@@ -301,13 +304,13 @@ function ModalBody({
 
     if (isCorrect) {
       setFeedback("ok");
-      setFeedbackMsg("✦ Les runes s'illuminent… le grimoire accepte ta réponse !");
+      setFeedbackMsg(t("modal.successFeedback"));
       sndOk();
       // Émettre onSuccess au parent (celebrate + fermer modale)
       setTimeout(() => lifecycle.onSuccess?.(enigma.id), SOLVE_FEEDBACK_MS);
     } else {
       setFeedback("err");
-      setFeedbackMsg("Les runes se sont éteintes… ce n'est pas le bon mot.");
+      setFeedbackMsg(t("modal.errorFeedback"));
       sndBad();
       // Émettre onFail au parent
       lifecycle.onFail?.(enigma.id);
@@ -340,7 +343,7 @@ function ModalBody({
         onMouseDown={handleMouseDown}
         role="button"
         tabIndex={0}
-        aria-label="Faire glisser pour fermer"
+        aria-label={t("modal.dragToClose")}
       >
         <div className={getHandleClass(isSolved)} />
       </div>
@@ -367,7 +370,7 @@ function ModalBody({
           <Input
             ref={inputRef}
             state={inputState}
-            placeholder="Murmure ta réponse ici…"
+            placeholder={t("modal.placeholder")}
             value={value}
             disabled={isSuspense}
             onChange={(e) => {
@@ -414,7 +417,7 @@ function ModalBody({
               <div className="bg-success/10 border-success/20 mx-auto mt-2 mb-1 flex w-fit items-center justify-center gap-2 rounded-full border px-3 py-1.5">
                 <span className="bg-success h-1.5 w-1.5 animate-pulse rounded-full" />
                 <span className="text-success text-[0.72rem] font-semibold tracking-wide">
-                  Le grimoire attend ta réponse
+                  {t("modal.waitingAnswer")}
                 </span>
               </div>
             </>
@@ -426,9 +429,9 @@ function ModalBody({
         <div className="py-5 text-center">
           <div className="bg-danger/10 border-danger/20 mx-auto mb-3 flex w-fit items-center justify-center gap-2 rounded-full border px-3 py-1.5">
             <span className="bg-danger h-1.5 w-1.5 rounded-full" />
-            <span className="text-danger text-[0.72rem] font-semibold tracking-wide">Le grimoire se repose…</span>
+            <span className="text-danger text-[0.72rem] font-semibold tracking-wide">{t("modal.resting")}</span>
           </div>
-          <p className="text-muted text-[0.72rem]">Prochaine tentative dans</p>
+          <p className="text-muted text-[0.72rem]">{t("modal.nextAttemptIn")}</p>
           <p className="text-accent mt-1.5 text-[1.4rem] font-[var(--font-cinzel)] tracking-[0.15em]">
             <CooldownLabel lastTriggeredAt={lastAttempt} />
           </p>
@@ -439,7 +442,9 @@ function ModalBody({
         <>
           <div className="mx-auto mt-2 mb-1 flex w-fit items-center justify-center gap-2 rounded-full border border-[#c9a03225] bg-[#c9a03212] px-3 py-1.5">
             <span className="h-1.5 w-1.5 rounded-full bg-[#c9a032]" />
-            <span className="text-[0.72rem] font-semibold tracking-wide text-[#8a6a20]">Le grimoire t'a souri</span>
+            <span className="text-[0.72rem] font-semibold tracking-wide text-[#8a6a20]">
+              {t("modal.grimoireSmiled")}
+            </span>
           </div>
           <button
             onClick={() => {
@@ -474,7 +479,7 @@ function ModalBody({
             )}
             <span className="relative z-1 flex items-center justify-center gap-2">
               <span className="text-[1.1rem]">💌</span>
-              Ouvrir ta lettre
+              {t("modal.openLetter")}
             </span>
           </button>
         </>
@@ -486,7 +491,7 @@ function ModalBody({
           disabled={attemptUsed || isSuspense}
           className={`mt-3 w-full cursor-pointer rounded-[14px] border-none py-4 text-[0.85rem] font-[var(--font-cinzel)] font-semibold tracking-[0.12em] text-white uppercase transition-all duration-200 active:scale-[0.97] ${attemptUsed || isSuspense ? "cursor-not-allowed bg-gradient-to-br from-[#3a3a4a] to-[#2a2a3a] opacity-50" : "to-accent bg-gradient-to-br from-[#6b4a97] shadow-[0_4px_22px_#9b6dff28]"}`}
         >
-          {getSubmitButtonText(attemptUsed, isSuspense)}
+          {getSubmitButtonText(attemptUsed, isSuspense, t)}
         </button>
       )}
 

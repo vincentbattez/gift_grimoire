@@ -2,6 +2,7 @@ import "./migrate"; // side-effect: migration v3 → feature stores
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import "./env";
+import "./i18n/i18n"; // side-effect: i18n init
 import "./index.css";
 import App from "./App.tsx";
 import { ChasseTresor } from "./chasse_tresor/ChasseTresor.tsx";

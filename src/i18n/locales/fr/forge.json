@@ -1,0 +1,32 @@
+{
+  "section": {
+    "start": "Commencer",
+    "accomplished": "✦ Épreuve accomplie ✦"
+  },
+  "magnet": {
+    "solvedLabel": "Dark Vador a trouvé un nouvel ami",
+    "listenSecret": "Écouter le secret",
+    "playing": "Lecture en cours…",
+    "checking": "Les forces convergent…",
+    "error": "Rien ne s'est produit",
+    "success": "Une nouvelle amitié s'est formée !",
+    "default": "Tenter un rapprochement",
+    "cooldownPrefix": "Répéter l'énigme dans"
+  },
+  "vibration": {
+    "listening": "Concentration…",
+    "detected": "Quelque chose a répondu",
+    "failed": "Rien ne s'est éveillé",
+    "idle": "Tendre l'oreille",
+    "solvedLabel": "Vibration détectée"
+  },
+  "ink": {
+    "cooldownPrefix": "Reset dans",
+    "tapInstruction": "Touche une case pour y verser de l'encre",
+    "wordsToReveal": "— Mots à révéler —",
+    "resetGame": "Reset jeu",
+    "victoryTitle": "✦ L'Encre Révélatrice ✦",
+    "victoryMessage": "\"maintenant, tu sais ce qu'il te reste à faire...\"",
+    "continue": "Continuer"
+  }
+}

@@ -1,0 +1,47 @@
+{
+  "card": {
+    "label": "Enigma {{id}}",
+    "envelope": "One last thing for you..."
+  },
+  "modal": {
+    "dragToClose": "Drag to close",
+    "placeholder": "Whisper your answer here…",
+    "submit": "Submit Answer ✦",
+    "exhausted": "Attempt used",
+    "thinking": "The grimoire is thinking…",
+    "analyzing": "The grimoire is analyzing your answer…",
+    "runesHesitate": "The runes hesitate…",
+    "resumeAnalysis": "The grimoire resumes its analysis…",
+    "successFeedback": "✦ The runes light up… the grimoire accepts your answer!",
+    "errorFeedback": "The runes have faded… that's not the right word.",
+    "alreadyAccepted": "✦ The grimoire has already accepted your answer",
+    "waitingAnswer": "The grimoire awaits your answer",
+    "resting": "The grimoire is resting…",
+    "nextAttemptIn": "Next attempt in",
+    "grimoireSmiled": "The grimoire smiled upon you",
+    "openLetter": "Open your letter"
+  },
+  "locked": {
+    "sealed": "This mystery is sealed",
+    "forgeKey": "Forge a key in the Forge to break the seal",
+    "close": "Close"
+  },
+  "success": {
+    "title": "Mystery solved",
+    "sealBroken": "The seal has broken…",
+    "canOpen": "You can now open",
+    "boxNumber": "Box #{{number}}",
+    "open": "Open"
+  },
+  "loveLetter": {
+    "title": "A letter for you",
+    "withLove": "With all my love ♡"
+  },
+  "doubt": {
+    "title": "The grimoire hesitates",
+    "question": "Are you sure you want to submit",
+    "questionLine2": "this answer to the runes?",
+    "cancel": "Rephrase",
+    "confirm": "I'm sure"
+  }
+}

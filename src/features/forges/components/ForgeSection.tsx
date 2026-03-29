@@ -1,5 +1,6 @@
 import type { CSSProperties } from "react";
 import { useEffect, useRef, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { sndClick, sndForgeReveal } from "@/audio";
 import { spawnParticles } from "@/particles";
 import { randomVisual } from "@/utils/random";
@@ -42,6 +43,7 @@ function ForgeIntroModal({
   text: string;
   onClose: () => void;
 }>): React.JSX.Element {
+  const { t } = useTranslation("forge");
   const [hasEntered, setHasEntered] = useState(false);
   const [isClosing, setIsClosing] = useState(false);
 
@@ -123,7 +125,7 @@ function ForgeIntroModal({
           className="to-accent cursor-pointer rounded-[14px] border-none bg-gradient-to-br from-[#3a2a6a] px-7 py-2.5 text-[0.75rem] font-[var(--font-cinzel)] font-semibold tracking-[0.12em] text-white uppercase shadow-[0_4px_22px_#9b6dff28] transition-all duration-200 active:scale-[0.97]"
           style={btnStyle}
         >
-          Commencer
+          {t("section.start")}
         </button>
       </div>
     </div>
@@ -145,6 +147,7 @@ type ForgeSectionProps = {
 };
 
 export function ForgeSection({ forge, isAdmin }: Readonly<ForgeSectionProps>): React.JSX.Element {
+  const { t } = useTranslation("forge");
   const { key, title, successMessage, introText, adminActionList, component: ForgeComponent } = forge;
 
   const isRevealed = forge.useRevealed();
@@ -213,7 +216,7 @@ export function ForgeSection({ forge, isAdmin }: Readonly<ForgeSectionProps>): R
           {isSolved && (
             <div className="border-success/15 mt-6 animate-[forge-unblur_0.8s_ease-out_both] border-t pt-4 text-center">
               <div className="text-success/40 mb-1.5 text-[0.5rem] tracking-[0.2em] uppercase">
-                ✦ Épreuve accomplie ✦
+                {t("section.accomplished")}
               </div>
               <p className="text-success/55 mx-auto max-w-[260px] text-[0.6rem] leading-relaxed italic">
                 {successMessage}

@@ -1,0 +1,54 @@
+{
+  "header": {
+    "title": "The Enchanted",
+    "titleLine2": "Grimoire of Léa",
+    "subtitle": "A spell guards each rune…",
+    "subtitleLine2": "can you break it?"
+  },
+  "footer": {
+    "madeWith": "Imagined and crafted",
+    "withLove": "with love",
+    "forLea": "for Léamour - 2026"
+  },
+  "admin": {
+    "quit": "quit admin mode",
+    "reset": "reset"
+  },
+  "intro": {
+    "slides": [
+      {
+        "title": "An ancient breath…",
+        "text": "A force has chosen you, you and you alone. This grimoire has slept for centuries, waiting for the right person to awaken it. Its pages hold secrets that no one has ever uncovered… until today."
+      },
+      {
+        "title": "Time is your ally",
+        "text": "This grimoire does not reveal itself in an instant. Its mysteries unfold over days, like a slowly rising tide. Come back each day — new doors may open…"
+      },
+      {
+        "title": "Every attempt counts",
+        "text": "Some trials are protected by an exhaustion spell. The small glowing circles show your remaining attempts. At midnight, the magic regenerates and you can try again."
+      },
+      {
+        "title": "Six Sealed Mysteries",
+        "text": "At the very bottom of the grimoire, six seals await to be broken. To achieve this, you'll need to solve riddles here… but also in the real world. All the clues are already hidden somewhere in the house. Some mechanisms are more… modern than they seem."
+      },
+      {
+        "title": "Your turn to play",
+        "text": "This grimoire was woven just for you. Every rune, every spell, every secret bears your name.\n\nHappy birthday, my Love ✦"
+      }
+    ],
+    "openGrimoire": "Open the Grimoire ✦",
+    "next": "Next",
+    "skip": "Skip introduction"
+  },
+  "audioWarning": {
+    "title": "An ancient warning",
+    "text": "The voices of this grimoire do not repeat endlessly. You only have a few listens per day — lend your ear, focus, and don't let any whisper escape you.",
+    "confirm": "I understand ✦"
+  },
+  "lastAttempt": {
+    "title": "Last listen",
+    "text": "This is your last listen. After this, the voices will fall silent until dawn. Close your eyes, make silence, and absorb every word.",
+    "confirm": "I'm ready ✦"
+  }
+}

@@ -1,0 +1,32 @@
+{
+  "section": {
+    "start": "Begin",
+    "accomplished": "✦ Trial accomplished ✦"
+  },
+  "magnet": {
+    "solvedLabel": "Darth Vader found a new friend",
+    "listenSecret": "Listen to the secret",
+    "playing": "Playing…",
+    "checking": "The forces are converging…",
+    "error": "Nothing happened",
+    "success": "A new friendship has formed!",
+    "default": "Attempt a connection",
+    "cooldownPrefix": "Repeat the riddle in"
+  },
+  "vibration": {
+    "listening": "Focusing…",
+    "detected": "Something answered",
+    "failed": "Nothing stirred",
+    "idle": "Listen closely",
+    "solvedLabel": "Vibration detected"
+  },
+  "ink": {
+    "cooldownPrefix": "Reset in",
+    "tapInstruction": "Touch a cell to pour ink",
+    "wordsToReveal": "— Words to reveal —",
+    "resetGame": "Reset game",
+    "victoryTitle": "✦ The Revealing Ink ✦",
+    "victoryMessage": "\"now you know what you need to do...\"",
+    "continue": "Continue"
+  }
+}

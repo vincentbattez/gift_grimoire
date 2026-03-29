@@ -1,0 +1,54 @@
+{
+  "header": {
+    "title": "Le Grimoire",
+    "titleLine2": "Ensorcelé de Léa",
+    "subtitle": "Un sort protège chaque rune…",
+    "subtitleLine2": "sauras-tu le briser ?"
+  },
+  "footer": {
+    "madeWith": "Imaginé et developpé",
+    "withLove": "avec amour",
+    "forLea": "pour Léamour - 2026"
+  },
+  "admin": {
+    "quit": "quitter le mode admin",
+    "reset": "reset"
+  },
+  "intro": {
+    "slides": [
+      {
+        "title": "Un souffle ancien…",
+        "text": "Une force t'a choisie, toi et toi seule. Ce grimoire dormait depuis des siècles, attendant que la bonne personne l'éveille. Ses pages renferment des secrets que nul n'a encore percés… jusqu'à aujourd'hui."
+      },
+      {
+        "title": "Le temps est ton allié",
+        "text": "Ce grimoire ne se dévoile pas en un instant. Ses mystères se révèlent au fil des jours, comme une marée qui monte lentement. Reviens chaque jour — de nouvelles portes s'ouvriront peut-être…"
+      },
+      {
+        "title": "Chaque essai compte",
+        "text": "Certaines épreuves sont protégées par un sortilège d'épuisement. Les petits cercles lumineux indiquent tes tentatives restantes. À minuit, la magie se régénère et tu pourras réessayer."
+      },
+      {
+        "title": "Six Mystères Scellés",
+        "text": "Tout en bas du grimoire, six sceaux attendent d'être brisés. Pour y parvenir, il te faudra résoudre des énigmes ici… mais aussi dans le monde réel. Tous les indices sont déjà cachés quelque part dans la maison. Certaines manipulations sont plus… modernes qu'il n'y paraît."
+      },
+      {
+        "title": "À toi de jouer",
+        "text": "Ce grimoire a été tissé rien que pour toi. Chaque rune, chaque sort, chaque secret porte ton nom.\n\nJoyeux anniversaire, mon Amour ✦"
+      }
+    ],
+    "openGrimoire": "Ouvrir le Grimoire ✦",
+    "next": "Suivant",
+    "skip": "Passer l'introduction"
+  },
+  "audioWarning": {
+    "title": "Un avertissement ancien",
+    "text": "Les voix de ce grimoire ne se répètent pas à l'infini. Tu n'as que quelques écoutes par jour — tends l'oreille, concentre-toi, et ne laisse aucun murmure t'échapper.",
+    "confirm": "J'ai compris ✦"
+  },
+  "lastAttempt": {
+    "title": "Dernière écoute",
+    "text": "C'est ta dernière écoute. Après celle-ci, les voix se tairont jusqu'à l'aube. Ferme les yeux, fais le silence, et absorbe chaque mot.",
+    "confirm": "Je suis prêt ✦"
+  }
+}
