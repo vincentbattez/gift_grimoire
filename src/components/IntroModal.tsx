@@ -9,7 +9,7 @@ const VELOCITY_THRESHOLD = 0.3;
 
 export function IntroModal({ onClose }: Readonly<{ onClose: () => void }>): React.JSX.Element {
   const { t } = useTranslation("common");
-  const slideList = t("intro.slideList", { returnObjects: true }) as { title: string; text: string }[];
+  const slideList = t("intro.slides", { returnObjects: true }) as { title: string; text: string }[];
   const [current, setCurrent] = useState(0);
   const [hasEntered, setHasEntered] = useState(false);
   const [isExiting, setIsExiting] = useState(false);

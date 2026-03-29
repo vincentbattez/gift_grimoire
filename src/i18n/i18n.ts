@@ -4,12 +4,10 @@ import commonEN from "./locales/en/common.json";
 import enigmaEN from "./locales/en/enigma.json";
 import finaleEN from "./locales/en/finale.json";
 import forgeEN from "./locales/en/forge.json";
-import tresorEN from "./locales/en/tresor.json";
 import commonFR from "./locales/fr/common.json";
 import enigmaFR from "./locales/fr/enigma.json";
 import finaleFR from "./locales/fr/finale.json";
 import forgeFR from "./locales/fr/forge.json";
-import tresorFR from "./locales/fr/tresor.json";
 
 const STORAGE_KEY = "gift-grimoire-lang";
 
@@ -23,8 +21,8 @@ function getSavedLanguage(): string {
 
 void i18n.use(initReactI18next).init({
   resources: {
-    fr: { common: commonFR, enigma: enigmaFR, forge: forgeFR, finale: finaleFR, tresor: tresorFR },
-    en: { common: commonEN, enigma: enigmaEN, forge: forgeEN, finale: finaleEN, tresor: tresorEN },
+    fr: { common: commonFR, enigma: enigmaFR, forge: forgeFR, finale: finaleFR },
+    en: { common: commonEN, enigma: enigmaEN, forge: forgeEN, finale: finaleEN },
   },
   lng: getSavedLanguage(),
   fallbackLng: "fr",

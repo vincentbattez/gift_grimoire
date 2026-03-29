@@ -74,7 +74,6 @@ export function SuccessModal(): React.JSX.Element {
   }
 
   const enigmaData = displayEnigmaId ? ENIGMA_LIST.find((e) => e.id === displayEnigmaId) : null;
-  const flavorText = enigmaData?.successFlavor ?? null;
   const isVisible = boxNumber !== null || isClosing;
   const isActive = hasEntered && !isClosing;
 
@@ -140,9 +139,9 @@ export function SuccessModal(): React.JSX.Element {
           {t("success.title")}
         </h2>
         {/* Flavor text — stagger 3 */}
-        {flavorText && (
+        {enigmaData && (
           <p className="text-text/70 mb-4 text-[1rem]" style={flavorStyle}>
-            {enigmaData ? t(`config.${enigmaData.id}.successFlavor`, { defaultValue: flavorText }) : flavorText}
+            {enigmaData.successFlavor}
           </p>
         )}
         {/* Separator — stagger 4 */}

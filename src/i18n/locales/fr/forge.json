@@ -4,8 +4,6 @@
     "accomplished": "✦ Épreuve accomplie ✦"
   },
   "magnet": {
-    "title": "La chaleur de L'Arc-en-ciel",
-    "successMessage": "Pascal changea les couleurs sombres du cœur de Dark Vador. Le seigneur des ténèbres posa enfin son sabre et sourit.",
     "solvedLabel": "Dark Vador a trouvé un nouvel ami",
     "listenSecret": "Écouter le secret",
     "playing": "Lecture en cours…",
@@ -15,13 +13,7 @@
     "default": "Tenter un rapprochement",
     "cooldownPrefix": "Répéter l'énigme dans"
   },
-  "scramble": {
-    "title": "Le Maillon des Égarés",
-    "successMessage": "Les lettres égarées ont retrouvé leur place… Une nouvelle clé se forge dans la lumière."
-  },
   "vibration": {
-    "title": "Le Murmure Invisible",
-    "successMessage": "Le murmure s'est tu… mais son secret résonne encore. Une clé naît du silence.",
     "listening": "Concentration…",
     "detected": "Quelque chose a répondu",
     "failed": "Rien ne s'est éveillé",
@@ -29,9 +21,6 @@
     "solvedLabel": "Vibration détectée"
   },
   "ink": {
-    "title": "L'Encre Révélatrice",
-    "successMessage": "L'encre a tout révélé. Les mots tracés dans l'ombre brillent désormais dans ta mémoire.",
-    "introText": "Cette page du grimoire semble vide… mais tes doigts sentent les sillons d'une plume ancienne. Des mots y furent tracés à l'encre des secrets — une encre que seul un regard patient peut révéler. Verse tes gouttes avec discernement : l'encre révélatrice n'est pas inépuisable.",
     "cooldownPrefix": "Reset dans",
     "tapInstruction": "Touche une case pour y verser de l'encre",
     "wordsToReveal": "— Mots à révéler —",

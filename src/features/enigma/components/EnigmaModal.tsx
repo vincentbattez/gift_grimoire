@@ -52,6 +52,7 @@ function getTranslateClass(hasEntered: boolean, isOpen: boolean, isDragging: boo
 }
 
 function getSubmitButtonText(attemptUsed: boolean, isSuspense: boolean, t: (key: string) => string): string {
+  // Note: `t` is typed loosely here to avoid importing TFunction — the enigma namespace is bound by the caller
   if (attemptUsed) {
     return t("modal.exhausted");
   }
@@ -360,11 +361,9 @@ function ModalBody({
 
       <div className={getIconClass(isSolved)}>{enigma.icon}</div>
       <h2 className="text-gold mb-5 text-center text-[1.05rem] font-[var(--font-cinzel-decorative)] drop-shadow-[0_0_20px_#e8c96a35]">
-        {t(`config.${enigma.id}.title`, { defaultValue: enigma.title })}
+        {enigma.title}
       </h2>
-      <p className={getQuestionClass(isSolved)}>
-        {t(`config.${enigma.id}.question`, { defaultValue: enigma.question })}
-      </p>
+      <p className={getQuestionClass(isSolved)}>{enigma.question}</p>
 
       {!isSolved && !attemptUsed && (
         <>

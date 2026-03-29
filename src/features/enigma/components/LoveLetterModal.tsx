@@ -213,7 +213,7 @@ export function LoveLetterModal(): React.JSX.Element {
             </h2>
 
             <p className="mb-5 text-center text-[0.68rem] tracking-[0.15em] uppercase" style={{ color: "#a08a50" }}>
-              {t(`config.${enigma.id}.title`, { defaultValue: enigma.title })}
+              {enigma.title}
             </p>
 
             {/* Gold separator */}
@@ -227,7 +227,7 @@ export function LoveLetterModal(): React.JSX.Element {
                 color: "#4a3a20",
               }}
             >
-              {t(`config.${enigma.id}.loveLetter.message`, { defaultValue: enigma.loveLetter.message })}
+              {enigma.loveLetter.message}
             </div>
 
             {/* Gold separator */}
@@ -241,7 +241,7 @@ export function LoveLetterModal(): React.JSX.Element {
                 color: "#8a6a20",
               }}
             >
-              — {t(`config.${enigma.id}.loveLetter.signature`, { defaultValue: enigma.loveLetter.signature })} —
+              — {enigma.loveLetter.signature} —
             </p>
             <p className="mt-2 text-center text-[0.65rem] tracking-[0.12em]" style={{ color: "#b09a60" }}>
               {t("loveLetter.withLove")}
