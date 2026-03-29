@@ -1,3 +1,5 @@
+import { useTranslation } from "react-i18next";
+
 /** Overlay de divination — affiché pendant le suspense quand le grimoire hésite */
 export function DoubtOverlay({
   visible,
@@ -8,6 +10,8 @@ export function DoubtOverlay({
   onConfirm: () => void;
   onCancel: () => void;
 }>): React.JSX.Element {
+  const { t } = useTranslation("enigma");
+
   return (
     <>
       {/* Fond opaque derrière la sheet */}
@@ -90,7 +94,7 @@ export function DoubtOverlay({
             className="text-accent/70 mb-1.5 text-[1rem] font-[var(--font-cinzel-decorative)] tracking-[0.15em] uppercase"
             style={visible ? { animation: "doubt-text-in 0.6s ease-out 0.1s both" } : undefined}
           >
-            Le grimoire hésite
+            {t("doubt.title")}
           </p>
           <div className="mb-3 flex items-center justify-center gap-2.5">
             <div
@@ -107,9 +111,9 @@ export function DoubtOverlay({
             className="text-text/80 text-[0.90rem] leading-relaxed font-[var(--font-cinzel)]"
             style={visible ? { animation: "doubt-text-in 0.6s ease-out 0.25s both" } : undefined}
           >
-            Es-tu certaine de vouloir soumettre
+            {t("doubt.question")}
             <br />
-            <span className="text-accent/60 text-[0.85rem]">cette réponse aux runes ?</span>
+            <span className="text-accent/60 text-[0.85rem]">{t("doubt.questionLine2")}</span>
           </p>
         </div>
 
@@ -124,7 +128,7 @@ export function DoubtOverlay({
           >
             <span className="relative z-[1] flex items-center justify-center gap-1.5">
               <span className="text-accent/30 text-[0.5rem]">◁</span>
-              Reformuler
+              {t("doubt.cancel")}
             </span>
           </button>
           <button
@@ -144,7 +148,7 @@ export function DoubtOverlay({
               }}
             />
             <span className="relative z-[1] flex items-center justify-center gap-1.5">
-              J'en suis sûre
+              {t("doubt.confirm")}
               <span className="text-[0.5rem]">✦</span>
             </span>
           </button>

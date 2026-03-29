@@ -1,4 +1,5 @@
 import { useMemo, useRef } from "react";
+import { useTranslation } from "react-i18next";
 import { toPng } from "html-to-image";
 import { ArcaneSymbolSvg } from "./ArcaneSymbol";
 import type { EnigmaData } from "./data";
@@ -181,6 +182,7 @@ async function downloadCard(cardElement: HTMLElement, enigma: EnigmaData): Promi
 }
 
 export function EnigmaSheet({ enigma, index }: Readonly<{ enigma: EnigmaData; index: number }>): React.JSX.Element {
+  const { t } = useTranslation("tresor");
   const cardRef = useRef<HTMLDivElement>(null);
 
   return (
@@ -232,7 +234,7 @@ export function EnigmaSheet({ enigma, index }: Readonly<{ enigma: EnigmaData; in
           </div>
 
           {/* Title */}
-          <div className="tarot-title">{enigma.title}</div>
+          <div className="tarot-title">{t(`enigmas.${String(index)}.title`, { defaultValue: enigma.title })}</div>
 
           {/* Ornate separator */}
           <OrnateSeparator />
@@ -240,13 +242,13 @@ export function EnigmaSheet({ enigma, index }: Readonly<{ enigma: EnigmaData; in
           {/* Riddle cartouche with decorative frame */}
           <div className="tarot-cartouche">
             <CartoucheFrame />
-            <p className="tarot-riddle">{enigma.riddle}</p>
+            <p className="tarot-riddle">{t(`enigmas.${String(index)}.riddle`, { defaultValue: enigma.riddle })}</p>
           </div>
 
           {/* Hint */}
           <div className="tarot-hint">
             <span className="hint-icon">◈</span>
-            <span>{enigma.hint}</span>
+            <span>{t(`enigmas.${String(index)}.hint`, { defaultValue: enigma.hint })}</span>
           </div>
 
           {/* Bottom medallion */}

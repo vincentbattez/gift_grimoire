@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { sndOk } from "@/audio";
 import { pollEntityState } from "@/ha";
 import { EnigmaPicker } from "@features/enigma/components/EnigmaPicker";
@@ -31,6 +32,7 @@ function SoundWaveIcon({ color, size }: Readonly<{ color: string; size?: number 
 
 /** Forge : Le Murmure Invisible — détecte une vibration via Home Assistant */
 export function VibrationForge({ solved, onSolve }: Readonly<ForgeProps>): React.JSX.Element {
+  const { t } = useTranslation("forge");
   const [phase, setPhase] = useState<Phase>("idle");
   const [progress, setProgress] = useState(0);
   const [isShowingPicker, setIsShowingPicker] = useState(false);
@@ -114,7 +116,9 @@ export function VibrationForge({ solved, onSolve }: Readonly<ForgeProps>): React
             <span className="text-success text-lg font-bold">✓</span>
           </div>
         </div>
-        <p className="text-success text-[0.6rem] font-semibold tracking-[0.18em] uppercase">Vibration détectée</p>
+        <p className="text-success text-[0.6rem] font-semibold tracking-[0.18em] uppercase">
+          {t("vibration.solvedLabel")}
+        </p>
       </div>
     );
   }
@@ -149,18 +153,18 @@ export function VibrationForge({ solved, onSolve }: Readonly<ForgeProps>): React
 
   const label = (() => {
     if (phase === "listening") {
-      return "Concentration…";
+      return t("vibration.listening");
     }
 
     if (phase === "detected") {
-      return "Quelque chose a répondu";
+      return t("vibration.detected");
     }
 
     if (phase === "failed") {
-      return "Rien ne s'est éveillé";
+      return t("vibration.failed");
     }
 
-    return "Tendre l'oreille";
+    return t("vibration.idle");
   })();
 
   const labelColor = (() => {

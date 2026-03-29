@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { sndClick, sndGoldenSeal, sndVictory } from "@/audio";
 import { spawnCelebration } from "@/particles";
 import { LockIcon } from "@components/LockIcon";
@@ -38,6 +39,7 @@ function getCardStateClass(isSolved: boolean, isUnlocked: boolean): string {
 }
 
 export function EnigmaCard({ enigma, isAdmin }: Readonly<{ enigma: Enigma; isAdmin: boolean }>): React.JSX.Element {
+  const { t } = useTranslation("enigma");
   const state = useEnigmaStore((s) => s.enigmas[enigma.id]);
   const openModal = useEnigmaStore((s) => s.openModal);
   const acknowledgeUnlock = useEnigmaStore((s) => s.acknowledgeUnlock);
@@ -205,12 +207,14 @@ export function EnigmaCard({ enigma, isAdmin }: Readonly<{ enigma: Enigma; isAdm
       {isLocked ? (
         <>
           <LockIcon />
-          <div className="text-muted text-[0.6rem] tracking-[0.2em] uppercase">Énigme {enigma.id}</div>
+          <div className="text-muted text-[0.6rem] tracking-[0.2em] uppercase">
+            {t("card.label", { id: enigma.id })}
+          </div>
         </>
       ) : (
         <div className="relative z-[1] flex flex-col items-center">
           <div className={`text-[0.6rem] tracking-[0.2em] ${isSolved ? "text-gold/50" : "text-muted"} mb-2 uppercase`}>
-            Énigme {enigma.id}
+            {t("card.label", { id: enigma.id })}
           </div>
           <div
             className={`mb-2 text-[2.3rem] leading-none transition-[filter] duration-700 ${isSolved ? "drop-shadow-[0_0_10px_rgba(201,160,50,0.6)]" : "drop-shadow-[0_0_10px_rgba(155,109,255,0.6)]"}`}
@@ -255,7 +259,7 @@ export function EnigmaCard({ enigma, isAdmin }: Readonly<{ enigma: Enigma; isAdm
           />
           <span className="relative z-[1] flex items-center justify-center gap-1">
             <span className="text-[0.75rem]">✦</span>
-            Une dernière chose pour toi...
+            {t("card.envelope")}
           </span>
         </button>
       )}

@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { sndHeartPop, sndLoveClose } from "@/audio";
 import { randomVisual } from "@/utils/random";
 import { CornerOrnaments } from "@components/ui/CornerOrnaments";
@@ -39,6 +40,7 @@ const GOLD_PARTICLE_LIST = Array.from({ length: 20 }, (_, i) => ({
 }));
 
 export function LoveLetterModal(): React.JSX.Element {
+  const { t } = useTranslation("enigma");
   const enigmaId = useEnigmaStore((s) => s.loveLetterEnigmaId);
   const closeLoveLetter = useEnigmaStore((s) => s.closeLoveLetter);
   const [hasEntered, setHasEntered] = useState(false);
@@ -82,8 +84,8 @@ export function LoveLetterModal(): React.JSX.Element {
       cancelAnimationFrame(raf);
       clearTimeout(showTimer);
 
-      popTimers.current.forEach((t) => {
-        clearTimeout(t);
+      popTimers.current.forEach((timer) => {
+        clearTimeout(timer);
       });
     };
   }, [enigmaId]);
@@ -207,11 +209,11 @@ export function LoveLetterModal(): React.JSX.Element {
                 textShadow: "0 0 20px #e8c96a30",
               }}
             >
-              Une lettre pour toi
+              {t("loveLetter.title")}
             </h2>
 
             <p className="mb-5 text-center text-[0.68rem] tracking-[0.15em] uppercase" style={{ color: "#a08a50" }}>
-              {enigma.title}
+              {t(`config.${enigma.id}.title`, { defaultValue: enigma.title })}
             </p>
 
             {/* Gold separator */}
@@ -225,7 +227,7 @@ export function LoveLetterModal(): React.JSX.Element {
                 color: "#4a3a20",
               }}
             >
-              {enigma.loveLetter.message}
+              {t(`config.${enigma.id}.loveLetter.message`, { defaultValue: enigma.loveLetter.message })}
             </div>
 
             {/* Gold separator */}
@@ -239,10 +241,10 @@ export function LoveLetterModal(): React.JSX.Element {
                 color: "#8a6a20",
               }}
             >
-              — {enigma.loveLetter.signature} —
+              — {t(`config.${enigma.id}.loveLetter.signature`, { defaultValue: enigma.loveLetter.signature })} —
             </p>
             <p className="mt-2 text-center text-[0.65rem] tracking-[0.12em]" style={{ color: "#b09a60" }}>
-              Avec tout mon amour ♡
+              {t("loveLetter.withLove")}
             </p>
           </div>
         </div>

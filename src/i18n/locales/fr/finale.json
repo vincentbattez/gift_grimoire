@@ -1,0 +1,44 @@
+{
+  "context": {
+    "title": "Le Dernier Sortilège",
+    "body": "Tu as percé les six mystères,\nforgé les trois clés,\net lu chaque lettre que mon cœur\navait cachée pour toi.\n\nCe grimoire n'était pas un jeu.\n\nC'était ma façon de te dire ce que les mots seuls n'auraient pas suffi à exprimer...",
+    "footer": "Chaque énigme portait un morceau de ce que tu représentes pour moi."
+  },
+  "stats": {
+    "title": "Ton aventure",
+    "mysteriesSolved": "Mystères percés",
+    "lettersRead": "Lettres d'amour lues",
+    "keysForged": "Clés forgées",
+    "disneyCharacters": "Personnages Disney",
+    "guardians": "Les gardiens du grimoire"
+  },
+  "love": {
+    "title": "Mon Léamour",
+    "lines": [
+      { "text": "Chaque ligne de code de ce grimoire", "pause": 1 },
+      { "text": "a été écrite en pensant à toi.", "pause": 1.4 },
+      { "text": "", "pause": 0.8 },
+      { "text": "Tu es la raison pour laquelle", "pause": 1 },
+      { "text": "je crois encore à la magie.", "pause": 1.2, "golden": true },
+      { "text": "Celle qui existe quand tu poses", "pause": 1 },
+      { "text": "ta tête sur mon épaule", "pause": 1 },
+      { "text": "et que le monde s'arrête.", "pause": 1.4, "golden": true },
+      { "text": "", "pause": 0.8 },
+      { "text": "Je t'aime au-delà des mots,", "pause": 1.2, "golden": true },
+      { "text": "au-delà des énigmes,", "pause": 1 },
+      { "text": "au-delà de tout ce que", "pause": 1 },
+      { "text": "ce grimoire pourra jamais contenir.", "pause": 1.6 }
+    ],
+    "signature": "— Pour toujours, ton Vincent —",
+    "withLove": "Avec tout mon amour, infiniment ♡"
+  },
+  "seal": {
+    "sealed": "✦ Scellé ✦",
+    "holdToSeal": "Maintenir pour sceller"
+  },
+  "narrative": [
+    "Le grimoire se referme…",
+    "Les mystères retournent au silence…",
+    "Mais la magie, elle, restera."
+  ]
+}

@@ -1,8 +1,12 @@
+import { useTranslation } from "react-i18next";
+
 type InkVictoryModalProps = {
   onContinue: () => void;
 };
 
 export function InkVictoryModal({ onContinue }: Readonly<InkVictoryModalProps>): React.JSX.Element {
+  const { t } = useTranslation("forge");
+
   return (
     <div
       className="fixed inset-0 z-[200] flex items-center justify-center"
@@ -20,7 +24,7 @@ export function InkVictoryModal({ onContinue }: Readonly<InkVictoryModalProps>):
           animation: "ink-modal-reveal 0.55s ease-out both",
         }}
       >
-        <div className="text-gold/40 text-[0.45rem] tracking-[0.4em] uppercase">✦ L'Encre Révélatrice ✦</div>
+        <div className="text-gold/40 text-[0.45rem] tracking-[0.4em] uppercase">{t("ink.victoryTitle")}</div>
 
         <p
           className="text-text/90 text-[0.8rem] leading-loose italic"
@@ -30,7 +34,7 @@ export function InkVictoryModal({ onContinue }: Readonly<InkVictoryModalProps>):
             textShadow: "0 0 20px rgba(232,201,106,0.15)",
           }}
         >
-          "maintenant, tu sais ce qu'il te reste à faire..."
+          {t("ink.victoryMessage")}
         </p>
 
         <div className="text-gold/25 flex gap-2 text-base">
@@ -48,7 +52,7 @@ export function InkVictoryModal({ onContinue }: Readonly<InkVictoryModalProps>):
             background: "rgba(232,201,106,0.06)",
           }}
         >
-          Continuer
+          {t("ink.continue")}
         </button>
       </div>
     </div>

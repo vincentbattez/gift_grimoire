@@ -1,0 +1,103 @@
+{
+  "card": {
+    "label": "Enigma {{id}}",
+    "envelope": "One last thing for you..."
+  },
+  "modal": {
+    "dragToClose": "Drag to close",
+    "placeholder": "Whisper your answer here…",
+    "submit": "Submit Answer ✦",
+    "exhausted": "Attempt used",
+    "thinking": "The grimoire is thinking…",
+    "analyzing": "The grimoire is analyzing your answer…",
+    "runesHesitate": "The runes hesitate…",
+    "resumeAnalysis": "The grimoire resumes its analysis…",
+    "successFeedback": "✦ The runes light up… the grimoire accepts your answer!",
+    "errorFeedback": "The runes have faded… that's not the right word.",
+    "alreadyAccepted": "✦ The grimoire has already accepted your answer",
+    "waitingAnswer": "The grimoire awaits your answer",
+    "resting": "The grimoire is resting…",
+    "nextAttemptIn": "Next attempt in",
+    "grimoireSmiled": "The grimoire smiled upon you",
+    "openLetter": "Open your letter"
+  },
+  "locked": {
+    "sealed": "This mystery is sealed",
+    "forgeKey": "Forge a key in the Forge to break the seal",
+    "close": "Close"
+  },
+  "success": {
+    "title": "Mystery solved",
+    "sealBroken": "The seal has broken…",
+    "canOpen": "You can now open",
+    "boxNumber": "Box #{{number}}",
+    "open": "Open"
+  },
+  "loveLetter": {
+    "title": "A letter for you",
+    "withLove": "With all my love ♡"
+  },
+  "doubt": {
+    "title": "The grimoire hesitates",
+    "question": "Are you sure you want to submit",
+    "questionLine2": "this answer to the runes?",
+    "cancel": "Rephrase",
+    "confirm": "I'm sure"
+  },
+  "config": {
+    "5": {
+      "title": "The invisible crack",
+      "question": "Everyone here sees the extraordinary effortlessly. I need help to see the ordinary. And yet, I'm the only one who saw what was about to destroy us",
+      "successFlavor": "The crack lights up… What was invisible becomes obvious.",
+      "loveLetter": {
+        "signature": "The most beautiful gift that exists",
+        "message": "Like Mirabel, you don't need any magical power to be extraordinary.\n      \nWhere others stop, you keep going.\nWhere walls crack, you lay your hands and rebuild, gently, silently, with a strength that few people even know how to recognize\n      \nYou are the one who repairs my invisible cracks, who holds everything together by the sheer force of your heart.\n      \nAnd that, my love, is the most beautiful gift that exists.\nHaving you by my side is the chance of my life"
+      }
+    },
+    "Y": {
+      "title": "The voices of the sky",
+      "question": "Every year, the sky speaks to me. Hundreds of silent voices float towards me, and I'm the only one who believes they're looking for me. Everyone sees a celebration. I see a question",
+      "successFlavor": "The voices finally fall silent, their message was always meant for you.",
+      "loveLetter": {
+        "signature": "My most beautiful waking dream",
+        "message": "You are my Rapunzel. There is in you this light that nothing can extinguish.\n        \nBy your side, I learned to dream again. You showed me how to look up, how to see the beauty I was letting pass.\n        \nYour emotions and your joy radiate and without us realizing it, transform everything they touch.\n        \nThe moments I live with you are like lanterns rising in the sky: fragile, luminous, and yet capable of illuminating my inner sky (which struggles to feel).\n        \nYou are my most beautiful dream, the one I live awake."
+      }
+    },
+    "2g": {
+      "title": "The dance of the stars",
+      "question": "He invited me to dance without a word and without music. His hand couldn't find mine. His body went the wrong way. He looked like anything but a dancer.\n      \nHis eyes carried what my calculations cannot solve:\n\"the desire to be there, with him, near me.\"",
+      "successFlavor": "The stars finish their dance… and it's you they chose.",
+      "loveLetter": {
+        "signature": "My most beautiful little thing",
+        "message": "Like Wall-E, you move forward. Gently, stubbornly, even when everything piles up, even when it weighs heavy. You don't make noise with your strength, you carry it, and it shows in everything you go through without ever losing what makes you you\n        \nYou remind me that love is simple. It's being there, side by side. No need to be someone we're not.\n      \nAnd if I had to keep one thing from you, it would be exactly that: the way you taught me that life, in the end, doesn't need to be grand to be beautiful"
+      }
+    },
+    "F": {
+      "title": "The golden frame",
+      "question": "I was confused with a law.\nI am a name, just a name.\nBanished, yes. But hanging there, right in front, in a golden frame that nobody looks at",
+      "successFlavor": "The golden frame reveals its secret. The vision was right in front of you.",
+      "loveLetter": {
+        "signature": "She who sees the invisible",
+        "message": "Like Bruno, you see what others don't see. Through this deep sensitivity that lives in you and that few people truly recognize, you perceive emotions, unspoken words, details that nobody else notices. You have this gift of seeing the invisible, of feeling what is hidden.\n\nYou carry a lot.\nOthers' emotions cling to you, and you welcome them without complaining, but I know it weighs heavy, sometimes.\nI see it. And I want you to know that I will always be there to help you lighten that weight, to support you, to love you, even in the moments when you feel overwhelmed.\n        \nIf only you could see what my eyes see when they look at you, you would finally understand that you deserve to be proud of the woman you are."
+      }
+    },
+    "X": {
+      "title": "The weight of a smile",
+      "question": "The day my strength wavered, I wasn't afraid of suffering. I was afraid that no one would look at me anymore. Because here, they don't love me for who I am, they love me for what I lift.",
+      "successFlavor": "The mask falls. Behind the smile, an unshakeable strength.",
+      "loveLetter": {
+        "signature": "Your most beautiful strength",
+        "message": "Like Luisa, you carry others, their sorrows, their needs, their urgencies, with a reliability that everyone notices without ever truly measuring what it costs you.\n        \nWhat you brought me is this rare certainty, knowing that you are there. Truly there. Unconditionally. You taught me what it means to be someone you can count on.\n        \nSo now it's my turn. With me, you can put everything down. The strength, the weight, the appearances.\nYour vulnerability is not a weakness, it's the part of you that few people know, and that I cherish more than anything.\n        \nYou spent your life being there for others. I will be there for you. I don't promise to carry everything in your place. I promise to never let you carry it alone."
+      }
+    },
+    "2d": {
+      "title": "The forgotten directive",
+      "question": "I fly without wings. I see without pupils. I kill without anger. And I love without a program. Among these four sentences, only one was not planned in my specifications. It's also the only one that matters.",
+      "successFlavor": "The forgotten directive awakens. Love never needed a program.",
+      "loveLetter": {
+        "signature": "Every morning, I choose you",
+        "message": "Like EVE, you have this grace that disarms me every time. You are brilliant, determined, capable of anything, and it's when you're not aware of your beauty that it strikes me the most\n        \nA look, a smile, a hand placed on mine.\n        \nYou taught me that love is not written in a program, it's a choice you make every morning. And every morning, my heart chooses you."
+      }
+    }
+  }
+}

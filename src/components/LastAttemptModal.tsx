@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { CooldownLabel } from "@features/cooldown/components/CooldownLabel";
 import { Modal } from "./ui/Modal";
 
@@ -6,6 +7,7 @@ export function LastAttemptModal({
   isOpen,
   onConfirm,
 }: Readonly<{ isOpen: boolean; onConfirm: () => void }>): React.JSX.Element {
+  const { t } = useTranslation("common");
   const [mountedAt] = useState(() => Date.now());
 
   return (
@@ -22,11 +24,10 @@ export function LastAttemptModal({
         ✦⏳
       </span>
       <h2 className="text-gold mb-3 text-[1rem] font-[var(--font-cinzel-decorative)] tracking-wide drop-shadow-[0_0_20px_#e8c96a40]">
-        Dernière écoute
+        {t("lastAttempt.title")}
       </h2>
       <p className="text-text/80 mb-4 max-w-[300px] text-[0.82rem] leading-relaxed whitespace-pre-line">
-        C'est ta dernière écoute. Après celle-ci, les voix se tairont jusqu'à l'aube. Ferme les yeux, fais le silence,
-        et absorbe chaque mot.
+        {t("lastAttempt.text")}
       </p>
       <CooldownLabel
         lastTriggeredAt={mountedAt}
@@ -36,7 +37,7 @@ export function LastAttemptModal({
         onClick={onConfirm}
         className="border-danger/40 bg-danger/10 text-danger hover:bg-danger/20 cursor-pointer rounded-full border px-8 py-3 text-[0.78rem] font-[var(--font-cinzel)] tracking-[0.15em] uppercase transition-all duration-300 active:scale-95"
       >
-        Je suis prêt ✦
+        {t("lastAttempt.confirm")}
       </button>
     </Modal>
   );

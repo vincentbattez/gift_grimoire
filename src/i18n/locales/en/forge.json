@@ -1,0 +1,43 @@
+{
+  "section": {
+    "start": "Begin",
+    "accomplished": "✦ Trial accomplished ✦"
+  },
+  "magnet": {
+    "title": "The Warmth of the Rainbow",
+    "successMessage": "Pascal changed the dark colors of Darth Vader's heart. The lord of darkness finally laid down his saber and smiled.",
+    "solvedLabel": "Darth Vader found a new friend",
+    "listenSecret": "Listen to the secret",
+    "playing": "Playing…",
+    "checking": "The forces are converging…",
+    "error": "Nothing happened",
+    "success": "A new friendship has formed!",
+    "default": "Attempt a connection",
+    "cooldownPrefix": "Repeat the riddle in"
+  },
+  "scramble": {
+    "title": "The Link of the Lost",
+    "successMessage": "The lost letters have found their place… A new key is forged in the light."
+  },
+  "vibration": {
+    "title": "The Invisible Whisper",
+    "successMessage": "The whisper has fallen silent… but its secret still resonates. A key is born from silence.",
+    "listening": "Focusing…",
+    "detected": "Something answered",
+    "failed": "Nothing stirred",
+    "idle": "Listen closely",
+    "solvedLabel": "Vibration detected"
+  },
+  "ink": {
+    "title": "The Revealing Ink",
+    "successMessage": "The ink has revealed everything. The words traced in shadow now shine in your memory.",
+    "introText": "This page of the grimoire seems empty… but your fingers feel the grooves of an ancient quill. Words were traced with the ink of secrets — an ink that only a patient gaze can reveal. Pour your drops wisely: the revealing ink is not inexhaustible.",
+    "cooldownPrefix": "Reset in",
+    "tapInstruction": "Touch a cell to pour ink",
+    "wordsToReveal": "— Words to reveal —",
+    "resetGame": "Reset game",
+    "victoryTitle": "✦ The Revealing Ink ✦",
+    "victoryMessage": "\"now you know what you need to do...\"",
+    "continue": "Continue"
+  }
+}

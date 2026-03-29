@@ -1,5 +1,6 @@
 import type { CSSProperties } from "react";
 import { useEffect, useRef, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { sndClick, sndForgeReveal } from "@/audio";
 import { spawnParticles } from "@/particles";
 import { randomVisual } from "@/utils/random";
@@ -42,6 +43,7 @@ function ForgeIntroModal({
   text: string;
   onClose: () => void;
 }>): React.JSX.Element {
+  const { t } = useTranslation("forge");
   const [hasEntered, setHasEntered] = useState(false);
   const [isClosing, setIsClosing] = useState(false);
 
@@ -123,7 +125,7 @@ function ForgeIntroModal({
           className="to-accent cursor-pointer rounded-[14px] border-none bg-gradient-to-br from-[#3a2a6a] px-7 py-2.5 text-[0.75rem] font-[var(--font-cinzel)] font-semibold tracking-[0.12em] text-white uppercase shadow-[0_4px_22px_#9b6dff28] transition-all duration-200 active:scale-[0.97]"
           style={btnStyle}
         >
-          Commencer
+          {t("section.start")}
         </button>
       </div>
     </div>
@@ -145,7 +147,8 @@ type ForgeSectionProps = {
 };
 
 export function ForgeSection({ forge, isAdmin }: Readonly<ForgeSectionProps>): React.JSX.Element {
-  const { key, title, successMessage, introText, adminActionList, component: ForgeComponent } = forge;
+  const { t } = useTranslation("forge");
+  const { key, introText, adminActionList, component: ForgeComponent } = forge;
 
   const isRevealed = forge.useRevealed();
   const isSolved = forge.useSolved();
@@ -160,8 +163,8 @@ export function ForgeSection({ forge, isAdmin }: Readonly<ForgeSectionProps>): R
       <>
         {isShowingIntro && introText && (
           <ForgeIntroModal
-            title={title}
-            text={introText}
+            title={t(`${key}.title`)}
+            text={t(`${key}.introText`)}
             onClose={() => {
               setIsShowingIntro(false);
             }}
@@ -175,7 +178,7 @@ export function ForgeSection({ forge, isAdmin }: Readonly<ForgeSectionProps>): R
           <div
             className={`mb-2 text-center text-[0.5rem] tracking-[0.25em] uppercase transition-colors duration-700 ${isSolved ? "text-success/60" : "text-muted/50"}`}
           >
-            {title}
+            {t(`${key}.title`)}
           </div>
           <ForgeComponent
             solved={isSolved}
@@ -213,10 +216,10 @@ export function ForgeSection({ forge, isAdmin }: Readonly<ForgeSectionProps>): R
           {isSolved && (
             <div className="border-success/15 mt-6 animate-[forge-unblur_0.8s_ease-out_both] border-t pt-4 text-center">
               <div className="text-success/40 mb-1.5 text-[0.5rem] tracking-[0.2em] uppercase">
-                ✦ Épreuve accomplie ✦
+                {t("section.accomplished")}
               </div>
               <p className="text-success/55 mx-auto max-w-[260px] text-[0.6rem] leading-relaxed italic">
-                {successMessage}
+                {t(`${key}.successMessage`)}
               </p>
               {isAdmin && (
                 <Button
@@ -301,7 +304,9 @@ export function ForgeSection({ forge, isAdmin }: Readonly<ForgeSectionProps>): R
           ...(phase === "revealing" && { animation: "forge-unblur 0.8s ease-out forwards" }),
         }}
       >
-        <div className="text-muted/50 mb-2 text-center text-[0.5rem] tracking-[0.25em] uppercase">{title}</div>
+        <div className="text-muted/50 mb-2 text-center text-[0.5rem] tracking-[0.25em] uppercase">
+          {t(`${key}.title`)}
+        </div>
         {phase === "revealing" ? (
           <ForgeComponent
             solved={isSolved}
@@ -378,7 +383,7 @@ export function ForgeSection({ forge, isAdmin }: Readonly<ForgeSectionProps>): R
           }}
         >
           <LockIcon />
-          <span className="text-muted text-[0.55rem] tracking-[0.25em] uppercase">{title}</span>
+          <span className="text-muted text-[0.55rem] tracking-[0.25em] uppercase">{t(`${key}.title`)}</span>
           {isAdmin && (
             <Button
               variant="admin"

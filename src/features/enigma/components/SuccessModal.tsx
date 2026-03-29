@@ -1,5 +1,6 @@
 import type { CSSProperties } from "react";
 import { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { sndClick } from "@/audio";
 import { fireEvent } from "@/ha";
 import { ENIGMA_LIST } from "@features/enigma/config";
@@ -23,6 +24,7 @@ function staggerStyle(
 }
 
 export function SuccessModal(): React.JSX.Element {
+  const { t } = useTranslation("enigma");
   const boxNumber = useEnigmaStore((s) => s.successBoxNumber);
   const haEvent = useEnigmaStore((s) => s.successHaEvent);
   const enigmaId = useEnigmaStore((s) => s.successEnigmaId);
@@ -135,12 +137,12 @@ export function SuccessModal(): React.JSX.Element {
           className="text-success mb-2 text-[1.1rem] font-[var(--font-cinzel-decorative)] drop-shadow-[0_0_20px_#4ecca340]"
           style={titleStyle}
         >
-          Mystère percé
+          {t("success.title")}
         </h2>
         {/* Flavor text — stagger 3 */}
         {flavorText && (
           <p className="text-text/70 mb-4 text-[1rem]" style={flavorStyle}>
-            {flavorText}
+            {enigmaData ? t(`config.${enigmaData.id}.successFlavor`, { defaultValue: flavorText }) : flavorText}
           </p>
         )}
         {/* Separator — stagger 4 */}
@@ -148,10 +150,10 @@ export function SuccessModal(): React.JSX.Element {
         {/* Box reveal — stagger 5 */}
         <div style={boxRevealStyle}>
           <p className="text-success/70 mb-1 text-[0.8rem] leading-relaxed">
-            Le sceau s'est brisé… <br /> Tu peux désormais ouvrir
+            {t("success.sealBroken")} <br /> {t("success.canOpen")}
           </p>
           <p className="text-gold my-3 text-[1.8rem] font-[var(--font-cinzel-decorative)] tracking-[0.08em] drop-shadow-[0_0_16px_#e8c96a40]">
-            Boîte n°{displayBoxNumber}
+            {t("success.boxNumber", { number: displayBoxNumber })}
           </p>
         </div>
         {/* Button — stagger 6 */}
@@ -160,7 +162,7 @@ export function SuccessModal(): React.JSX.Element {
           className="to-success mt-2 cursor-pointer rounded-[14px] border-none bg-gradient-to-br from-[#2a6a4a] px-8 py-3 text-[0.82rem] font-[var(--font-cinzel)] font-semibold tracking-[0.12em] text-white uppercase shadow-[0_4px_22px_#4ecca328] transition-all duration-200 active:scale-[0.97]"
           style={buttonStyle}
         >
-          Ouvrir
+          {t("success.open")}
         </button>
       </div>
     </div>

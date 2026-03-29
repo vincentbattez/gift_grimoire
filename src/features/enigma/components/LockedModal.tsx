@@ -1,8 +1,10 @@
 import { useState } from "react";
 import { createPortal } from "react-dom";
+import { useTranslation } from "react-i18next";
 import { LockIcon } from "@components/LockIcon";
 
 export function LockedModal({ onClose }: { readonly onClose: () => void }): React.JSX.Element {
+  const { t } = useTranslation("enigma");
   const [isClosing, setIsClosing] = useState(false);
 
   function handleClose(e?: React.MouseEvent): void {
@@ -32,10 +34,10 @@ export function LockedModal({ onClose }: { readonly onClose: () => void }): Reac
 
       {/* Text */}
       <p className="text-muted px-8 text-center text-[0.75rem] leading-relaxed tracking-[0.25em] uppercase">
-        Ce mystère est scellé
+        {t("locked.sealed")}
       </p>
       <p className="text-muted/50 mt-3 px-10 text-center text-[0.6rem] leading-relaxed tracking-[0.15em]">
-        Forgez une clé dans la Forge pour briser le sceau
+        {t("locked.forgeKey")}
       </p>
 
       {/* Close button */}
@@ -44,7 +46,7 @@ export function LockedModal({ onClose }: { readonly onClose: () => void }): Reac
         className="border-muted/25 text-muted/60 hover:border-muted/40 hover:text-muted mt-8 rounded-full border px-5 py-2 text-[0.6rem] tracking-[0.2em] uppercase transition-all duration-200 active:scale-95"
         style={{ background: "linear-gradient(155deg, #1a1438, #110e22)" }}
       >
-        Fermer
+        {t("locked.close")}
       </button>
     </div>,
     document.body,

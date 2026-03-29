@@ -1,6 +1,8 @@
 import { useEffect, useRef, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { Header } from "./components/Header";
 import { IntroModal } from "./components/IntroModal";
+import { LanguageSwitcher } from "./components/LanguageSwitcher";
 import { Starfield } from "./components/Starfield";
 import { Toast } from "./components/Toast";
 import { initAdmin, logoutAdmin, useAdmin } from "./features/admin/useAdmin";
@@ -88,19 +90,21 @@ function ScreenFlash(): React.JSX.Element {
 
 export default function App(): React.JSX.Element {
   useQRUnlock();
+  const { t } = useTranslation("common");
   const resetAttempt = useCooldownStore((s) => s.resetAttempt);
   const isAdmin = useAdmin();
   const [isShowingIntro, setIsShowingIntro] = useState(shouldShowIntro);
 
   return (
     <>
+      <LanguageSwitcher />
       <Starfield />
       <div className="relative z-1 mx-auto max-w-[430px] px-4 pb-12">
         <Header />
         <EnigmaGrid isAdmin={isAdmin} />
         <p className="text-muted/80 mt-6 text-center text-[0.6rem]">
-          <span className="text-danger/50 font-bold">❤</span> Imaginé et developpé{" "}
-          <span className="text-danger/50 font-bold">avec amour</span> pour Léamour - 2026{" "}
+          <span className="text-danger/50 font-bold">❤</span> {t("footer.madeWith")}{" "}
+          <span className="text-danger/50 font-bold">{t("footer.withLove")}</span> {t("footer.forLea")}{" "}
           <span className="text-danger/50 font-bold">❤</span>
         </p>
         <button
@@ -110,14 +114,14 @@ export default function App(): React.JSX.Element {
           }}
           className="text-muted/20 mt-2 mb-4 w-full cursor-default border-none bg-transparent py-2 text-[0.5rem] select-none"
         >
-          reset
+          {t("admin.reset")}
         </button>
         {isAdmin && (
           <button
             onClick={logoutAdmin}
             className="w-full cursor-pointer rounded border border-amber-400/20 bg-transparent py-1 text-[0.55rem] text-amber-400/40 transition-colors hover:border-amber-400/50 hover:text-amber-400/80"
           >
-            ⚙ quitter le mode admin
+            ⚙ {t("admin.quit")}
           </button>
         )}
       </div>

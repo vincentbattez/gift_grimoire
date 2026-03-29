@@ -1,4 +1,5 @@
 import { useRef, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { useAdmin } from "@features/admin/useAdmin";
 import { CooldownLabel } from "@features/cooldown/components/CooldownLabel";
 import { INK_CONFIG, LETTER_MAP, PROXIMITY_MAP } from "@features/forges/forge-ink/config";
@@ -11,6 +12,7 @@ import { InkVictoryModal } from "./InkVictoryModal";
 import { InkWordCard } from "./InkWordCard";
 
 export function InkRevealForge({ solved: propSolved, onSolve }: Readonly<ForgeProps>): React.JSX.Element {
+  const { t } = useTranslation("forge");
   const isAdmin = useAdmin();
   const gridRef = useRef<HTMLDivElement>(null);
   const engine = useInkGameEngine(gridRef, propSolved, onSolve);
@@ -25,7 +27,7 @@ export function InkRevealForge({ solved: propSolved, onSolve }: Readonly<ForgePr
       <InkDropIndicator dropsLeft={engine.dropsLeft} />
 
       <div className="text-muted/30 mb-4 text-center font-mono text-[0.45rem] tracking-[0.15em]">
-        <CooldownLabel lastTriggeredAt={mountedAt} prefix="Reset dans" />
+        <CooldownLabel lastTriggeredAt={mountedAt} prefix={t("ink.cooldownPrefix")} />
       </div>
 
       {engine.tapMessage && (
@@ -40,7 +42,7 @@ export function InkRevealForge({ solved: propSolved, onSolve }: Readonly<ForgePr
 
       {engine.revealedCellList.size === 0 && engine.missedCellList.size === 0 && !engine.isSolved && (
         <div className="text-muted/40 mb-3 text-center text-[0.45rem] tracking-wide italic">
-          Touche une case pour y verser de l'encre
+          {t("ink.tapInstruction")}
         </div>
       )}
 
@@ -112,7 +114,9 @@ export function InkRevealForge({ solved: propSolved, onSolve }: Readonly<ForgePr
       {/* Words */}
       {engine.activeWordList.length > 0 && (
         <div className="mt-5 flex flex-col gap-3">
-          <div className="text-muted/40 text-center text-[0.45rem] tracking-[0.25em] uppercase">— Mots à révéler —</div>
+          <div className="text-muted/40 text-center text-[0.45rem] tracking-[0.25em] uppercase">
+            {t("ink.wordsToReveal")}
+          </div>
           {engine.activeWordList.map((wordText) => {
             const state = engine.wordStates[wordText];
             const word = INK_CONFIG.wordList.find((w) => w.text === wordText);
@@ -138,7 +142,7 @@ export function InkRevealForge({ solved: propSolved, onSolve }: Readonly<ForgePr
             onClick={engine.resetAll}
             className="border-danger/30 text-danger/50 bg-danger/5 hover:border-danger/60 hover:text-danger/80 hover:bg-danger/10 rounded-md border px-3 py-1 text-[0.55rem] tracking-[0.15em] uppercase transition-all duration-150 active:scale-95"
           >
-            ↺ Reset jeu
+            ↺ {t("ink.resetGame")}
           </button>
         </div>
       )}

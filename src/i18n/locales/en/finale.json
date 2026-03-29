@@ -1,0 +1,44 @@
+{
+  "context": {
+    "title": "The Last Spell",
+    "body": "You have solved the six mysteries,\nforged the three keys,\nand read every letter that my heart\nhad hidden for you.\n\nThis grimoire was not a game.\n\nIt was my way of telling you what words alone could never have expressed...",
+    "footer": "Each riddle carried a piece of what you mean to me."
+  },
+  "stats": {
+    "title": "Your adventure",
+    "mysteriesSolved": "Mysteries solved",
+    "lettersRead": "Love letters read",
+    "keysForged": "Keys forged",
+    "disneyCharacters": "Disney characters",
+    "guardians": "The guardians of the grimoire"
+  },
+  "love": {
+    "title": "My Léamour",
+    "lines": [
+      { "text": "Every line of code in this grimoire", "pause": 1 },
+      { "text": "was written thinking of you.", "pause": 1.4 },
+      { "text": "", "pause": 0.8 },
+      { "text": "You are the reason why", "pause": 1 },
+      { "text": "I still believe in magic.", "pause": 1.2, "golden": true },
+      { "text": "The kind that exists when you rest", "pause": 1 },
+      { "text": "your head on my shoulder", "pause": 1 },
+      { "text": "and the world stops.", "pause": 1.4, "golden": true },
+      { "text": "", "pause": 0.8 },
+      { "text": "I love you beyond words,", "pause": 1.2, "golden": true },
+      { "text": "beyond riddles,", "pause": 1 },
+      { "text": "beyond everything that", "pause": 1 },
+      { "text": "this grimoire could ever contain.", "pause": 1.6 }
+    ],
+    "signature": "— Forever yours, Vincent —",
+    "withLove": "With all my love, infinitely ♡"
+  },
+  "seal": {
+    "sealed": "✦ Sealed ✦",
+    "holdToSeal": "Hold to seal"
+  },
+  "narrative": [
+    "The grimoire closes…",
+    "The mysteries return to silence…",
+    "But the magic will remain."
+  ]
+}
