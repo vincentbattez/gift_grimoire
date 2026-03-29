@@ -1,54 +1,34 @@
-import { useRef, useMemo } from "react";
+import { useMemo, useRef } from "react";
 import { toPng } from "html-to-image";
-import type { EnigmaData } from "./data";
 import { ArcaneSymbolSvg } from "./ArcaneSymbol";
+import type { EnigmaData } from "./data";
 
 /** Pseudo-random from seed — deterministic starfield per card */
 function seededRandom(seed: number) {
   let s = seed;
+
   return () => {
     s = (s * 16807 + 0) % 2147483647;
+
     return s / 2147483647;
   };
 }
 
-function CornerFiligree() {
+function CornerFiligree(): React.JSX.Element {
   return (
     <svg viewBox="0 0 60 60" fill="none">
       {/* Main scroll curve */}
-      <path
-        d="M4 56 Q4 28 16 16 Q28 4 56 4"
-        stroke="var(--gold)"
-        strokeWidth="1.2"
-      />
+      <path d="M4 56 Q4 28 16 16 Q28 4 56 4" stroke="var(--gold)" strokeWidth="1.2" />
       {/* Inner parallel scroll */}
-      <path
-        d="M8 52 Q8 30 18 20 Q28 10 52 8"
-        stroke="var(--gold)"
-        strokeWidth="0.6"
-        opacity="0.4"
-      />
+      <path d="M8 52 Q8 30 18 20 Q28 10 52 8" stroke="var(--gold)" strokeWidth="0.6" opacity="0.4" />
       {/* Spiral tendril */}
-      <path
-        d="M6 6 Q10 6 12 10 Q14 14 10 16 Q6 14 8 10"
-        stroke="var(--gold)"
-        strokeWidth="0.8"
-        opacity="0.7"
-      />
+      <path d="M6 6 Q10 6 12 10 Q14 14 10 16 Q6 14 8 10" stroke="var(--gold)" strokeWidth="0.8" opacity="0.7" />
       {/* Corner jewel */}
       <circle cx="6" cy="6" r="2.5" fill="var(--gold)" opacity="0.9" />
       <circle cx="6" cy="6" r="4" fill="none" stroke="var(--gold)" strokeWidth="0.5" opacity="0.4" />
       {/* Leaf accents */}
-      <path
-        d="M20 8 Q24 4 28 8 Q24 6 20 8Z"
-        fill="var(--gold)"
-        opacity="0.3"
-      />
-      <path
-        d="M8 20 Q4 24 8 28 Q6 24 8 20Z"
-        fill="var(--gold)"
-        opacity="0.3"
-      />
+      <path d="M20 8 Q24 4 28 8 Q24 6 20 8Z" fill="var(--gold)" opacity="0.3" />
+      <path d="M8 20 Q4 24 8 28 Q6 24 8 20Z" fill="var(--gold)" opacity="0.3" />
       {/* Tiny dot accents */}
       <circle cx="16" cy="6" r="0.8" fill="var(--gold)" opacity="0.5" />
       <circle cx="6" cy="16" r="0.8" fill="var(--gold)" opacity="0.5" />
@@ -58,7 +38,7 @@ function CornerFiligree() {
   );
 }
 
-function OrnateSeparator() {
+function OrnateSeparator(): React.JSX.Element {
   return (
     <div className="tarot-separator-ornate">
       <svg className="separator-svg" viewBox="0 0 200 16" preserveAspectRatio="none">
@@ -81,7 +61,7 @@ function OrnateSeparator() {
   );
 }
 
-function SacredGeometryRing() {
+function SacredGeometryRing(): React.JSX.Element {
   return (
     <svg className="sacred-geometry-ring" viewBox="0 0 100 100">
       {/* Outer dotted circle */}
@@ -97,18 +77,13 @@ function SacredGeometryRing() {
       <line x1="82" y1="50" x2="92" y2="50" stroke="currentColor" strokeWidth="0.4" />
       {/* Diagonal ticks */}
       {[45, 135, 225, 315].map((angle) => {
-        const rad = (angle * Math.PI) / 180;
-        const x1 = 50 + 38 * Math.cos(rad);
-        const y1 = 50 + 38 * Math.sin(rad);
-        const x2 = 50 + 44 * Math.cos(rad);
-        const y2 = 50 + 44 * Math.sin(rad);
-        return (
-          <line
-            key={angle}
-            x1={x1} y1={y1} x2={x2} y2={y2}
-            stroke="currentColor" strokeWidth="0.3"
-          />
-        );
+        const angleRadians = (angle * Math.PI) / 180;
+        const x1 = 50 + 38 * Math.cos(angleRadians);
+        const y1 = 50 + 38 * Math.sin(angleRadians);
+        const x2 = 50 + 44 * Math.cos(angleRadians);
+        const y2 = 50 + 44 * Math.sin(angleRadians);
+
+        return <line key={angle} x1={x1} y1={y1} x2={x2} y2={y2} stroke="currentColor" strokeWidth="0.3" />;
       })}
       {/* Cardinal jewels */}
       <circle cx="50" cy="10" r="1.5" fill="currentColor" opacity="0.5" />
@@ -119,7 +94,7 @@ function SacredGeometryRing() {
   );
 }
 
-function CartoucheFrame() {
+function CartoucheFrame(): React.JSX.Element {
   return (
     <div className="cartouche-frame">
       <svg className="cartouche-frame-svg" viewBox="0 0 200 300" preserveAspectRatio="none">
@@ -141,7 +116,7 @@ function CartoucheFrame() {
   );
 }
 
-function BottomMedallion({ numeral }: { numeral: string }) {
+function BottomMedallion({ numeral }: Readonly<{ numeral: string }>): React.JSX.Element {
   return (
     <div className="tarot-bottom-medallion">
       <svg className="bottom-wing" viewBox="0 0 30 12">
@@ -159,21 +134,27 @@ function BottomMedallion({ numeral }: { numeral: string }) {
   );
 }
 
-function SideRail({ side }: { side: "left" | "right" }) {
+function SideRail({ side }: Readonly<{ side: "left" | "right" }>): React.JSX.Element {
   return (
     <svg className={`side-rail side-rail-${side}`} viewBox="0 0 6 100" preserveAspectRatio="none">
       <line x1="3" y1="0" x2="3" y2="100" stroke="currentColor" strokeWidth="0.3" />
-      {/* Repeating diamond pattern */}
+      {/* Repeating diamond patternList */}
       {[10, 25, 40, 55, 70, 85].map((y) => (
-        <polygon key={y} points={`3,${y - 2} 5,${y} 3,${y + 2} 1,${y}`} fill="currentColor" opacity="0.6" />
+        <polygon
+          key={y}
+          points={`3,${String(y - 2)} 5,${String(y)} 3,${String(y + 2)} 1,${String(y)}`}
+          fill="currentColor"
+          opacity="0.6"
+        />
       ))}
     </svg>
   );
 }
 
-function Starfield({ seed }: { seed: number }) {
-  const stars = useMemo(() => {
+function Starfield({ seed }: Readonly<{ seed: number }>): React.JSX.Element {
+  const starList = useMemo(() => {
     const rng = seededRandom(seed);
+
     return Array.from({ length: 30 }, () => ({
       cx: rng() * 100,
       cy: rng() * 100,
@@ -184,22 +165,22 @@ function Starfield({ seed }: { seed: number }) {
 
   return (
     <svg className="tarot-starfield" viewBox="0 0 100 100" preserveAspectRatio="none">
-      {stars.map((s, i) => (
+      {starList.map((s, i) => (
         <circle key={i} cx={s.cx} cy={s.cy} r={s.r} fill="var(--gold)" opacity={s.opacity} />
       ))}
     </svg>
   );
 }
 
-async function downloadCard(el: HTMLElement, enigma: EnigmaData) {
-  const dataUrl = await toPng(el, { pixelRatio: 3 });
+async function downloadCard(cardElement: HTMLElement, enigma: EnigmaData): Promise<void> {
+  const dataUrl = await toPng(cardElement, { pixelRatio: 3 });
   const link = document.createElement("a");
-  link.download = `carte-${enigma.number}-${enigma.title.replaceAll(/[^a-zA-ZÀ-ÿ0-9]/g, "_")}.png`;
+  link.download = `carte-${enigma.number}-${enigma.title.replaceAll(/[^\dA-Za-zÀ-ÿ]/g, "_")}.png`;
   link.href = dataUrl;
   link.click();
 }
 
-export function EnigmaSheet({ enigma, index }: { enigma: EnigmaData; index: number }) {
+export function EnigmaSheet({ enigma, index }: Readonly<{ enigma: EnigmaData; index: number }>): React.JSX.Element {
   const cardRef = useRef<HTMLDivElement>(null);
 
   return (
@@ -212,10 +193,18 @@ export function EnigmaSheet({ enigma, index }: { enigma: EnigmaData; index: numb
         <Starfield seed={index * 7 + 42} />
 
         {/* Corner filigrees */}
-        <div className="corner-flourish corner-fl-tl"><CornerFiligree /></div>
-        <div className="corner-flourish corner-fl-tr"><CornerFiligree /></div>
-        <div className="corner-flourish corner-fl-bl"><CornerFiligree /></div>
-        <div className="corner-flourish corner-fl-br"><CornerFiligree /></div>
+        <div className="corner-flourish corner-fl-tl">
+          <CornerFiligree />
+        </div>
+        <div className="corner-flourish corner-fl-tr">
+          <CornerFiligree />
+        </div>
+        <div className="corner-flourish corner-fl-bl">
+          <CornerFiligree />
+        </div>
+        <div className="corner-flourish corner-fl-br">
+          <CornerFiligree />
+        </div>
 
         {/* Mid-frame accent dots */}
         <div className="frame-dot frame-dot-top" />
@@ -266,7 +255,11 @@ export function EnigmaSheet({ enigma, index }: { enigma: EnigmaData; index: numb
       </div>
       <button
         className="card-download-btn"
-        onClick={() => cardRef.current && downloadCard(cardRef.current, enigma)}
+        onClick={() => {
+          if (cardRef.current) {
+            void downloadCard(cardRef.current, enigma);
+          }
+        }}
       >
         PNG
       </button>

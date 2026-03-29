@@ -35,12 +35,13 @@ export const useCooldownStore = create<CooldownStore>()(
 
 /** Returns true if an attempt was already used today */
 export function isAttemptUsedToday(lastAttempt: number | null): boolean {
-  if (!lastAttempt) return false;
+  if (!lastAttempt) {
+    return false;
+  }
   const now = new Date();
   const last = new Date(lastAttempt);
+
   return (
-    now.getFullYear() === last.getFullYear() &&
-    now.getMonth() === last.getMonth() &&
-    now.getDate() === last.getDate()
+    now.getFullYear() === last.getFullYear() && now.getMonth() === last.getMonth() && now.getDate() === last.getDate()
   );
 }

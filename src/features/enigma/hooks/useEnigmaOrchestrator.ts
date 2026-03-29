@@ -1,7 +1,7 @@
 import { useCallback } from "react";
-import { useEnigmaStore } from "../store";
-import { useCooldownStore } from "../../cooldown/store";
-import type { EnigmaLifecycleEvents } from "../types";
+import { useCooldownStore } from "@features/cooldown/store";
+import { useEnigmaStore } from "@features/enigma/store";
+import type { EnigmaLifecycleEvents } from "@features/enigma/types";
 
 /**
  * Hook orchestrateur parent pour les énigmes.
@@ -18,12 +18,9 @@ export function useEnigmaOrchestrator(): EnigmaLifecycleEvents {
   const celebrate = useEnigmaStore((s) => s.celebrate);
   const closeModal = useEnigmaStore((s) => s.closeModal);
 
-  const onTry = useCallback(
-    () => {
-      recordAttempt();
-    },
-    [recordAttempt],
-  );
+  const onTry = useCallback(() => {
+    recordAttempt();
+  }, [recordAttempt]);
 
   const onSuccess = useCallback(
     (enigmaId: string) => {

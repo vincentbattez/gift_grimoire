@@ -1,69 +1,84 @@
 import { useEffect, useRef, useState } from "react";
-import { useEnigmaStore } from "./features/enigma/store";
-import { useCooldownStore } from "./features/cooldown/store";
-import { ENIGMAS } from "./features/enigma/config";
-import { Starfield } from "./components/Starfield";
 import { Header } from "./components/Header";
+import { IntroModal } from "./components/IntroModal";
+import { Starfield } from "./components/Starfield";
+import { Toast } from "./components/Toast";
+import { initAdmin, logoutAdmin, useAdmin } from "./features/admin/useAdmin";
+import { CooldownBadge } from "./features/cooldown/components/CooldownBadge";
+import { useCooldownStore } from "./features/cooldown/store";
 import { EnigmaGrid } from "./features/enigma/components/EnigmaGrid";
 import { EnigmaModal } from "./features/enigma/components/EnigmaModal";
-import { Toast } from "./components/Toast";
-import { UnlockOverlay } from "./features/enigma/components/UnlockOverlay";
-import { SuccessModal } from "./features/enigma/components/SuccessModal";
 import { LoveLetterModal } from "./features/enigma/components/LoveLetterModal";
-import { FinaleModal } from "./features/finale/components/FinaleModal";
-import { IntroModal } from "./components/IntroModal";
-import { CooldownBadge } from "./features/cooldown/components/CooldownBadge";
+import { SuccessModal } from "./features/enigma/components/SuccessModal";
+import { UnlockOverlay } from "./features/enigma/components/UnlockOverlay";
+import { ENIGMA_LIST } from "./features/enigma/config";
+import { useEnigmaStore } from "./features/enigma/store";
 import { triggerUnlockEffect } from "./features/enigma/unlock";
-import { initAdmin, logoutAdmin, useAdmin } from "./features/admin/useAdmin";
-import { fireEvent } from "./ha";
+import { FinaleModal } from "./features/finale/components/FinaleModal";
 import { useMagnetStore } from "./features/forges/forge-magnet/store";
+import { fireEvent } from "./ha";
 
 initAdmin();
 
 let shouldShowIntro = false;
 
-function initGrimoireInit() {
+function initGrimoireInit(): void {
   const params = new URLSearchParams(location.search);
-  if (params.get("init") !== "true") return;
+
+  if (params.get("init") !== "true") {
+    return;
+  }
   params.delete("init");
   const qs = params.toString();
   history.replaceState({}, "", location.pathname + (qs ? `?${qs}` : ""));
-  fireEvent("gift_grimoire-init");
+  void fireEvent("gift_grimoire-init");
   shouldShowIntro = true;
 }
 
 initGrimoireInit();
 
-function useQRUnlock() {
+function useQRUnlock(): void {
   useEffect(() => {
     const params = new URLSearchParams(location.search);
     const raw = params.get("unlock");
-    if (!raw) return;
-    const enigma = ENIGMAS.find((e) => String(e.id) === raw);
+
+    if (!raw) {
+      return;
+    }
+    const enigma = ENIGMA_LIST.find((e) => e.id === raw);
+
     if (enigma) {
       history.replaceState({}, "", location.pathname);
-      setTimeout(() => triggerUnlockEffect(enigma.id, enigma.title), 700);
+
+      setTimeout(() => {
+        triggerUnlockEffect(enigma.id, enigma.title);
+      }, 700);
     }
   }, []);
 }
 
-function ScreenFlash() {
+function ScreenFlash(): React.JSX.Element {
   const celebrateCardId = useEnigmaStore((s) => s.celebrateCardId);
-  const ref = useRef<HTMLDivElement>(null);
+  const screenFlashRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    if (!celebrateCardId) return;
-    const el = ref.current;
-    if (!el) return;
-    el.style.animation = "none";
-    void el.offsetHeight; // force reflow
-    el.style.animation = "screen-flash 0.5s ease-out forwards";
+    if (!celebrateCardId) {
+      return;
+    }
+    const element = screenFlashRef.current;
+
+    if (!element) {
+      return;
+    }
+    element.style.animation = "none";
+    void element.offsetHeight; // force reflow
+    element.style.animation = "screen-flash 0.5s ease-out forwards";
   }, [celebrateCardId]);
 
   return (
     <div
-      ref={ref}
-      className="fixed inset-0 z-[90] pointer-events-none opacity-0"
+      ref={screenFlashRef}
+      className="pointer-events-none fixed inset-0 z-[90] opacity-0"
       style={{
         background: "radial-gradient(circle at 50% 50%, #e8c96a40, #4ecca320, transparent 70%)",
       }}
@@ -71,31 +86,36 @@ function ScreenFlash() {
   );
 }
 
-export default function App() {
+export default function App(): React.JSX.Element {
   useQRUnlock();
   const resetAttempt = useCooldownStore((s) => s.resetAttempt);
   const isAdmin = useAdmin();
-  const [showIntro, setShowIntro] = useState(shouldShowIntro);
+  const [isShowingIntro, setIsShowingIntro] = useState(shouldShowIntro);
 
   return (
     <>
       <Starfield />
-      <div className="relative z-1 max-w-[430px] mx-auto px-4 pb-12">
+      <div className="relative z-1 mx-auto max-w-[430px] px-4 pb-12">
         <Header />
         <EnigmaGrid isAdmin={isAdmin} />
-        <p className="mt-6 text-center text-[0.6rem] text-muted/80">
-          <span className="text-danger/50 font-bold">❤</span> Imaginé et developpé <span className="text-danger/50 font-bold">avec amour</span> pour Léamour - 2026 <span className="text-danger/50 font-bold">❤</span>
+        <p className="text-muted/80 mt-6 text-center text-[0.6rem]">
+          <span className="text-danger/50 font-bold">❤</span> Imaginé et developpé{" "}
+          <span className="text-danger/50 font-bold">avec amour</span> pour Léamour - 2026{" "}
+          <span className="text-danger/50 font-bold">❤</span>
         </p>
         <button
-          onClick={() => { resetAttempt(); useMagnetStore.getState().reset(); }}
-          className="w-full mt-2 mb-4 py-2 text-[0.5rem] text-muted/20 bg-transparent border-none cursor-default select-none"
+          onClick={() => {
+            resetAttempt();
+            useMagnetStore.getState().reset();
+          }}
+          className="text-muted/20 mt-2 mb-4 w-full cursor-default border-none bg-transparent py-2 text-[0.5rem] select-none"
         >
           reset
         </button>
         {isAdmin && (
           <button
             onClick={logoutAdmin}
-            className="w-full py-1 text-[0.55rem] text-amber-400/40 hover:text-amber-400/80 bg-transparent border border-amber-400/20 hover:border-amber-400/50 rounded transition-colors cursor-pointer"
+            className="w-full cursor-pointer rounded border border-amber-400/20 bg-transparent py-1 text-[0.55rem] text-amber-400/40 transition-colors hover:border-amber-400/50 hover:text-amber-400/80"
           >
             ⚙ quitter le mode admin
           </button>
@@ -109,7 +129,13 @@ export default function App() {
       <SuccessModal />
       <LoveLetterModal />
       <FinaleModal />
-      {showIntro && <IntroModal onClose={() => setShowIntro(false)} />}
+      {isShowingIntro && (
+        <IntroModal
+          onClose={() => {
+            setIsShowingIntro(false);
+          }}
+        />
+      )}
     </>
   );
 }

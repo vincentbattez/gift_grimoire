@@ -1,15 +1,15 @@
 import type { Ref } from "react";
 
-interface LockIconProps {
+type LockIconProps = {
   /** Unique prefix for SVG defs IDs (avoids clashes when multiple instances exist) */
   readonly id?: string;
   /** SVG pixel width — default 36 */
   readonly width?: number;
   /** SVG pixel height — default 43 */
   readonly height?: number;
-  /** Show orbiting rune particles — default true */
+  /** Show orbiting rune particleList — default true */
   readonly orbit?: boolean;
-  /** Allow burst/glow to render outside SVG bounds */
+  /** Allow burst/glow to render outside SVG bounds — default false */
   readonly overflow?: boolean;
   /** Ref on the SVG element */
   readonly svgRef?: Ref<SVGSVGElement>;
@@ -20,8 +20,9 @@ interface LockIconProps {
     phase: "drag" | "unlocking" | "done";
     proximity: number;
   };
-}
+};
 
+/* eslint-disable @typescript-eslint/no-useless-default-assignment -- defaults required for optional props */
 export function LockIcon({
   id = "lock",
   width = 36,
@@ -31,10 +32,18 @@ export function LockIcon({
   svgRef,
   keyholeRef,
   unlock,
-}: LockIconProps) {
+}: LockIconProps): React.JSX.Element {
+  /* eslint-enable @typescript-eslint/no-useless-default-assignment */
   const isUnlocking = unlock?.phase === "unlocking";
   const isDone = unlock?.phase === "done";
   const proximity = unlock?.proximity ?? 0;
+
+  const openingClass = isUnlocking || isDone ? "is-opening" : "";
+  const shackleClass = unlock ? `unlock-shackle ${openingClass}` : "lock-shackle";
+
+  const reactingClass = isUnlocking ? "is-reacting" : "";
+  const dissolvingClass = isDone ? "is-dissolving" : "";
+  const bodyClass = unlock ? `unlock-body ${reactingClass} ${dissolvingClass}` : undefined;
 
   return (
     <div className="lock-icon-wrapper">
@@ -81,7 +90,7 @@ export function LockIcon({
 
         {/* Shackle */}
         <path
-          className={unlock ? `unlock-shackle ${isUnlocking || isDone ? "is-opening" : ""}` : "lock-shackle"}
+          className={shackleClass}
           d="M11 20 V14 A9 9 0 0 1 29 14 V20"
           stroke="#5a4f6a"
           strokeWidth="3"
@@ -91,7 +100,7 @@ export function LockIcon({
 
         {/* Body */}
         <rect
-          className={unlock ? `unlock-body ${isUnlocking ? "is-reacting" : ""} ${isDone ? "is-dissolving" : ""}` : undefined}
+          className={bodyClass}
           x="5"
           y="20"
           width="30"

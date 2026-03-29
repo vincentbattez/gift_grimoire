@@ -1,11 +1,11 @@
-import { getCtx } from "../../../../audio";
+import { getAudioContext } from "@/audio";
 
 /** Deep listening drone — 10s meditative ambience, returns stop function */
 export function sndDeepListen(): () => void {
-  const c = getCtx();
+  const c = getAudioContext();
   const t = c.currentTime;
   const DUR = 10;
-  const allNodes: { o: OscillatorNode; g: GainNode }[] = [];
+  const allNodeList: { o: OscillatorNode; g: GainNode }[] = [];
 
   // Warm sub-bass with slow breathing LFO (~0.15 Hz)
   const sub = c.createOscillator();
@@ -29,7 +29,7 @@ export function sndDeepListen(): () => void {
   sub.stop(t + DUR);
   breathLfo.start(t);
   breathLfo.stop(t + DUR);
-  allNodes.push({ o: sub, g: subG });
+  allNodeList.push({ o: sub, g: subG });
 
   // Binaural-like beating — two close frequencies creating a slow 3Hz pulse
   for (const freq of [200, 203]) {
@@ -45,7 +45,7 @@ export function sndDeepListen(): () => void {
     g.gain.linearRampToValueAtTime(0.0001, t + DUR);
     o.start(t);
     o.stop(t + DUR);
-    allNodes.push({ o, g });
+    allNodeList.push({ o, g });
   }
 
   // Ethereal high harmonic — slowly drifting pitch
@@ -63,7 +63,7 @@ export function sndDeepListen(): () => void {
   hiG.gain.linearRampToValueAtTime(0.0001, t + DUR);
   hi.start(t);
   hi.stop(t + DUR);
-  allNodes.push({ o: hi, g: hiG });
+  allNodeList.push({ o: hi, g: hiG });
 
   // Soft periodic pings — 5 very subtle sonar-like tones spread across 10s
   for (let i = 0; i < 5; i++) {
@@ -80,17 +80,22 @@ export function sndDeepListen(): () => void {
     g.gain.exponentialRampToValueAtTime(0.0001, pt + 0.8);
     o.start(pt);
     o.stop(pt + 0.85);
-    allNodes.push({ o, g });
+    allNodeList.push({ o, g });
   }
 
   return () => {
     const now = c.currentTime;
-    for (const { o, g } of allNodes) {
+    for (const { o, g } of allNodeList) {
       g.gain.cancelScheduledValues(now);
       g.gain.setValueAtTime(g.gain.value, now);
       g.gain.exponentialRampToValueAtTime(0.0001, now + 0.4);
       o.stop(now + 0.45);
     }
-    try { breathLfo.stop(now + 0.45); } catch { /* AudioNode déjà arrêté */ }
+
+    try {
+      breathLfo.stop(now + 0.45);
+    } catch {
+      /* AudioNode déjà arrêté */
+    }
   };
 }

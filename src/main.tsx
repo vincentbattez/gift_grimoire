@@ -9,7 +9,14 @@ import { ChasseTresor } from "./chasse_tresor/ChasseTresor.tsx";
 // eslint-disable-next-line react-refresh/only-export-components
 const Root = location.pathname === "/tresor" ? ChasseTresor : App;
 
-createRoot(document.getElementById("root")!).render(
+const rootEl = document.querySelector("#root");
+
+if (!rootEl) {
+  // eslint-disable-next-line @typescript-eslint/only-throw-error -- Error object is thrown
+  throw new Error("Root element #root not found");
+}
+
+createRoot(rootEl).render(
   <StrictMode>
     <Root />
   </StrictMode>,

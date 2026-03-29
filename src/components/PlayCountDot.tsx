@@ -7,9 +7,11 @@ type Props = {
   inactiveClass?: string;
   /** Color when section is solved (overrides active) */
   solvedClass?: string;
+  /** Whether the section is solved — default false */
   solved?: boolean;
 };
 
+/* eslint-disable @typescript-eslint/no-useless-default-assignment -- defaults required for optional props */
 export function PlayCountDot({
   total,
   remaining,
@@ -17,16 +19,24 @@ export function PlayCountDot({
   inactiveClass = "bg-white/8",
   solvedClass = "bg-success/50",
   solved = false,
-}: Props) {
+}: Readonly<Props>): React.JSX.Element {
+  /* eslint-enable @typescript-eslint/no-useless-default-assignment */
+  const getDotClass = (i: number): string => {
+    if (solved) {
+      return solvedClass;
+    }
+
+    if (i < remaining) {
+      return activeClass;
+    }
+
+    return inactiveClass;
+  };
+
   return (
     <div className="relative flex gap-1.5">
       {Array.from({ length: total }, (_, i) => (
-        <span
-          key={i}
-          className={`w-1.5 h-1.5 rounded-full transition-colors duration-300 ${
-            solved ? solvedClass : i < remaining ? activeClass : inactiveClass
-          }`}
-        />
+        <span key={i} className={`h-1.5 w-1.5 rounded-full transition-colors duration-300 ${getDotClass(i)}`} />
       ))}
     </div>
   );

@@ -1,5 +1,24 @@
 # AGENTS.md
 
+## Naming conventions
+
+Every identifier must be **self-documenting** — no abbreviations, no single-letter names.
+
+### Rules
+
+- **No abbreviations.** Write the full word even if it's long. `event` not `evt`, `error` not `err` etc.
+- **No single-letter variables.**
+- **Descriptive over generic.** Prefer `cardBounds` over `rect`. The name should tell you *what it represents*, not just its type.
+- **Booleans** must use a prefix: `is`, `has`, `should`, `can`, `did`, `will`, `must`.
+- **Arrays** must contain `List` (camelCase) or `_LIST` (UPPER_CASE) in the name.
+- **Interfaces** must use prefix `I` (e.g. `IUserConfig`).
+- **Enums** must use suffix `Enum` (e.g. `StatusEnum`), members in `UPPER_CASE`.
+- **Imports** must use path aliases (`@/`, `@features/`, `@components/`), never `../`.
+
+### Applies to
+
+All variables, parameters, function names, type properties, and constants across the entire codebase.
+
 ## Commands
 
 - Package manager: `yarn` (not npm/pnpm)

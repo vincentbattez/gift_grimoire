@@ -1,47 +1,47 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
-import { ENIGMAS } from "./config";
+import { ENIGMA_LIST } from "./config";
 import { MODAL_CLOSE_MS } from "./timings";
 import type { EnigmaPersistedStatus } from "./types";
 
-type EnigmaId = string;
 type EnigmaState = { unlocked: boolean; solved: boolean };
 
 type EnigmaStore = {
-  enigmas: Record<EnigmaId, EnigmaState>;
-  readLetters: Record<EnigmaId, boolean>;
+  enigmas: Record<string, EnigmaState>;
+  readLetters: Record<string, boolean>;
 
   // UI éphémère
-  newlyUnlocked: Set<EnigmaId>;
-  modalEnigmaId: EnigmaId | null;
-  modalClosingId: EnigmaId | null;
-  celebrateCardId: EnigmaId | null;
-  unlockingCardId: EnigmaId | null;
+  newlyUnlocked: Set<string>;
+  modalEnigmaId: string | null;
+  modalClosingId: string | null;
+  celebrateCardId: string | null;
+  unlockingCardId: string | null;
   unlockingTitle: string | null;
   successBoxNumber: number | null;
   successHaEvent: string | null;
-  successEnigmaId: EnigmaId | null;
-  loveLetterEnigmaId: EnigmaId | null;
+  successEnigmaId: string | null;
+  loveLetterEnigmaId: string | null;
 
-  unlock: (id: EnigmaId) => void;
-  solve: (id: EnigmaId) => void;
-  relock: (id: EnigmaId) => void;
-  setEnigmaStatus: (id: EnigmaId, status: EnigmaPersistedStatus) => void;
-  acknowledgeUnlock: (id: EnigmaId) => void;
-  openModal: (id: EnigmaId) => void;
+  unlock: (id: string) => void;
+  solve: (id: string) => void;
+  relock: (id: string) => void;
+  setEnigmaStatus: (id: string, status: EnigmaPersistedStatus) => void;
+  acknowledgeUnlock: (id: string) => void;
+  openModal: (id: string) => void;
   closeModal: () => void;
-  celebrate: (id: EnigmaId) => void;
+  celebrate: (id: string) => void;
   clearCelebrate: () => void;
-  startUnlocking: (id: EnigmaId, title: string) => void;
+  startUnlocking: (id: string, title: string) => void;
   clearUnlocking: () => void;
-  showSuccessBox: (boxNumber: number, haEvent: string, enigmaId: EnigmaId) => void;
+  showSuccessBox: (boxNumber: number, haEvent: string, enigmaId: string) => void;
   hideSuccessBox: () => void;
-  openLoveLetter: (id: EnigmaId) => void;
+  openLoveLetter: (id: string) => void;
   closeLoveLetter: () => void;
 };
 
-const initialEnigmas: Record<EnigmaId, EnigmaState> = {};
-ENIGMAS.forEach((e) => {
+const initialEnigmas: Record<string, EnigmaState> = {};
+
+ENIGMA_LIST.forEach((e) => {
   initialEnigmas[e.id] = { unlocked: false, solved: false };
 });
 
@@ -62,10 +62,14 @@ export const useEnigmaStore = create<EnigmaStore>()(
       loveLetterEnigmaId: null,
 
       unlock: (id) =>
+        // eslint-disable-next-line sonarjs/function-return-type -- returns full state or partial update
         set((s) => {
-          if (s.enigmas[id]?.unlocked || s.enigmas[id]?.solved) return s;
+          if (s.enigmas[id].unlocked || s.enigmas[id].solved) {
+            return s;
+          }
           const next = new Set(s.newlyUnlocked);
           next.add(id);
+
           return {
             enigmas: { ...s.enigmas, [id]: { ...s.enigmas[id], unlocked: true } },
             newlyUnlocked: next,
@@ -81,6 +85,7 @@ export const useEnigmaStore = create<EnigmaStore>()(
         set((s) => {
           const next = new Set(s.newlyUnlocked);
           next.delete(id);
+
           return {
             enigmas: { ...s.enigmas, [id]: { unlocked: false, solved: false } },
             newlyUnlocked: next,
@@ -88,27 +93,35 @@ export const useEnigmaStore = create<EnigmaStore>()(
         }),
 
       setEnigmaStatus: (id, status) =>
+        // eslint-disable-next-line sonarjs/function-return-type -- switch returns different partial states
         set((s) => {
           switch (status) {
-            case "locked":
+            case "locked": {
               return {
                 enigmas: { ...s.enigmas, [id]: { unlocked: false, solved: false } },
                 readLetters: { ...s.readLetters, [id]: false },
               };
-            case "unlocked":
+            }
+            case "unlocked": {
               return {
                 enigmas: { ...s.enigmas, [id]: { unlocked: true, solved: false } },
                 readLetters: { ...s.readLetters, [id]: false },
               };
-            case "solved":
+            }
+            case "solved": {
               return {
                 enigmas: { ...s.enigmas, [id]: { unlocked: true, solved: true } },
               };
-            case "completed":
+            }
+            case "completed": {
               return {
                 enigmas: { ...s.enigmas, [id]: { unlocked: true, solved: true } },
                 readLetters: { ...s.readLetters, [id]: true },
               };
+            }
+            default: {
+              return status satisfies never;
+            }
           }
         }),
 
@@ -116,6 +129,7 @@ export const useEnigmaStore = create<EnigmaStore>()(
         set((s) => {
           const next = new Set(s.newlyUnlocked);
           next.delete(id);
+
           return { newlyUnlocked: next };
         }),
 
@@ -135,6 +149,7 @@ export const useEnigmaStore = create<EnigmaStore>()(
         set({ successBoxNumber: boxNumber, successHaEvent: haEvent, successEnigmaId: enigmaId }),
       hideSuccessBox: () => {
         const enigmaId = get().successEnigmaId;
+
         if (enigmaId) {
           set((s) => ({
             successBoxNumber: null,
@@ -151,12 +166,14 @@ export const useEnigmaStore = create<EnigmaStore>()(
       closeLoveLetter: () => {
         const id = get().loveLetterEnigmaId;
         const closingModalId = get().modalEnigmaId;
+
         set((s) => ({
           loveLetterEnigmaId: null,
           modalEnigmaId: null,
           ...(closingModalId ? { modalClosingId: closingModalId } : {}),
           ...(id ? { readLetters: { ...s.readLetters, [id]: true } } : {}),
         }));
+
         if (closingModalId) {
           setTimeout(() => set({ modalClosingId: null }), MODAL_CLOSE_MS);
         }

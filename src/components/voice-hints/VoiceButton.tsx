@@ -1,34 +1,36 @@
 import { useState } from "react";
-import { useCooldownStore } from "../../features/cooldown/store";
-import { useForgeStore } from "../../features/forges/store";
-import { useEnigmaStore } from "../../features/enigma/store";
-import { WaveformIcon } from "./WaveformIcon";
+import { AudioWarningModal } from "@components/AudioWarningModal";
+import { LastAttemptModal } from "@components/LastAttemptModal";
+import { PlayCountDot } from "@components/PlayCountDot";
+import { CornerOrnaments } from "@components/ui/CornerOrnaments";
+import { useCooldownStore } from "@features/cooldown/store";
+import { useEnigmaStore } from "@features/enigma/store";
+import { useForgeStore } from "@features/forges/store";
 import { MAX_PLAYS, type VoiceHint } from "./constants";
-import { PlayCountDot } from "../PlayCountDot";
-import { AudioWarningModal } from "../AudioWarningModal";
-import { LastAttemptModal } from "../LastAttemptModal";
-import { CornerOrnaments } from "../ui/CornerOrnaments";
+import { WaveformIcon } from "./WaveformIcon";
 
-export function VoiceButton({ hint }: { hint: VoiceHint }) {
+export function VoiceButton({ hint }: Readonly<{ hint: VoiceHint }>): React.JSX.Element {
   const count = useCooldownStore((s) => s.audioPlayCounts[hint.key] ?? 0);
   const incrementAudioPlay = useCooldownStore((s) => s.incrementAudioPlay);
-  const audioWarningAcknowledged = useForgeStore((s) => s.audioWarningAcknowledged);
-  const anyUnlocked = useEnigmaStore((s) =>
-    Object.values(s.enigmas).some((e) => e.unlocked || e.solved),
-  );
+  const hasAudioWarningAcknowledged = useForgeStore((s) => s.audioWarningAcknowledged);
+  const hasAnyUnlocked = useEnigmaStore((s) => Object.values(s.enigmas).some((e) => e.unlocked || e.solved));
 
   const remaining = MAX_PLAYS - count;
   const isLastAttempt = remaining === 1;
-  const success = anyUnlocked;
-  const exhausted = remaining <= 0;
+  const isSuccess = hasAnyUnlocked;
+  const isExhausted = remaining <= 0;
   const [isPlaying, setIsPlaying] = useState(false);
-  const [showWarning, setShowWarning] = useState(false);
-  const [showLastAttempt, setShowLastAttempt] = useState(false);
+  const [isShowingWarning, setIsShowingWarning] = useState(false);
+  const [isShowingLastAttempt, setIsShowingLastAttempt] = useState(false);
 
-  async function playAudio() {
+  async function playAudio(): Promise<void> {
     const audio = new Audio(hint.src);
     setIsPlaying(true);
-    audio.addEventListener("ended", () => setIsPlaying(false));
+
+    audio.addEventListener("ended", () => {
+      setIsPlaying(false);
+    });
+
     try {
       await audio.play();
       incrementAudioPlay(hint.key);
@@ -37,72 +39,89 @@ export function VoiceButton({ hint }: { hint: VoiceHint }) {
     }
   }
 
-  function confirmAndPlay() {
+  function confirmAndPlay(): void {
     if (isLastAttempt) {
-      setShowLastAttempt(true);
+      setIsShowingLastAttempt(true);
+
       return;
     }
-    playAudio();
+    void playAudio();
   }
 
-  function handlePlay() {
-    if (exhausted || isPlaying) return;
-    if (!audioWarningAcknowledged) {
-      setShowWarning(true);
+  function handlePlay(): void {
+    if (isExhausted || isPlaying) {
+      return;
+    }
+
+    if (!hasAudioWarningAcknowledged) {
+      setIsShowingWarning(true);
+
       return;
     }
     confirmAndPlay();
   }
 
   // ── visual states ──
-  const accentColor = success ? "var(--color-success)" : "var(--color-accent)";
+  const accentColor = isSuccess ? "var(--color-success)" : "var(--color-accent)";
 
-  const borderClass = success
-    ? "border-solved-border/50 shadow-[0_0_22px_#4ecca325]"
-    : isPlaying
-      ? "border-accent/50 shadow-[0_0_20px_#9b6dff25]"
-      : exhausted
-        ? "border-white/5 opacity-30 cursor-not-allowed"
-        : "border-unlocked-border/25 hover:border-unlocked-border/50 active:scale-[0.96]";
+  const borderClass = (() => {
+    if (isSuccess) {
+      return "border-solved-border/50 shadow-[0_0_22px_#4ecca325]";
+    }
 
-  const labelClass = success
-    ? "text-success"
-    : exhausted
-      ? "text-muted/30"
-      : "text-accent/80";
+    if (isPlaying) {
+      return "border-accent/50 shadow-[0_0_20px_#9b6dff25]";
+    }
 
-  const cornerBorder = success
-    ? "border-solved-border/50"
-    : "border-unlocked-border";
+    if (isExhausted) {
+      return "border-white/5 opacity-30 cursor-not-allowed";
+    }
+
+    return "border-unlocked-border/25 hover:border-unlocked-border/50 active:scale-[0.96]";
+  })();
+
+  const labelClass = (() => {
+    if (isSuccess) {
+      return "text-success";
+    }
+
+    if (isExhausted) {
+      return "text-muted/30";
+    }
+
+    return "text-accent/80";
+  })();
+
+  const cornerBorder = isSuccess ? "border-solved-border/50" : "border-unlocked-border";
 
   return (
     <>
       <button
         onClick={handlePlay}
-        disabled={exhausted}
-        className={`flex-1 relative overflow-hidden flex flex-col items-center gap-2 py-3.5 px-3 rounded-[14px] border-[1.5px] transition-all duration-300 select-none cursor-pointer ${borderClass}`}
+        disabled={isExhausted}
+        className={`relative flex flex-1 cursor-pointer flex-col items-center gap-2 overflow-hidden rounded-[14px] border-[1.5px] px-3 py-3.5 transition-all duration-300 select-none ${borderClass}`}
         style={{
-          background: success
+          background: isSuccess
             ? "linear-gradient(155deg, #0a1f1a, #080f0c)"
             : "linear-gradient(155deg, #130f26, #0b0917)",
         }}
       >
         {/* radial glow */}
         <div
-          className="absolute inset-0 pointer-events-none"
+          className="pointer-events-none absolute inset-0"
           style={{
-            background: success
+            background: isSuccess
               ? "radial-gradient(ellipse at 50% 50%, #4ecca318, transparent 65%)"
               : "radial-gradient(ellipse at 50% 10%, #3a2a5a18, transparent 60%)",
           }}
         />
 
         {/* corner decorations */}
-        {!exhausted && <CornerOrnaments color={cornerBorder} />}
+        {!isExhausted && <CornerOrnaments color={cornerBorder} />}
 
         {/* success badge */}
-        {success && (
-          <div className="absolute top-1.5 right-1.5 w-4 h-4 rounded-full bg-success flex items-center justify-center text-[0.5rem] shadow-[0_0_8px_var(--color-success)]">
+        {isSuccess && (
+          <div className="bg-success absolute top-1.5 right-1.5 flex h-4 w-4 items-center justify-center rounded-full text-[0.5rem] shadow-[0_0_8px_var(--color-success)]">
             ✓
           </div>
         )}
@@ -116,11 +135,23 @@ export function VoiceButton({ hint }: { hint: VoiceHint }) {
         </span>
 
         {/* play-count dots */}
-        <PlayCountDot total={MAX_PLAYS} remaining={remaining} solved={success} />
+        <PlayCountDot total={MAX_PLAYS} remaining={remaining} solved={isSuccess} />
       </button>
 
-      <AudioWarningModal isOpen={showWarning} onConfirm={() => { setShowWarning(false); confirmAndPlay(); }} />
-      <LastAttemptModal isOpen={showLastAttempt} onConfirm={() => { setShowLastAttempt(false); playAudio(); }} />
+      <AudioWarningModal
+        isOpen={isShowingWarning}
+        onConfirm={() => {
+          setIsShowingWarning(false);
+          confirmAndPlay();
+        }}
+      />
+      <LastAttemptModal
+        isOpen={isShowingLastAttempt}
+        onConfirm={() => {
+          setIsShowingLastAttempt(false);
+          void playAudio();
+        }}
+      />
     </>
   );
 }

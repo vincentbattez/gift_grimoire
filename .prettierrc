@@ -1,0 +1,19 @@
+{
+  "plugins": [
+    "prettier-plugin-multiline-arrays",
+    "@ianvs/prettier-plugin-sort-imports",
+    "prettier-plugin-tailwindcss"
+  ],
+  "tabWidth": 2,
+  "printWidth": 120,
+  "semi": true,
+  "trailingComma": "all",
+  "importOrder": [
+    "^react(.*)$",
+    "<THIRD_PARTY_MODULES>",
+    "^@(?:features|components)?/",
+    "^[./]"
+  ],
+  "importOrderSeparation": true,
+  "importOrderSortSpecifiers": true
+}

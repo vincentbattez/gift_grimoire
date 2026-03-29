@@ -3,15 +3,19 @@ import { env } from "./env";
 export async function getEntityState(entityId: string): Promise<string | null> {
   try {
     const { HA_URL, HA_TOKEN } = env;
-    const r = await fetch(`${HA_URL}/api/states/${entityId}`, {
+    const response = await fetch(`${HA_URL}/api/states/${entityId}`, {
       headers: {
         Authorization: `Bearer ${HA_TOKEN}`,
         "Content-Type": "application/json",
       },
     });
-    if (!r.ok) return null;
-    const data = await r.json();
-    return data.state as string;
+
+    if (!response.ok) {
+      return null;
+    }
+    const data = (await response.json()) as { state: string };
+
+    return data.state;
   } catch {
     return null;
   }
@@ -24,31 +28,42 @@ export function pollEntityState(
   timeoutMs: number,
   intervalMs = 500,
 ): Promise<boolean> {
-  return new Promise((resolve) => {
-    let resolved = false;
-    const done = (result: boolean) => {
-      if (resolved) return;
-      resolved = true;
+  return new Promise<boolean>((resolve) => {
+    let isResolved = false;
+    const done = (result: boolean): void => {
+      if (isResolved) {
+        return;
+      }
+      isResolved = true;
       clearTimeout(timer);
       clearInterval(poller);
       resolve(result);
     };
 
-    const timer = setTimeout(() => done(false), timeoutMs);
+    const timer = setTimeout(() => {
+      done(false);
+    }, timeoutMs);
     const poller = setInterval(async () => {
       const state = await getEntityState(entityId);
-      if (state === targetState) done(true);
+
+      if (state === targetState) {
+        done(true);
+      }
     }, intervalMs);
 
     // Check immediately
-    getEntityState(entityId).then((s) => { if (s === targetState) done(true); });
+    void getEntityState(entityId).then((currentState) => {
+      if (currentState === targetState) {
+        done(true);
+      }
+    });
   });
 }
 
-export async function fireEvent(event: string) {
+export async function fireEvent(event: string): Promise<void> {
   try {
     const { HA_URL, HA_TOKEN } = env;
-    const r = await fetch(`${HA_URL}/api/events/${event}`, {
+    const response = await fetch(`${HA_URL}/api/events/${event}`, {
       method: "POST",
       headers: {
         Authorization: `Bearer ${HA_TOKEN}`,
@@ -56,8 +71,8 @@ export async function fireEvent(event: string) {
       },
       body: JSON.stringify({ source: "grimoire" }),
     });
-    console.log(r.ok ? `HA event: ${event}` : `HA error: ${r.status}`);
-  } catch (err) {
-    console.error("HA error:", err);
+    console.log(response.ok ? `HA event: ${event}` : `HA error: ${String(response.status)}`);
+  } catch (error) {
+    console.error("HA error:", error);
   }
 }

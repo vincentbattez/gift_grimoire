@@ -1,86 +1,106 @@
 import { useEffect, useRef, useState } from "react";
-import { useEnigmaStore } from "../store";
-import { ENIGMAS } from "../config";
-import { sndLoveClose, sndHeartPop } from "../../../audio";
-import { OrnamentDivider } from "../../../components/ui/OrnamentDivider";
-import { CornerOrnaments } from "../../../components/ui/CornerOrnaments";
+import { sndHeartPop, sndLoveClose } from "@/audio";
+import { randomVisual } from "@/utils/random";
+import { CornerOrnaments } from "@components/ui/CornerOrnaments";
+import { OrnamentDivider } from "@components/ui/OrnamentDivider";
+import { ENIGMA_LIST } from "@features/enigma/config";
+import { useEnigmaStore } from "@features/enigma/store";
 
 const CLOSE_MS = 500;
 const BURST_COUNT = 40;
 
-function buildBurst(emojis: string[]) {
-  const items: { emoji: string; left: number; delay: number; size: number; rot: number; pitch: number }[] = [];
+function buildBurst(
+  emojis: string[],
+): { emoji: string; left: number; delay: number; size: number; rot: number; pitch: number }[] {
+  const itemList: { emoji: string; left: number; delay: number; size: number; rot: number; pitch: number }[] = [];
   let cumDelay = 0.15;
   let gap = 0.2;
   for (let i = 0; i < BURST_COUNT; i++) {
-    items.push({
+    itemList.push({
       emoji: emojis[i % emojis.length],
-      left: 10 + Math.random() * 80,
+      left: 10 + randomVisual() * 80,
       delay: cumDelay,
-      size: 1.75 + Math.random() * 0.55,
-      rot: -20 + Math.random() * 40,
-      pitch: -300 + Math.random() * 600,
+      size: 1.75 + randomVisual() * 0.55,
+      rot: -20 + randomVisual() * 40,
+      pitch: -300 + randomVisual() * 600,
     });
     cumDelay += gap;
     gap *= 0.97;
   }
-  return items;
+
+  return itemList;
 }
 
-const GOLD_PARTICLES = Array.from({ length: 20 }, (_, i) => ({
-  left: `${5 + (i % 5) * 22}%`,
-  top: `${5 + Math.floor(i / 5) * 23}%`,
+const GOLD_PARTICLE_LIST = Array.from({ length: 20 }, (_, i) => ({
+  left: `${String(5 + (i % 5) * 22)}%`,
+  top: `${String(Math.floor(i / 5) * 23 + 5)}%`,
   size: 2 + (i % 3) * 1.5,
   delay: i * 0.35,
 }));
 
-export function LoveLetterModal() {
+export function LoveLetterModal(): React.JSX.Element {
   const enigmaId = useEnigmaStore((s) => s.loveLetterEnigmaId);
   const closeLoveLetter = useEnigmaStore((s) => s.closeLoveLetter);
-  const [entered, setEntered] = useState(false);
-  const [closing, setClosing] = useState(false);
-  const [showHearts, setShowHearts] = useState(false);
+  const [hasEntered, setHasEntered] = useState(false);
+  const [isClosing, setIsClosing] = useState(false);
+  const [isShowingHearts, setIsShowingHearts] = useState(false);
   const closingEnigmaRef = useRef<string | null>(null);
   const popTimers = useRef<ReturnType<typeof setTimeout>[]>([]);
-  const burstRef = useRef(buildBurst(["❤️"]));
+  const [burstDataList, setBurstData] = useState(() => buildBurst(["❤️"]));
 
   useEffect(() => {
     if (!enigmaId) {
-      setEntered(false);
-      setShowHearts(false);
+      setHasEntered(false);
+      setIsShowingHearts(false);
+
       return;
     }
     closingEnigmaRef.current = enigmaId;
-    const currentEnigma = ENIGMAS.find((e) => e.id === enigmaId);
-    burstRef.current = buildBurst(currentEnigma?.loveLetter.emojis ?? ["❤️"]);
-    setClosing(false);
-    const raf = requestAnimationFrame(() => setEntered(true));
+    const currentEnigma = ENIGMA_LIST.find((e) => e.id === enigmaId);
+    const newBurstList = buildBurst(currentEnigma?.loveLetter.emojis ?? ["❤️"]);
+    setBurstData(newBurstList);
+    setIsClosing(false);
+    const raf = requestAnimationFrame(() => {
+      setHasEntered(true);
+    });
 
     // Launch heart burst with staggered pops
-    const showTimer = setTimeout(() => setShowHearts(true), 400);
-    popTimers.current = burstRef.current.map((h) =>
-      setTimeout(() => sndHeartPop(h.pitch), h.delay * 1000 + 400),
+    const showTimer = setTimeout(() => {
+      setIsShowingHearts(true);
+    }, 400);
+
+    popTimers.current = newBurstList.map((h) =>
+      setTimeout(
+        () => {
+          sndHeartPop(h.pitch);
+        },
+        h.delay * 1000 + 400,
+      ),
     );
 
     return () => {
       cancelAnimationFrame(raf);
       clearTimeout(showTimer);
-      popTimers.current.forEach(clearTimeout);
+
+      popTimers.current.forEach((t) => {
+        clearTimeout(t);
+      });
     };
   }, [enigmaId]);
 
   // eslint-disable-next-line react-hooks/refs
-  const displayId = enigmaId ?? (closing ? closingEnigmaRef.current : null);
+  const displayId = enigmaId ?? (isClosing ? closingEnigmaRef.current : null);
   // eslint-disable-next-line react-hooks/refs
-  const enigma = displayId ? ENIGMAS.find((e) => e.id === displayId) : null;
-  const isOpen = !!enigmaId && !closing;
+  const enigma = displayId ? ENIGMA_LIST.find((e) => e.id === displayId) : null;
+  const isOpen = !!enigmaId && !isClosing;
 
-  function handleClose() {
+  function handleClose(): void {
     sndLoveClose();
-    setClosing(true);
-    setEntered(false);
+    setIsClosing(true);
+    setHasEntered(false);
+
     setTimeout(() => {
-      setClosing(false);
+      setIsClosing(false);
       closeLoveLetter();
     }, CLOSE_MS);
   }
@@ -88,71 +108,81 @@ export function LoveLetterModal() {
   return (
     <div
       className={`fixed inset-0 z-[120] flex items-center justify-center p-4 transition-opacity duration-500 ${
-        isOpen ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"
+        isOpen ? "pointer-events-auto opacity-100" : "pointer-events-none opacity-0"
       }`}
       style={{
         background: "radial-gradient(ellipse at 50% 40%, #e8c96a18, #00000090)",
         backdropFilter: "blur(8px)",
         WebkitBackdropFilter: "blur(8px)",
       }}
+      role="presentation"
       onClick={handleClose}
     >
       {/* Heart burst */}
-      {/* eslint-disable-next-line react-hooks/refs */}
-      {showHearts && burstRef.current.map((h, i) => (
-        <div
-          key={i}
-          className="absolute pointer-events-none z-10"
-          style={{
-            left: `${h.left}%`,
-            bottom: "20%",
-            fontSize: `${h.size}rem`,
-            ["--heart-rot" as string]: `${h.rot}deg`,
-            animation: `heart-float-up 3.5s linear ${h.delay}s both`,
-          }}
-        >
-          {h.emoji}
-        </div>
-      ))}
+      {}
+      {isShowingHearts &&
+        burstDataList.map((h, i) => (
+          <div
+            key={i}
+            className="pointer-events-none absolute z-10"
+            style={{
+              left: `${String(h.left)}%`,
+              bottom: "20%",
+              fontSize: `${String(h.size)}rem`,
+              ["--heart-rot" as string]: `${String(h.rot)}deg`,
+              animation: `heart-float-up 3.5s linear ${String(h.delay)}s both`,
+            }}
+          >
+            {h.emoji}
+          </div>
+        ))}
 
       {enigma && (
         <div
-          className={`relative max-w-[380px] w-full rounded-[22px] overflow-hidden transition-all duration-700 ${
-            entered ? "opacity-100 scale-100 translate-y-0" : "opacity-0 scale-[0.82] translate-y-5"
+          className={`relative w-full max-w-[380px] overflow-hidden rounded-[22px] transition-all duration-700 ${
+            hasEntered ? "translate-y-0 scale-100 opacity-100" : "translate-y-5 scale-[0.82] opacity-0"
           }`}
           style={{
             background: "linear-gradient(165deg, #fdf8ec, #f5e6c8, #ede0c0)",
             border: "1.5px solid #d4a94280",
-            boxShadow:
-              "0 0 30px #e8c96a50, 0 0 80px #e8c96a30, 0 0 160px #e8c96a18, inset 0 1px 0 #ffffff60",
+            boxShadow: "0 0 30px #e8c96a50, 0 0 80px #e8c96a30, 0 0 160px #e8c96a18, inset 0 1px 0 #ffffff60",
             animation: "love-glow-shine 4s ease-in-out infinite",
             transitionTimingFunction: "cubic-bezier(.22,1,.36,1)",
           }}
-          onClick={(e) => e.stopPropagation()}
+          role="presentation"
+          onClick={(e) => {
+            e.stopPropagation();
+          }}
         >
-          {/* Gold particles background */}
-          {GOLD_PARTICLES.map((p, i) => (
+          {/* Gold particleList background */}
+          {GOLD_PARTICLE_LIST.map((p, i) => (
             <div
               key={i}
-              className="absolute rounded-full pointer-events-none"
+              className="pointer-events-none absolute rounded-full"
               style={{
                 left: p.left,
                 top: p.top,
                 width: p.size,
                 height: p.size,
                 background: "radial-gradient(circle, #e8c96a, #c9a032)",
-                animation: `love-particle-float 3.2s ease-in-out ${p.delay}s infinite`,
+                animation: `love-particle-float 3.2s ease-in-out ${String(p.delay)}s infinite`,
               }}
             />
           ))}
 
           {/* Corner decorations */}
-          <CornerOrnaments color="border-[#c9a03260]" size="w-3 h-3" offset="10px" opacity="opacity-60" corners={["tl", "bl", "br"]} />
+          <CornerOrnaments
+            color="border-[#c9a03260]"
+            size="w-3 h-3"
+            offset="10px"
+            opacity="opacity-60"
+            cornerList={["tl", "bl", "br"]}
+          />
 
           {/* Close button */}
           <button
             onClick={handleClose}
-            className="absolute top-3 right-3 w-[28px] h-[28px] rounded-full flex items-center justify-center cursor-pointer text-[0.75rem] z-20 border border-[#c9a03230] bg-[#f5e6c8] text-[#8a7040] hover:bg-[#ede0c0] transition-colors"
+            className="absolute top-3 right-3 z-20 flex h-[28px] w-[28px] cursor-pointer items-center justify-center rounded-full border border-[#c9a03230] bg-[#f5e6c8] text-[0.75rem] text-[#8a7040] transition-colors hover:bg-[#ede0c0]"
           >
             ✕
           </button>
@@ -160,7 +190,7 @@ export function LoveLetterModal() {
           <div className="relative z-10 px-7 pt-8 pb-9">
             {/* Character icon */}
             <div
-              className="text-[2.8rem] text-center mb-2 leading-none"
+              className="mb-2 text-center text-[2.8rem] leading-none"
               style={{
                 filter: "drop-shadow(0 0 12px #c9a03240)",
               }}
@@ -170,7 +200,7 @@ export function LoveLetterModal() {
 
             {/* Title */}
             <h2
-              className="text-center text-[1rem] font-semibold mb-1 tracking-[0.06em]"
+              className="mb-1 text-center text-[1rem] font-semibold tracking-[0.06em]"
               style={{
                 fontFamily: "var(--font-cinzel-decorative)",
                 color: "#8a6a20",
@@ -180,10 +210,7 @@ export function LoveLetterModal() {
               Une lettre pour toi
             </h2>
 
-            <p
-              className="text-center text-[0.68rem] tracking-[0.15em] uppercase mb-5"
-              style={{ color: "#a08a50" }}
-            >
+            <p className="mb-5 text-center text-[0.68rem] tracking-[0.15em] uppercase" style={{ color: "#a08a50" }}>
               {enigma.title}
             </p>
 
@@ -192,7 +219,7 @@ export function LoveLetterModal() {
 
             {/* Message */}
             <div
-              className="text-[0.84rem] leading-[1.75] text-center whitespace-pre-line mb-6"
+              className="mb-6 text-center text-[0.84rem] leading-[1.75] whitespace-pre-line"
               style={{
                 fontFamily: "var(--font-cinzel)",
                 color: "#4a3a20",
@@ -206,7 +233,7 @@ export function LoveLetterModal() {
 
             {/* Signature */}
             <p
-              className="text-center text-[0.76rem] italic tracking-wide"
+              className="text-center text-[0.76rem] tracking-wide italic"
               style={{
                 fontFamily: "var(--font-cinzel)",
                 color: "#8a6a20",
@@ -214,10 +241,7 @@ export function LoveLetterModal() {
             >
               — {enigma.loveLetter.signature} —
             </p>
-            <p
-              className="text-center text-[0.65rem] mt-2 tracking-[0.12em]"
-              style={{ color: "#b09a60" }}
-            >
+            <p className="mt-2 text-center text-[0.65rem] tracking-[0.12em]" style={{ color: "#b09a60" }}>
               Avec tout mon amour ♡
             </p>
           </div>

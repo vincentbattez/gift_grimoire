@@ -1,26 +1,24 @@
-import { INK_CONFIG } from "../config";
+import { INK_CONFIG } from "@features/forges/forge-ink/config";
 
-interface InkDropIndicatorProps {
+type InkDropIndicatorProps = {
   dropsLeft: number;
-}
+};
 
-export function InkDropIndicator({ dropsLeft }: InkDropIndicatorProps) {
+export function InkDropIndicator({ dropsLeft }: Readonly<InkDropIndicatorProps>): React.JSX.Element {
   return (
     <>
-      <div className="text-center text-[0.4rem] tracking-[0.2em] text-muted/30 uppercase mb-2">
-        Gouttes restantes
-      </div>
-      <div className="flex justify-center gap-3 mb-5">
+      <div className="text-muted/30 mb-2 text-center text-[0.4rem] tracking-[0.2em] uppercase">Gouttes restantes</div>
+      <div className="mb-5 flex justify-center gap-3">
         {Array.from({ length: INK_CONFIG.maxDrops }, (_, i) => (
           <div
             key={i}
-            className={`relative overflow-hidden transition-all duration-500 ${
-              i < dropsLeft
-                ? dropsLeft === 1
-                  ? "ink-drop-last"
-                  : "ink-drop-active"
-                : ""
-            }`}
+            className={`relative overflow-hidden transition-all duration-500 ${(() => {
+              if (i >= dropsLeft) {
+                return "";
+              }
+
+              return dropsLeft === 1 ? "ink-drop-last" : "ink-drop-active";
+            })()}`}
             style={{
               width: 16,
               height: 23,

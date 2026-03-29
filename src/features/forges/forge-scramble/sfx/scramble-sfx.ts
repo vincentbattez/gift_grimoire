@@ -1,8 +1,8 @@
-import { getCtx, tone } from "../../../../audio";
+import { getAudioContext, tone } from "@/audio";
 
 /** Modern fluid swap — letter slides into place */
-export const sndLetterSwap = () => {
-  const c = getCtx();
+export const sndLetterSwap = (): void => {
+  const c = getAudioContext();
   const t = c.currentTime;
 
   // Main body — pitch arc up then resolves down ("spring into place")

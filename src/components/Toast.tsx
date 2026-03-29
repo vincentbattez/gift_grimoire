@@ -1,22 +1,25 @@
 import { useEffect } from "react";
-import { useUIStore } from "../store";
+import { useUIStore } from "@/store";
 
-export function Toast() {
+export function Toast(): React.JSX.Element {
   const message = useUIStore((s) => s.toastMessage);
   const hideToast = useUIStore((s) => s.hideToast);
 
   useEffect(() => {
-    if (!message) return;
+    if (!message) {
+      return;
+    }
     const t = setTimeout(hideToast, 3200);
-    return () => clearTimeout(t);
+
+    return () => {
+      clearTimeout(t);
+    };
   }, [message, hideToast]);
 
   return (
     <div
-      className={`fixed top-5 left-1/2 z-200 rounded-2xl py-2.5 px-5 text-[0.78rem] text-text text-center whitespace-nowrap max-w-[90vw] transition-all duration-400 ${
-        message
-          ? "-translate-x-1/2 translate-y-0 opacity-100"
-          : "-translate-x-1/2 -translate-y-[90px] opacity-0"
+      className={`text-text fixed top-5 left-1/2 z-200 max-w-[90vw] rounded-2xl px-5 py-2.5 text-center text-[0.78rem] whitespace-nowrap transition-all duration-400 ${
+        message ? "-translate-x-1/2 translate-y-0 opacity-100" : "-translate-x-1/2 -translate-y-[90px] opacity-0"
       }`}
       style={{
         background: "linear-gradient(135deg, #2a1a4a, #1a1030)",

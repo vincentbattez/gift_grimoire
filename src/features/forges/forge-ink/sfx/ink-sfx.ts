@@ -1,8 +1,8 @@
-import { getCtx, tone } from "../../../../audio";
+import { getAudioContext, tone } from "@/audio";
 
 /** Ink drop falling — water plip. ratio 0→1 : encrier vide→plein */
-export const sndInkDrop = (ratio = 1) => {
-  const c = getCtx();
+export const sndInkDrop = (ratio = 1): void => {
+  const c = getAudioContext();
   const t = c.currentTime;
 
   const startFreq = 600 + ratio * 500;
@@ -26,8 +26,8 @@ export const sndInkDrop = (ratio = 1) => {
 };
 
 /** Crystalline hit — letter revealed */
-export const sndInkHit = () => {
-  const c = getCtx();
+export const sndInkHit = (): void => {
+  const c = getAudioContext();
   const t = c.currentTime;
 
   [1047, 1319, 1568].forEach((f, i) => {
@@ -48,8 +48,8 @@ export const sndInkHit = () => {
 };
 
 /** Dull thud — miss */
-export const sndInkMiss = () => {
-  const c = getCtx();
+export const sndInkMiss = (): void => {
+  const c = getAudioContext();
   const t = c.currentTime;
 
   const o = c.createOscillator();
@@ -68,7 +68,7 @@ export const sndInkMiss = () => {
 };
 
 /** Dull thud + warm tinkle — miss adjacent */
-export const sndInkMissAdjacent = () => {
+export const sndInkMissAdjacent = (): void => {
   sndInkMiss();
   // Warm tinkle overlay
   tone(1200, "triangle", 0.04, 0.5, 0.06);
@@ -76,25 +76,26 @@ export const sndInkMissAdjacent = () => {
 };
 
 /** Short triumph — word solved */
-export const sndInkWordSolved = () => {
-  [784, 988, 1175, 1568].forEach((f, i) =>
-    tone(f, "sine", 0.12, 0.5, i * 0.07),
-  );
-  [988, 1175].forEach((f, i) =>
-    tone(f, "triangle", 0.07, 1.0, 0.3 + i * 0.03),
-  );
+export const sndInkWordSolved = (): void => {
+  [784, 988, 1175, 1568].forEach((f, i) => {
+    tone(f, "sine", 0.12, 0.5, i * 0.07);
+  });
+
+  [988, 1175].forEach((f, i) => {
+    tone(f, "triangle", 0.07, 1, 0.3 + i * 0.03);
+  });
 };
 
 /** Brief dissonant tone — wrong word guess */
-export const sndInkGuessError = () => {
+export const sndInkGuessError = (): void => {
   tone(220, "triangle", 0.06, 0.2);
   tone(233, "triangle", 0.05, 0.18, 0.01);
 };
 
 /** Crystalline ping — one per letter during word reveal cascade */
-export const sndInkLetterReveal = (index: number) => {
-  const scale = [587, 659, 784, 880, 988, 1175, 1319, 1568, 1760];
-  const freq = scale[index % scale.length];
+export const sndInkLetterReveal = (index: number): void => {
+  const scaleList = [587, 659, 784, 880, 988, 1175, 1319, 1568, 1760];
+  const freq = scaleList[index % scaleList.length];
   tone(freq, "sine", 0.07, 0.32);
   tone(freq * 2, "triangle", 0.025, 0.22, 0.01);
 };
