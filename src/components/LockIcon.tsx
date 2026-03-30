@@ -22,7 +22,6 @@ type LockIconProps = {
   };
 };
 
-/* eslint-disable @typescript-eslint/no-useless-default-assignment -- defaults required for optional props */
 export function LockIcon({
   id = "lock",
   width = 36,
@@ -33,7 +32,6 @@ export function LockIcon({
   keyholeRef,
   unlock,
 }: LockIconProps): React.JSX.Element {
-  /* eslint-enable @typescript-eslint/no-useless-default-assignment */
   const isUnlocking = unlock?.phase === "unlocking";
   const isDone = unlock?.phase === "done";
   const proximity = unlock?.proximity ?? 0;

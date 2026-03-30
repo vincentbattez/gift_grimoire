@@ -62,7 +62,6 @@ export const useEnigmaStore = create<EnigmaStore>()(
       loveLetterEnigmaId: null,
 
       unlock: (id) =>
-        // eslint-disable-next-line sonarjs/function-return-type -- returns full state or partial update
         set((s) => {
           if (s.enigmas[id].unlocked || s.enigmas[id].solved) {
             return s;
@@ -93,7 +92,6 @@ export const useEnigmaStore = create<EnigmaStore>()(
         }),
 
       setEnigmaStatus: (id, status) =>
-        // eslint-disable-next-line sonarjs/function-return-type -- switch returns different partial states
         set((s) => {
           switch (status) {
             case "locked": {

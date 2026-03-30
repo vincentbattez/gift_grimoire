@@ -19,11 +19,21 @@ Every identifier must be **self-documenting** — no abbreviations, no single-le
 
 All variables, parameters, function names, type properties, and constants across the entire codebase.
 
+## Used tools
+- Issue tracker: Linear
+- Git hosting: GitHub
+- Package manager: Bun
+- Build tool: Vite
+- State management: Zustand
+- Styling: Tailwind CSS
+- Language: TypeScript
+- Framework: React
+
 ## Commands
 
-- Package manager: `yarn` (not npm/pnpm)
-- Build includes typecheck: `yarn build` runs `tsc -b && vite build`
-- No test framework — no tests exist
+- Package manager: `bun` (not yarn/npm/pnpm)
+- Build includes typecheck: `bun run build` runs `tsc -b && vite build`
+- Tests: `bun run test` / `bun run test:coverage`
 
 ## Landmines
 

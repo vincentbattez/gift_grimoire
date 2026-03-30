@@ -24,26 +24,27 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version-file: "package.json"
-          cache: yarn
 
-      - run: yarn install --frozen-lockfile
+      - uses: oven-sh/setup-bun@v2
+
+      - run: bun install --frozen-lockfile
 
       - name: Lint
-        run: yarn lint --max-warnings 0
+        run: bun run lint --max-warnings 0
 
       - name: Type-check
-        run: npx tsc -b --noEmit
+        run: bunx tsc -b --noEmit
 
       - name: Build
-        run: yarn build
+        run: bun run build
 
       - name: Dead code
-        run: yarn knip
+        run: bun run knip
 
       - name: Commitlint (PR)
         if: github.event_name == 'pull_request'
         run: |
-          npx commitlint --from ${{ github.event.pull_request.base.sha }} --to ${{ github.event.pull_request.head.sha }}
+          bunx commitlint --from ${{ github.event.pull_request.base.sha }} --to ${{ github.event.pull_request.head.sha }}
 
   release:
     name: Release
@@ -65,11 +66,12 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version-file: "package.json"
-          cache: yarn
 
-      - run: yarn install --frozen-lockfile
+      - uses: oven-sh/setup-bun@v2
+
+      - run: bun install --frozen-lockfile
 
       - name: Semantic Release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: npx semantic-release
+        run: bunx semantic-release

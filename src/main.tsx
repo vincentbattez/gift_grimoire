@@ -12,7 +12,6 @@ const Root = location.pathname === "/tresor" ? ChasseTresor : App;
 const rootEl = document.querySelector("#root");
 
 if (!rootEl) {
-  // eslint-disable-next-line @typescript-eslint/only-throw-error -- Error object is thrown
   throw new Error("Root element #root not found");
 }
 

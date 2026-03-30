@@ -35,7 +35,7 @@ function computeWordPattern(wordText: string, revealedCellList: Set<string>): st
   const word = INK_CONFIG.wordList.find((w) => w.text === wordText);
 
   if (!word) {
-    throw new Error(`Unknown word: ${wordText}`); // eslint-disable-line @typescript-eslint/only-throw-error -- Error object is thrown
+    throw new Error(`Unknown word: ${wordText}`);
   }
 
   return Array.from(word.text, (letter, i) => {
@@ -52,7 +52,7 @@ function getActiveWordTexts(revealedCellList: Set<string>): string[] {
     .map((w) => w.text);
 }
 
-const normalize = (s: string): string => s.normalize("NFD").replaceAll(/[\u0300-\u036F]/g, ""); // eslint-disable-line sonarjs/null-dereference -- s is typed string
+const normalize = (s: string): string => s.normalize("NFD").replaceAll(/[\u0300-\u036F]/g, "");
 
 function todayStamp(): string {
   const d = new Date();
@@ -361,7 +361,7 @@ export function useInkGameEngine(
   // ── Word guess handler ──
   const handleWordGuess = useCallback(
     (wordText: string, guess: string): "correct" | "wrong" | "ignored" => {
-      const val = normalize(guess.trim().toUpperCase()); // eslint-disable-line sonarjs/null-dereference -- guess is typed string
+      const val = normalize(guess.trim().toUpperCase());
       const state = wordStates[wordText];
 
       if (!val || state.guessesLeft === 0 || state.solved) {
