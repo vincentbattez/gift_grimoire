@@ -19,7 +19,6 @@ export function CornerOrnaments({
 
   return (
     <>
-      {}
       {cornerList.includes("tl") && (
         <div className={`${base} border-t border-l`} style={{ top: offset, left: offset }} />
       )}
@@ -32,7 +31,6 @@ export function CornerOrnaments({
       {cornerList.includes("br") && (
         <div className={`${base} border-r border-b`} style={{ bottom: offset, right: offset }} />
       )}
-      {}
     </>
   );
 }
