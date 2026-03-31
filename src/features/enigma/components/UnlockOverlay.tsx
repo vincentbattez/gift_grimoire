@@ -13,7 +13,6 @@ const FRAG_DISTANCE_LIST = Array.from({ length: 8 }, () => 80 + randomVisual() *
 
 type Phase = "drag" | "unlocking" | "done";
 
-// eslint-disable-next-line sonarjs/function-return-type -- React component with conditional rendering
 export function UnlockOverlay(): React.JSX.Element | null {
   const unlockingId = useEnigmaStore((s) => s.unlockingCardId);
   const unlockingTitle = useEnigmaStore((s) => s.unlockingTitle);
@@ -65,7 +64,6 @@ export function UnlockOverlay(): React.JSX.Element | null {
     };
   }, [unlockingId]);
 
-  // eslint-disable-next-line sonarjs/function-return-type -- returns null when refs not ready
   const getKeyholeCenter = useCallback((): { x: number; y: number } | null => {
     if (!keyholeRef.current || !lockSvgRef.current) {
       return null;

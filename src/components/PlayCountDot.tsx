@@ -11,7 +11,6 @@ type Props = {
   solved?: boolean;
 };
 
-/* eslint-disable @typescript-eslint/no-useless-default-assignment -- defaults required for optional props */
 export function PlayCountDot({
   total,
   remaining,
@@ -20,7 +19,6 @@ export function PlayCountDot({
   solvedClass = "bg-success/50",
   solved = false,
 }: Readonly<Props>): React.JSX.Element {
-  /* eslint-enable @typescript-eslint/no-useless-default-assignment */
   const getDotClass = (i: number): string => {
     if (solved) {
       return solvedClass;
