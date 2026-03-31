@@ -1,4 +1,14 @@
-# AGENTS.md
+# CLAUDE.md
+
+## Used tools
+- Issue tracker: Linear
+- Git hosting: GitHub
+- Package manager: Yarn
+- Build tool: Vite
+- State management: Zustand
+- Styling: Tailwind CSS
+- Language: TypeScript
+- Framework: React
 
 ## Naming conventions
 
@@ -18,16 +28,6 @@ Every identifier must be **self-documenting** — no abbreviations, no single-le
 ### Applies to
 
 All variables, parameters, function names, type properties, and constants across the entire codebase.
-
-## Used tools
-- Issue tracker: Linear
-- Git hosting: GitHub
-- Package manager: Bun
-- Build tool: Vite
-- State management: Zustand
-- Styling: Tailwind CSS
-- Language: TypeScript
-- Framework: React
 
 ## Commands
 
