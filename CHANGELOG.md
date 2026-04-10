@@ -1,3 +1,10 @@
+# [1.1.0](https://github.com/vincentbattez/gift_grimoire/compare/v1.0.0...v1.1.0) (2026-04-10)
+
+
+### Features
+
+* **docker:** add Docker and docker-compose setup (VIN-47) ([#10](https://github.com/vincentbattez/gift_grimoire/issues/10)) ([3ffc1c7](https://github.com/vincentbattez/gift_grimoire/commit/3ffc1c7408acd4ecd82ffac5b42b5ef59c32b841))
+
 # 1.0.0 (2026-03-29)
 
 
