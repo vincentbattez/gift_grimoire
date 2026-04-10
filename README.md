@@ -68,8 +68,8 @@ React 19 · TypeScript · Zustand · Tailwind CSS 4 · Vite 8 · Zod · Home Ass
 
 ```bash
 cp .env.example .env  # configurer VITE_HA_URL et VITE_HA_TOKEN
-npm install
-npm run dev
+bun install
+bun run dev
 ```
 
 ## Docker

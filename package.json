@@ -57,6 +57,9 @@
     "vite": "^8.0.0",
     "vitest": "^4.1.2"
   },
+  "knip": {
+    "ignore": [".claude/**"]
+  },
   "packageManager": "bun@1.2.12",
   "engines": {
     "node": ">=25.6.0"
