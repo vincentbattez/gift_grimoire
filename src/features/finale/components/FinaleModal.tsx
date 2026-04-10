@@ -221,7 +221,7 @@ function TypewriterLine({
   onDone?: () => void;
 }>): React.JSX.Element {
   const [visibleWords, setVisibleWords] = useState(0);
-  // eslint-disable-next-line sonarjs/null-dereference -- typed parameter
+
   const wordList = text.split(" ");
 
   useEffect(() => {
@@ -569,7 +569,7 @@ const NARRATIVE_TEXT_LIST = [
  * Narrative pre-celebration: cards flip to reveal runes,
  * forges glow, everything converges to center, then fireworks begin.
  */
-// eslint-disable-next-line sonarjs/function-return-type -- React component with conditional rendering
+
 function NarrativeSequence(): React.JSX.Element | null {
   const isFinaleNarrative = useFinaleStore((s) => s.finaleNarrative);
   const startFinale = useFinaleStore((s) => s.startFinale);

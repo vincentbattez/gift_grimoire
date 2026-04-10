@@ -56,7 +56,6 @@ const COLOR_MAP: Record<
   },
 };
 
-/* eslint-disable @typescript-eslint/no-useless-default-assignment -- defaults required for optional props */
 export function Button({
   variant = "primary",
   color = "accent",
@@ -64,7 +63,6 @@ export function Button({
   className = "",
   ...props
 }: ButtonProps): React.JSX.Element {
-  /* eslint-enable @typescript-eslint/no-useless-default-assignment */
   if (variant === "admin") {
     const colorStyles = COLOR_MAP[color];
 

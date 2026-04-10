@@ -14,10 +14,10 @@ pre-commit:
       stage_fixed: true
 
     - name: build
-      run: yarn build
+      run: bun run build
 
     - name: knip
-      run: yarn knip
+      run: bun run knip
 
 commit-msg:
   jobs:

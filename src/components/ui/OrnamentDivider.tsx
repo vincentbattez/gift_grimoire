@@ -4,13 +4,11 @@ type OrnamentDividerProps = {
   lineWidth?: "flex" | "fixed";
 };
 
-/* eslint-disable @typescript-eslint/no-useless-default-assignment -- defaults required for optional props */
 export function OrnamentDivider({
   color = "#c9a032",
   className = "",
   lineWidth = "flex",
 }: Readonly<OrnamentDividerProps>): React.JSX.Element {
-  /* eslint-enable @typescript-eslint/no-useless-default-assignment */
   const lineClass = lineWidth === "flex" ? "flex-1" : "w-10";
   const fadeColor = `${color}40`;
 

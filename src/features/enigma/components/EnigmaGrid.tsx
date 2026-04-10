@@ -11,7 +11,6 @@ function SectionLabel({ children }: Readonly<{ children: React.ReactNode }>): Re
   return <div className="text-muted my-4 text-center text-[0.6rem] tracking-[0.35em] uppercase">{children}</div>;
 }
 
-// eslint-disable-next-line sonarjs/function-return-type -- React component with conditional rendering
 function FinaleButton(): React.JSX.Element | null {
   const enigmas = useEnigmaStore((s) => s.enigmas);
   const startNarrative = useFinaleStore((s) => s.startNarrative);

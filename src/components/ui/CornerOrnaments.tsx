@@ -7,7 +7,6 @@ type CornerOrnamentsProps = {
   cornerList?: ("tl" | "tr" | "bl" | "br")[];
 };
 
-/* eslint-disable @typescript-eslint/no-useless-default-assignment -- defaults required for optional props */
 export function CornerOrnaments({
   color = "border-accent",
   size = "w-2 h-2",
@@ -16,12 +15,10 @@ export function CornerOrnaments({
   className = "",
   cornerList = ["tl", "tr", "bl", "br"],
 }: Readonly<CornerOrnamentsProps>): React.JSX.Element {
-  /* eslint-enable @typescript-eslint/no-useless-default-assignment */
   const base = `absolute ${size} ${opacity} ${color} ${className}`;
 
   return (
     <>
-      {/* eslint-disable sonarjs/argument-type -- dynamic class string is valid */}
       {cornerList.includes("tl") && (
         <div className={`${base} border-t border-l`} style={{ top: offset, left: offset }} />
       )}
@@ -34,7 +31,6 @@ export function CornerOrnaments({
       {cornerList.includes("br") && (
         <div className={`${base} border-r border-b`} style={{ bottom: offset, right: offset }} />
       )}
-      {/* eslint-enable sonarjs/argument-type */}
     </>
   );
 }
